@@ -19,10 +19,12 @@ $route['group_menu'] = 'user/user/groupMenu';
 $route['group_menu'] = 'user/user/groupMenu';
 
 
-/*   api execute */
-$route['WS'] = "wsengine/api_execute/wscontroller";
-$route['WS/(:any)'] = "wsengine/api_execute/wscontroller/$1";
-$route['WS/(:any)/(:any)'] = "wsengine/api_execute/wscontroller/$1/$2";
+// /*   api execute */
+// $route['WS'] = "wsengine/api_execute/wscontroller";
+// $route['WS/(:any)'] = "wsengine/api_execute/wscontroller/$1";
+// $route['WS/(:any)/(:any)'] = "wsengine/api_execute/wscontroller/$1/$2";
+// $route['WS/(:any)/(:any)/(:any)/(:any)'] = "wsengine/api_execute/wscontroller/$1/$2";
+$route['WS/(.*)'] = "wsengine/api_execute/wscontroller/$1";
 
 $GLOBALS = false;
 if (($this->uri->segments[1] == "WS" )) {

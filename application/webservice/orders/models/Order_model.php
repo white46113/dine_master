@@ -41,7 +41,7 @@ class Order_model extends CI_Model
     public function get($id)
     {
         
-        $order = $this->db->get_where($this->orders, ['id' => $id])->row();
+        $order = $this->db->get_where($this->orders, ['order_id' => $id])->row();
         if (!$order)
             return null;
         $items = $this->db->get_where($this->order_items, ['order_id' => $id])->result();
