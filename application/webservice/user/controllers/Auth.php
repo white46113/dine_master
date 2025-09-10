@@ -5,6 +5,7 @@ class Auth extends My_Api_Controller
     {
         parent::__construct();
         $this->load->model('user_login_model');
+      
     }
     public function register_post()
     {
@@ -17,9 +18,10 @@ class Auth extends My_Api_Controller
             return $this->response(['status' => false, 'errors' => $this->form_validation->error_array()], REST_Controller::HTTP_BAD_REQUEST);
         }
 
-        $data = ['name' => $input['name'], 'email' => $input['email'], 'phone' => $input['phone'] ?? null, 'password' => $input['password'], 'role' => $input['role'] ?? 'customer', 'is_active' => 1, 'added_by' => $input['added_by'] ?? null];
+        $data = ['name' => $input['name'], 'email' => $input['email'], 'phone' => $input['phone'] ?? null, 'user_password' => $input['password'], 'user_role' => $input['role'] ?? 'customer','added_by' => $input['added_by'] ?? null];
         $id = $this->user_login_model->register($data);
-        return $this->response(['success' => true,'message' => 'Login successful','data' => ['status' => true, 'user_id' => $id]], REST_Controller::HTTP_CREATED);
+        return $response = $this->response(['success' => true,'message' => 'Login successful','data' => ['status' => true, 'user_id' => $id]], REST_Controller::HTTP_CREATED);
+         
     }
     public function index_post()
     {
@@ -28,11 +30,12 @@ class Auth extends My_Api_Controller
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
         $this->form_validation->set_rules('password', 'Password', 'required');
         if ($this->form_validation->run() === false) {
+            
             return $this->response(['status' => false, 'errors' => $this->form_validation->error_array()], REST_Controller::HTTP_BAD_REQUEST);
         }
-
+        
         $user = $this->user_login_model->get_by_email($input['email']);
-        if (!$user || !$this->verify_password($input['password'], $user->password_hash)) {
+        if (!$user || !$this->verify_password($input['password'], $user->user_password)) {
 
             return $this->response(['status' => false, 'message' => 'Invalid credentials'], REST_Controller::HTTP_UNAUTHORIZED);
         }

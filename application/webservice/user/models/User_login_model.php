@@ -15,7 +15,7 @@ class User_login_model extends CI_Model{
     public function register($data) {
         $data['added_date'] = date('Y-m-d H:i:s');
         if (isset($data['password'])) {
-            $data['password_hash'] = password_hash($data['password'], PASSWORD_BCRYPT);
+            $data['user_password'] = password_hash($data['password'], PASSWORD_BCRYPT);
             unset($data['password']);
         }
         $this->db->insert($this->table, $data);
@@ -23,7 +23,7 @@ class User_login_model extends CI_Model{
     }
 
     public function get_by_email($email) {
-        return $this->db->get_where($this->table, ['email'=>$email, 'is_active'=>1])->row();
+        return $this->db->get_where($this->table, ['user_email'=>$email, 'status'=>"Active"])->row();
     }
 
     public function get_by_id($id) {
@@ -32,7 +32,7 @@ class User_login_model extends CI_Model{
 
     public function update_user($id, $data) {
         if (isset($data['password'])) {
-            $data['password_hash'] = password_hash($data['password'], PASSWORD_BCRYPT);
+            $data['user_password'] = password_hash($data['password'], PASSWORD_BCRYPT);
             unset($data['password']);
         }
         $this->db->where('user_id', $id)->update($this->table, $data);

@@ -32,7 +32,7 @@ class User_login extends My_Api_Controller{
                 ], REST_Controller::HTTP_NOT_FOUND);
             }
 
-            unset($u->password_hash);
+            unset($u->user_password);
             return $this->response(['success' => true, 'message' => 'register succesfullly' ,'status' => true, 'data' => $u], REST_Controller::HTTP_OK);
         }
         if ($this->authenticate() !== true) return;
@@ -46,7 +46,7 @@ class User_login extends My_Api_Controller{
 
         $users = $this->db->get('users')->result();
         foreach ($users as &$u) {
-            unset($u->password_hash);
+            unset($u->user_password);
         }
 
         return $this->response(['success' => true, 'message' => 'register succesfullly','status' => true, 'data' => $users], REST_Controller::HTTP_OK);
