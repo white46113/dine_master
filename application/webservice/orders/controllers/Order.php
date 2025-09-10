@@ -22,6 +22,7 @@ class Order extends My_Api_Controller
     }
     public function index($id = null)
     {   
+        
         if ($this->authenticate() !== true)
             return;
         if ($id) {
