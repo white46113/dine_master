@@ -50,7 +50,6 @@ class Auth extends My_Api_Controller
     public function logout()
     {
         if ($this->authenticate() !== true) {
-            
             return;
         }
 
