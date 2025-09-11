@@ -22,6 +22,9 @@ class api_execute extends MX_Controller {
 
 	    parent::__construct();
 	    //load database
+// 		ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 	  }
 	public function wscontroller()
@@ -34,6 +37,7 @@ class api_execute extends MX_Controller {
 	// Collect extra segments as parameters
 		$extra_params = array_slice($this->uri->segments, 4);
 		
+		
 		if(array_key_exists($api_method_name, $all_methods)){
 			require APPPATH.'libraries/REST_Controller.php';
 			
@@ -42,12 +46,10 @@ class api_execute extends MX_Controller {
 			/* create api path */
 			
 			$api_path = $method_details['folder']."/controllers/".ucfirst($api_method_name);
-			// $this->load->module('user/user_login');
-			$this->load->module($method_details['folder'] . "/" . $api_method_name);
-
-			// Now you can access the module instance through $this
-			$className = ucfirst($api_method_name); 
-	        $api_instant = new $className(); 
+			$this->load->module($method_details['folder'] . "/" . $api_method_name);;
+				// Now you can access the module instance through $this
+			// $className = ucfirst($api_method_name); 
+	        // $api_instant = new $className(); 
             
 			// Dynamically call API function if provided, else call method based on HTTP verb
 			$request_method = $this->input->server('REQUEST_METHOD');

@@ -32,22 +32,12 @@ $config["order"] = array(
         
     )
 );
-$config["playlist_list"] = array(
-    "title" => "Play List",
-    "folder" => "api",
+$config["menu_items"] = array(
+    "title" => "Menu",
+    "folder" => "menu",
     "method" => "GET_POST",
     "params" => array(
-        "email",
-        "password"
-    )
-);
-$config["song_list"] = array(
-    "title" => "Song List",
-    "folder" => "api",
-    "method" => "GET_POST",
-    "params" => array(
-        "email",
-        "password"
+        
     )
 );
 
