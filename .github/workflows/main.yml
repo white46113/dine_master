@@ -3,7 +3,7 @@ name: Deploy to Hostinger FTP
 on:
   push:
     branches:
-      - main   # or master
+      - main
 
 jobs:
   ftp-deploy:
@@ -19,25 +19,23 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/dine_master/   # change to your directory
-          local-dir: ./   # upload everything from repo root
+          server-dir: /public_html/dine_master/
+          local-dir: ./
           exclude: |
             **/.git/**
             **/.git*
             **/.github/**
 
-      - name: Send Discord notification (success)
+      - name: Telegram notification (success)
         if: success()
         run: |
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{\"content\": \"✅ Deployment to Hostinger completed successfully!\"}" \
-          ${{ secrets.DISCORD_WEBHOOK }}
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TG_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TG_CHAT_ID }} \
+          -d text="✅ Deployment to Hostinger completed successfully on branch ${{ github.ref }} by ${{ github.actor }}."
 
-      - name: Send Discord notification (failure)
+      - name: Telegram notification (failure)
         if: failure()
         run: |
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{\"content\": \"❌ Deployment to Hostinger FAILED! Check GitHub Actions logs.\"}" \
-          ${{ secrets.DISCORD_WEBHOOK }}
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TG_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TG_CHAT_ID }} \
+          -d text="❌ Deployment FAILED! Check GitHub Actions logs. Branch: ${{ github.ref }} by ${{ github.actor }}."
