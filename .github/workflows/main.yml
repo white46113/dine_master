@@ -25,3 +25,18 @@ jobs:
             **/.git/**
             **/.git*
             **/.github/**
+          - name: Send Discord notification (success)
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\": \"✅ Deployment to Hostinger completed successfully!\"}" \
+          ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Send Discord notification (failure)
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\": \"❌ Deployment to Hostinger FAILED! Check GitHub Actions logs.\"}" \
+          ${{ secrets.DISCORD_WEBHOOK }}

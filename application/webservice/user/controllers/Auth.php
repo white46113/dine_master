@@ -45,7 +45,7 @@ class Auth extends My_Api_Controller
         $token = $this->jwt_encode($payload);
         
         $this->user_login_model->set_token($user->user_id, $token);
-        return $this->response(['success' => true,'message' => 'Login successful', 'data' => ['id' => $user->user_id,'token' => $token, 'name' => $user->username, 'email' => $user->email]], REST_Controller::HTTP_OK);
+        return $this->response(['success' => true,'message' => 'Login successful', 'data' => ['id' => $user->user_id,'token' => $token, 'name' => $user->user_name, 'email' => $user->user_email]], REST_Controller::HTTP_OK);
     }
     public function logout()
     {
