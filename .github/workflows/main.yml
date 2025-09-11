@@ -22,5 +22,6 @@ jobs:
           server-dir: /public_html/dine_master/   # change to your directory
           local-dir: ./   # upload everything from repo root
           exclude: |
+            **/.git/**
             **/.git*
             **/.github/**

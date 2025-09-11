@@ -40,6 +40,14 @@ $config["menu_items"] = array(
         
     )
 );
+$config['categories'] = array(
+    "title" => "Categories",
+    "folder" => "menu",
+    "method" => "GET_POST",
+    "params" => array(
+        
+    )
+);
 
 
 #####GENERATED_CONFIG_SETTINGS_END#####

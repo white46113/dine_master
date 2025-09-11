@@ -37,16 +37,17 @@ class api_execute extends MX_Controller {
 	// Collect extra segments as parameters
 		$extra_params = array_slice($this->uri->segments, 4);
 		
-		
 		if(array_key_exists($api_method_name, $all_methods)){
 			require APPPATH.'libraries/REST_Controller.php';
+			
 			
 			/* get api method details */
 			$method_details = $all_methods[$api_method_name];
 			/* create api path */
 			
+			
 			$api_path = $method_details['folder']."/controllers/".ucfirst($api_method_name);
-			$this->load->module($method_details['folder'] . "/" . $api_method_name);;
+			$this->load->module($method_details['folder'] . "/" . $api_method_name);
 				// Now you can access the module instance through $this
 			// $className = ucfirst($api_method_name); 
 	        // $api_instant = new $className(); 
@@ -73,8 +74,7 @@ class api_execute extends MX_Controller {
 					'PATCH' => 'index_patch'
 				];
 				$method_to_call = $method_map[$request_method] ?? null;
-				// pr($method_to_call);
-				// pr($api_method_name,1);
+				
 				if ($method_to_call && method_exists($this->$api_method_name, $method_to_call)) {
 					call_user_func_array([$this->$api_method_name, $method_to_call], $call_params);
 				} else {
