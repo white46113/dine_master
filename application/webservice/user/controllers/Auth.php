@@ -23,7 +23,7 @@ class Auth extends My_Api_Controller
         return $response = $this->response(['success' => true,'message' => 'Login successful','data' => ['status' => true, 'user_id' => $id]], REST_Controller::HTTP_CREATED);
          
     }
-    public function index_post()
+    public function login()
     {
         $input = $this->post();
         $this->form_validation->set_data($input);
@@ -47,7 +47,7 @@ class Auth extends My_Api_Controller
         $this->user_login_model->set_token($user->user_id, $token);
         return $this->response(['success' => true,'message' => 'Login successful', 'data' => ['id' => $user->user_id,'token' => $token, 'name' => $user->username, 'email' => $user->email]], REST_Controller::HTTP_OK);
     }
-    public function logout_post()
+    public function logout()
     {
         if ($this->authenticate() !== true) {
             return;

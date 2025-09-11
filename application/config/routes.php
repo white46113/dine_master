@@ -26,7 +26,7 @@ $route['group_menu'] = 'user/user/groupMenu';
 // $route['WS/(:any)/(:any)/(:any)/(:any)'] = "wsengine/api_execute/wscontroller/$1/$2";
 $route['WS/(.*)'] = "wsengine/api_execute/wscontroller/$1";
 
-$GLOBALS = false;
+$GLOBALS['is_ws'] = false;
 if (($this->uri->segments[1] == "WS" )) {
-	$GLOBALS = true;
+$GLOBALS['is_ws'] = true;
 }

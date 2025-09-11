@@ -22,9 +22,9 @@ class api_execute extends MX_Controller {
 
 	    parent::__construct();
 	    //load database
-// 		ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+		//ini_set('display_errors', 1);
+		// ini_set('display_startup_errors', 1);
+		// error_reporting(E_ALL);
 
 	  }
 	public function wscontroller()
@@ -92,7 +92,7 @@ class api_execute extends MX_Controller {
 			}
 
 		}else{
-          
+
 			require_once(APPPATH.'controllers/Api_response.php');
 			$api_instant = new Api_response(); 
 			$return_arr = array(

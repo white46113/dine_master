@@ -44,6 +44,18 @@ class User_login_model extends CI_Model{
       return $this->db->where('user_id',$id)->update($this->table, ['api_token'=>$token, 'token_issued_at'=>date('Y-m-d H:i:s')]);;
     }
 
+    public function update_password_by_email($email, $new_password) {
+    $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+
+    $this->db->where('user_email', $email)
+             ->where('status', 'Active'); // only update active users
+
+    return $this->db->update($this->table, [
+        'user_password' => $hashed_password,
+        'updated_date'  => date('Y-m-d H:i:s')
+    ]);
+}
+
 }
 
  ?>

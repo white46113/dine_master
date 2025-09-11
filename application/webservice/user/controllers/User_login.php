@@ -118,6 +118,46 @@ class User_login extends My_Api_Controller{
         ], REST_Controller::HTTP_OK);
     }
 
+    public function forgot_password_post()
+{
+    $email = $this->post('email');
+    $new_password = $this->post('password');
+
+    if (empty($email) || empty($new_password)) {
+        return $this->response([
+            'status' => false,
+            'message' => 'Email and new password are required.'
+        ], REST_Controller::HTTP_BAD_REQUEST);
+    }
+
+    // Get user
+    $user = $this->user_login_model->get_by_email($email);
+
+    if (!$user) {
+        return $this->response([
+            'status' => false,
+            'message' => 'Email not found.'
+        ], REST_Controller::HTTP_NOT_FOUND);
+    }
+
+    // Update password
+    $updated = $this->user_login_model->update_password_by_email($email, $new_password);
+
+    if ($updated) {
+        return $this->response([
+            'status' => true,
+            'message' => 'Password updated successfully.'
+        ], REST_Controller::HTTP_OK);
+    } else {
+        return $this->response([
+            'status' => false,
+            'message' => 'Failed to update password.'
+        ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+
 }
 
 ?>
