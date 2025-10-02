@@ -30,9 +30,10 @@ class Order extends My_Api_Controller
            
             if (!$o)
                 return $this->response(['success' => false, 'status' => false, 'message' => 'Not found'], REST_Controller::HTTP_NOT_FOUND);
-            if ($o->added_by != $this->current_user->user_id)
-                return $this->response(['success' => false,'status' => false, 'message' => 'Forbidden'], REST_Controller::HTTP_FORBIDDEN);
+            // if ($o->added_by != $this->current_user->user_id)
+                // return $this->response(['success' => false,'status' => false, 'message' => 'Forbidden'], REST_Controller::HTTP_FORBIDDEN);
             return $this->response(['success' => true,'status' => true, 'data' => $o], REST_Controller::HTTP_OK);
+
         }
         $filters = [];
         // if ($this->current_user->role === 'customer')

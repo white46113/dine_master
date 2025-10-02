@@ -34,19 +34,20 @@ class api_execute extends MX_Controller {
 		$all_methods = $this->config->item('api_config');
 		$api_method_name = $this->uri->segments[2];
 		$api_func = $this->uri->segments[3];
+		
 	// Collect extra segments as parameters
 		$extra_params = array_slice($this->uri->segments, 4);
 		
 		if(array_key_exists($api_method_name, $all_methods)){
 			require APPPATH.'libraries/REST_Controller.php';
-			
-			
+		
 			/* get api method details */
 			$method_details = $all_methods[$api_method_name];
 			/* create api path */
 			
 			
 			$api_path = $method_details['folder']."/controllers/".ucfirst($api_method_name);
+			
 			$this->load->module($method_details['folder'] . "/" . $api_method_name);
 				// Now you can access the module instance through $this
 			// $className = ucfirst($api_method_name); 
@@ -63,6 +64,7 @@ class api_execute extends MX_Controller {
 			}
 			if ($api_func && method_exists($this->$api_method_name, $api_func)) {
 				// Pass all collected parameters to the API function
+				
 				call_user_func_array([$this->$api_method_name, $api_func], $call_params);
 			} else {
 				// Map HTTP verbs to method names
@@ -76,6 +78,7 @@ class api_execute extends MX_Controller {
 				$method_to_call = $method_map[$request_method] ?? null;
 				
 				if ($method_to_call && method_exists($this->$api_method_name, $method_to_call)) {
+					
 					call_user_func_array([$this->$api_method_name, $method_to_call], $call_params);
 				} else {
 					// Fallback: method not found

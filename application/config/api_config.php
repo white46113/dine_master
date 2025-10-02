@@ -25,7 +25,7 @@ $config["auth"] = array(
 );
 
 $config["order"] = array(
-    "title" => "Oder",
+    "title" => "Order",
     "folder" => "orders",
     "method" => "GET_POST",
     "params" => array(

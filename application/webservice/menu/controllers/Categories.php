@@ -3,16 +3,17 @@ class Categories extends My_Api_Controller
 {
     public function __construct()
     {
+
         parent::__construct();
         $this->load->model('category_model', 'category');
     }
-    public function index_get()
+    public function index($rid = 0)
     {
-        $rid = $this->get('restaurant_id');
+        
         if (!$rid)
-            return $this->response(['status' => false, 'message' => 'restaurant_id required'], REST_Controller::HTTP_BAD_REQUEST);
+            return $this->response(['success' => false,'status' => false, 'message' => 'restaurant_id required'], REST_Controller::HTTP_BAD_REQUEST);
         $data = $this->category->list_by_restaurant($rid);
-        return $this->response(['status' => true, 'data' => $data], REST_Controller::HTTP_OK);
+        return $this->response(['success' => true,'message' => 'catagories found successfully.','status' => true, 'data' => $data], REST_Controller::HTTP_OK);
     }
     public function index_post()
     {

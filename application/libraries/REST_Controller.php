@@ -760,6 +760,8 @@ abstract class REST_Controller extends \MX_Controller {
      */
     public function response($data = NULL, $http_code = NULL)
     {
+     
+        
 		ob_start();
         // If the HTTP status is not NULL, then cast as an integer
         if ($http_code !== NULL)
@@ -781,6 +783,7 @@ abstract class REST_Controller extends \MX_Controller {
         elseif ($data !== NULL)
         {
             $data = $this->prepair_response($data);
+            
             // If the format method exists, call and return the output in that format
             if (method_exists($this->format, 'to_' . $this->response->format))
             {
@@ -792,7 +795,7 @@ abstract class REST_Controller extends \MX_Controller {
                 // Json is the most appropriate form for such a data type
                 if ($this->response->format === 'array')
                 {
-                    $output = $this->format->factory($output)->{'to_json'}();
+                    $output = $this->format->factory($output)->{'to_jsson'}();
                 }
             }
             else
