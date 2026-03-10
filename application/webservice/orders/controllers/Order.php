@@ -26,6 +26,12 @@ class Order extends My_Api_Controller
         if ($this->authenticate() !== true)
             return;
 
+        if (is_array($id) && isset($id['id'])) {
+            $id = $id['id'];
+        } elseif (is_array($id)) {
+            $id = null;
+        }
+
         if (!$id) {
             $id = $this->get('id');
         }
@@ -37,7 +43,8 @@ class Order extends My_Api_Controller
                 return $this->response(['success' => false, 'status' => false, 'message' => 'Not found'], REST_Controller::HTTP_NOT_FOUND);
             // if ($o->added_by != $this->current_user->user_id)
                 // return $this->response(['success' => false,'status' => false, 'message' => 'Forbidden'], REST_Controller::HTTP_FORBIDDEN);
-            return $this->response(['success' => true,'status' => true, 'data' => $o], REST_Controller::HTTP_OK);
+            return $this->response(['success' => true,'status' => true, 'message' => 'Order details fetched successfully', 'data' => $o], REST_Controller::HTTP_OK);
+
 
         }
         $filters = [];
@@ -49,6 +56,8 @@ class Order extends My_Api_Controller
         return $this->response(['success' => true,'status' => true, 'data' => $list], REST_Controller::HTTP_OK);
     }
 
-
-   
+    public function index_get($id = null)
+    {
+        return $this->index($id);
+    }
 }
