@@ -25,6 +25,11 @@ class Order extends My_Api_Controller
         
         if ($this->authenticate() !== true)
             return;
+
+        if (!$id) {
+            $id = $this->get('id');
+        }
+
         if ($id) {
             $o = $this->order_model->get($id);
            
