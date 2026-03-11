@@ -82,33 +82,30 @@ class api_execute extends MX_Controller {
 					call_user_func_array([$this->$api_method_name, $method_to_call], $call_params);
 				} else {
 					// Fallback: method not found
-					require_once(APPPATH.'controllers/Api_response.php');
-					$api_instant = new Api_response();
-					$return_arr = [
-						"success" => 0,
-						"message" => "API method not found.",
-						"data" => []
-					];
-					$server_error = REST_Controller::HTTP_NOT_FOUND;
-					$api_instant->response_return($return_arr, $server_error);
+					$this->output
+						->set_content_type('application/json')
+						->set_status_header(REST_Controller::HTTP_NOT_FOUND)
+						->set_output(json_encode([
+							'settings' => [
+								"success" => false,
+								"message" => "API method not found.",
+							],
+							"data" => []
+						]));
 				}
 			}
 
 		}else{
-
-			require_once(APPPATH.'controllers/Api_response.php');
-			$api_instant = new Api_response(); 
-			$return_arr = array(
-		        "success" => 0,
-		        "message" => "API code does not exist.",
-		    );
-		    $return_arr = array(
-		        "success" => 0,
-		        "message" => "API code does not exist.",
-		        "data" => []
-		    );
-		    $server_error = REST_Controller::HTTP_OK;
-		    $api_instant->response_return($return_arr,$server_error);
+			$this->output
+				->set_content_type('application/json')
+				->set_status_header(REST_Controller::HTTP_NOT_FOUND)
+				->set_output(json_encode([
+					'settings' => [
+						"success" => false,
+						"message" => "API code does not exist.",
+					],
+					"data" => []
+				]));
 		}
 		
 		

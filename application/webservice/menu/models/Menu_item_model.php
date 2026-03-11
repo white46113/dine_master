@@ -2,16 +2,29 @@
 class Menu_item_model extends CI_Model
 {
     private $table = 'menu_items';
-    public function list_by_category($cid)
+    public function list_by_category($restaurant_id, $category_id = 0, $veg_type = null)
     {
-        if($cid > 0){   
-            return $this->db->get_where($this->table, ['category_id' => $cid, 'is_active' => 1])->result();
-        }else{
-            return $this->db->get_where($this->table, ['is_active' => 1])->result();
+        $this->db->where('restaurant_id', $restaurant_id);
+        $this->db->where('is_active', 1);
+
+        if ($category_id > 0) {
+            $this->db->where('category_id', $category_id);
         }
-            
-        
+
+        if (!empty($veg_type)) {
+            $this->db->where('veg_type', $veg_type);
+        }
+
+        return $this->db->get($this->table)->result();
     }
+
+    public function get_item_details($item_id)
+    {
+        $this->db->where('item_id', $item_id);
+        $this->db->where('is_active', 1);
+        return $this->db->get($this->table)->row();
+    }
+
     public function insert($data)
     {
         $this->db->insert($this->table, $data);

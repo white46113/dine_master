@@ -9,14 +9,70 @@ class Menu_items extends My_Api_Controller
     }
     public function get_menu($params = array())
     {
-        $cid = $this->get('id') > 0 ? $this->get('id') : 0;
+        $restaurant_id = $this->get('restaurant_id') ? $this->get('restaurant_id') : $this->post('restaurant_id');
+        $category_id = $this->get('category_id') ? $this->get('category_id') : ($this->post('category_id') ? $this->post('category_id') : 0);
+        $veg_type = $this->get('veg_type') ? $this->get('veg_type') : ($this->post('veg_type') ? $this->post('veg_type') : null);
 
-        $data = $this->item->list_by_category($cid);
-        if ($data) {
-            return $this->response(['success' => true, 'message' => 'Menus found sucessfully.', 'status' => true, 'data' => $data], REST_Controller::HTTP_OK);
+        if (empty($restaurant_id)) {
+            return $this->response([
+                'success' => false,
+                'status' => false, 
+                'message' => 'The restaurant_id field is required.',
+                'data' => []
+            ], REST_Controller::HTTP_BAD_REQUEST);
         }
-        return $this->response(['success' => false, 'status' => false, 'message' => 'No data Found'], REST_Controller::HTTP_BAD_REQUEST);
+
+        $data = $this->item->list_by_category($restaurant_id, $category_id, $veg_type);
+        
+        if ($data) {
+            return $this->response([
+                'success' => true, 
+                'status' => true,
+                'message' => 'Menus found successfully.', 
+                'data' => $data
+            ], REST_Controller::HTTP_OK);
+        }
+
+        return $this->response([
+            'success' => false, 
+            'status' => false, 
+            'message' => 'No data found',
+            'data' => []
+        ], REST_Controller::HTTP_OK);
     }
+
+    public function get_item_details()
+    {
+        $item_id = $this->get('item_id') ? $this->get('item_id') : $this->post('item_id');
+
+        if (empty($item_id)) {
+            return $this->response([
+                'success' => false,
+                'status' => false, 
+                'message' => 'The item_id field is required.',
+                'data' => []
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+        $data = $this->item->get_item_details($item_id);
+        
+        if ($data) {
+            return $this->response([
+                'success' => true, 
+                'status' => true,
+                'message' => 'Item details found successfully.', 
+                'data' => $data
+            ], REST_Controller::HTTP_OK);
+        }
+
+        return $this->response([
+            'success' => false, 
+            'status' => false, 
+            'message' => 'Item not found.',
+            'data' => []
+        ], REST_Controller::HTTP_NOT_FOUND);
+    }
+
     public function index_post()
     {
         if ($this->authenticate() !== true) {

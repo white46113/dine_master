@@ -31,7 +31,7 @@ $config = [
         [
             'field' => 'email',
             'label' => 'Email',
-            'rules' => 'required|valid_email|is_unique[users.email]'
+            'rules' => 'required|valid_email|is_unique[users.user_email]'
         ],
         [
             'field' => 'password',

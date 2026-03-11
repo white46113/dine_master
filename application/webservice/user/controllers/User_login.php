@@ -8,48 +8,32 @@ class User_login extends My_Api_Controller{
          $this->load->model('user_login_model');
     }
 
-    public function index_get()
+    public function get_user_details()
     {
-      
-        if ($this->get('id')) {
-          
-            if ($this->authenticate() !== true) return;
-
-            $id = $this->get('id');
-
-            if ($this->current_user->id != $id ) {
-                return $this->response([
-                    'status' => false,
-                    'message' => 'Forbidden'
-                ], REST_Controller::HTTP_FORBIDDEN);
-            }
-
-            $u = $this->user_login_model->get_by_id($id);
-            if (!$u) {
-                return $this->response([
-                    'status' => false,
-                    'message' => 'Not found'
-                ], REST_Controller::HTTP_NOT_FOUND);
-            }
-
-            unset($u->user_password);
-            return $this->response(['success' => true, 'message' => 'register succesfullly' ,'status' => true, 'data' => $u], REST_Controller::HTTP_OK);
-        }
         if ($this->authenticate() !== true) return;
-        
-        // if ($this->current_user->role !== 'admin') {
-        //     return $this->response([
-        //         'status' => false,
-        //         'message' => 'Forbidden'
-        //     ], REST_Controller::HTTP_FORBIDDEN);
-        // }
 
-        $users = $this->db->get('users')->result();
-        foreach ($users as &$u) {
-            unset($u->user_password);
+        // If 'id' is provided, fetch that user. Otherwise, fetch the currently logged-in user.
+        $id = $this->get('id') ? $this->get('id') : ($this->post('id') ? $this->post('id') : $this->current_user->user_id);
+
+        $u = $this->user_login_model->get_by_id($id);
+        
+        if (!$u) {
+            return $this->response([
+                'success' => false,
+                'status' => false,
+                'message' => 'User not found',
+                'data' => []
+            ], REST_Controller::HTTP_NOT_FOUND);
         }
 
-        return $this->response(['success' => true, 'message' => 'register succesfullly','status' => true, 'data' => $users], REST_Controller::HTTP_OK);
+        unset($u->user_password);
+        
+        return $this->response([
+            'success' => true,
+            'status' => true, 
+            'message' => 'User details fetched successfully',
+            'data' => $u
+        ], REST_Controller::HTTP_OK);
     }
 
     public function index_post()
@@ -118,15 +102,17 @@ class User_login extends My_Api_Controller{
         ], REST_Controller::HTTP_OK);
     }
 
-    public function forgot_password_post()
+    public function forgot_password()
 {
     $email = $this->post('email');
     $new_password = $this->post('password');
 
     if (empty($email) || empty($new_password)) {
         return $this->response([
+            'success' => false,
             'status' => false,
-            'message' => 'Email and new password are required.'
+            'message' => 'Email and new password are required.',
+            'data' => []
         ], REST_Controller::HTTP_BAD_REQUEST);
     }
 
@@ -135,8 +121,10 @@ class User_login extends My_Api_Controller{
 
     if (!$user) {
         return $this->response([
+            'success' => false,
             'status' => false,
-            'message' => 'Email not found.'
+            'message' => 'Email not found.',
+            'data' => []
         ], REST_Controller::HTTP_NOT_FOUND);
     }
 
@@ -145,13 +133,17 @@ class User_login extends My_Api_Controller{
 
     if ($updated) {
         return $this->response([
+            'success' => true,
             'status' => true,
-            'message' => 'Password updated successfully.'
+            'message' => 'Password updated successfully.',
+            'data' => []
         ], REST_Controller::HTTP_OK);
     } else {
         return $this->response([
+            'success' => false,
             'status' => false,
-            'message' => 'Failed to update password.'
+            'message' => 'Failed to update password.',
+            'data' => []
         ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
