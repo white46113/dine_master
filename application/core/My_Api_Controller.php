@@ -108,6 +108,25 @@ class My_Api_Controller extends REST_Controller
         return password_verify($password, $hash);
     }
 
+    public function param($key)
+    {
+        // Try GET
+        $val = $this->get($key);
+        if ($val !== NULL) return $val;
+
+        // Try POST (parsed by REST_Controller for POST/PUT/etc)
+        $val = $this->post($key);
+        if ($val !== NULL) return $val;
+
+        // Try manual parse of raw input (for GET with body)
+        $raw = json_decode($this->input->raw_input_stream, true);
+        if (is_array($raw) && isset($raw[$key])) {
+            return $raw[$key];
+        }
+
+        return NULL;
+    }
+
     protected function validate($group)
 {
     // run validation rules defined in config/form_validation.php

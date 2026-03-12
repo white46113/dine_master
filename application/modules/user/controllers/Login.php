@@ -6,6 +6,7 @@ class Login extends MY_Controller {
         $this->load->model('Login_model');
     }
 	public function index() {
+    	header('X-Debug-Target: Login_Controller_Index');
 		$data['base_url'] = base_url();
 		$this->smarty->loadView('login.tpl',$data,'No','No');
 	}
@@ -21,59 +22,75 @@ class Login extends MY_Controller {
 	public function signin()
 	{
 		$login_attempt_count = $this->config->item("login_attempt");
-		// pr($_POST,1);
-		// $data['userInfo'] = $this->Crud->read_data("userInfo");
+		$login_attempt_count = !empty($login_attempt_count) ? $login_attempt_count : 5; 
+
 		$this->form_validation->set_rules('email', ' Email', 'trim|required|min_length[3]');
 		$this->form_validation->set_rules('password', ' Password', 'trim|required|min_length[3]');
 
-		$email = $this->input->post('email');
-		$password = $this->input->post('password');
-		$result = $this->Login_model->get_user_details($email, $password);	
+		$email = trim($this->input->post('email'));
+		$password = trim($this->input->post('password'));
 		
 		$redirect_url = "";
-		if (empty($result)) {
-			$result = $this->Login_model->get_user_exist($email);
-			$success = 0;
-			if($result['login_attempt'] > $login_attempt_count){
-				$messages = "User temporary block!";
-				$update_data = array(
-	                'status' => "Block",
-	            );
-			}else{
-				$login_attempt = $result['login_attempt']+1;
-				$update_data = array(
-	                'login_attempt' => $login_attempt,
-	            );
-				$messages = "Invalid credentials!";
-			}
-			$result = $this->Login_model->updateUserData($update_data, $result['id']);			
-		} else {
-			$this->session->unset_userdata($user_data);
-			$user_data = array(
-				'user_id' => $result['id'],
-				'user_email' => $result['user_email'],
-				'user_login' => true,
-				'user_name' => $result['user_name'],
-				'type' => $result['type'],
-				'role' => $result['user_role'],
-				'groups' => $result['groups']
-			);
-			$this->session->set_userdata($user_data);
+		$success = 0;
+		$messages = "";
 
-			$group_rights = $this->Login_model->getGroupRightData($result['groups'],"");
-			$this->session->set_userdata('group_rights_arr', base64_encode(json_encode($group_rights)));
-			if(checkGroupAccess("sitemap","list","No")){
-					$redirect_url = "sitemap";
-			}else{
-					$redirect_url = "sitemap";
+		$user = $this->Login_model->get_user_exist($email);	
+		
+		if ($user) {
+			if ($user['status'] == 'Block') {
+				$messages = "User temporary block!";
+			} else if (password_verify($password, $user['user_password'])) {
+				// Success
+				$user_data = array(
+					'user_id' => $user['user_id'],
+					'user_email' => $user['user_email'],
+					'user_login' => true,
+					'user_name' => $user['user_name'],
+					'type' => isset($user['type']) ? $user['type'] : '',
+					'role' => $user['user_role'],
+					'groups' => $user['groups']
+				);
+				$this->session->set_userdata($user_data);
+
+				$group_rights = $this->Login_model->getGroupRightData($user['groups'],"");
+				$this->session->set_userdata('group_rights_arr', base64_encode(json_encode($group_rights)));
+				
+				// Reset login attempts on success
+				$this->Login_model->updateUserData(['login_attempt' => 0], $user['user_id']);
+
+				$redirect_url = "sitemap";
+				$success = 1;
+				$messages = "User Login successfully";
+			} else {
+				// Password incorrect
+				$login_attempt = $user['login_attempt'] + 1;
+				if($login_attempt >= $login_attempt_count){
+					$messages = "User temporary block!";
+					$update_data = array(
+						'status' => "Block",
+						'login_attempt' => $login_attempt
+					);
+				} else {
+					$messages = "Invalid credentials!";
+					$update_data = array(
+						'login_attempt' => $login_attempt,
+					);
+				}
+				$this->Login_model->updateUserData($update_data, $user['user_id']);
 			}
-			$success = 1;
-			$messages = "User Login successfully";
-			
+		} else {
+			// User not found
+			$messages = "Invalid credentials! (DEBUG_VERIFY: NOT FOUND)";
+			$return_arr['debug'] = "User Not Found for email: " . $email;
 		}
 		$return_arr['redirect_url']= $redirect_url;
 		$return_arr['success']=$success;
 		$return_arr['messages']=$messages;
+		if (isset($user) && $user) {
+			$return_arr['debug'] = "User Found. ID: " . $user['user_id'] . ". Hash starts with: " . substr($user['user_password'], 0, 7);
+		}
+        $return_arr['DEBUG_ID'] = "UNIQUE_ID_REPLY_12345";
+        header('X-Debug-Target: Login_Controller_Signin');
 		echo json_encode($return_arr);
 		exit;
 	}
@@ -83,7 +100,7 @@ class Login extends MY_Controller {
 		if(is_valid_array($result)){
 	        $success = 1;
 			$messages = "Password sent successfully";
-			$user_id = $result['id'];
+			$user_id = $result['user_id'];
 			$email_data = [
 				"time_stramp" => time(),
 				"user_id" => $user_id,

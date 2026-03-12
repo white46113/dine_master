@@ -149,6 +149,31 @@ class User_login extends My_Api_Controller{
 }
 
 
+    public function get_restaurant_details()
+    {
+        if ($this->authenticate() !== true) return;
+
+        // If 'id' is provided, fetch for that user. Otherwise, fetch for the currently logged-in user.
+        $id = $this->get('id') ? $this->get('id') : ($this->post('id') ? $this->post('id') : $this->current_user->user_id);
+
+        $restaurant = $this->user_login_model->get_restaurant_by_user_id($id);
+        
+        if (!$restaurant) {
+            return $this->response([
+                'success' => false,
+                'status' => false,
+                'message' => 'Restaurant not found for the given user',
+                'data' => []
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+        
+        return $this->response([
+            'success' => true,
+            'status' => true, 
+            'message' => 'Restaurant details fetched successfully',
+            'data' => $restaurant
+        ], REST_Controller::HTTP_OK);
+    }
 
 }
 

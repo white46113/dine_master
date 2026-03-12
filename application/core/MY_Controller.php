@@ -9,13 +9,21 @@ class MY_Controller extends MX_Controller
     $routes = $this->router->routes;
     $current_route = $this->uri->segment(1);
     $controller_route = $this->uri->rsegments[1];
-    $route_string = explode ('/',$routes[$current_route]);
-    $current_folder = $route_string[0];
+    $current_module = $this->router->fetch_module();
+    if (!empty($current_module)) {
+        $current_folder = $current_module;
+    } else {
+        $route_string = explode('/', $routes[$current_route]);
+        $current_folder = isset($route_string[0]) ? $route_string[0] : '';
+    }
     $this->current_folder = $current_folder;
-    $this->checkEntryAuth($current_folder,$controller_route,$current_route);
+    $this->checkEntryAuth($current_folder, $controller_route, $current_route);
     $this->setConfigSetting();
     // setting smarty template.
-    $this->smarty->setTemplateDir(APPPATH.'modules/'.$current_folder.'/views/');
+    $this->smarty->setTemplateDir(array(
+        APPPATH.'modules/'.$current_folder.'/views/',
+        APPPATH.'views/'
+    ));
     
   }
   public function checkEntryAuth($current_folder='',$controller_route='',$current_route=''){
@@ -26,6 +34,11 @@ class MY_Controller extends MX_Controller
             'user' => array(
                 'login' => array(
                     'login','forgot_password'
+                )
+            ),
+            'admin_auth' => array(
+                'admin_auth' => array(
+                    'login'
                 )
             )
       );

@@ -56,6 +56,15 @@ class User_login_model extends CI_Model{
     ]);
 }
 
+    public function get_restaurant_by_user_id($user_id) {
+        $this->db->select('r.*');
+        $this->db->from('restaurants r');
+        $this->db->join('users u', 'u.restaurant_id = r.restaurant_id');
+        $this->db->where('u.user_id', $user_id);
+        $this->db->where('r.is_active', 1);
+        return $this->db->get()->row();
+    }
+
 }
 
  ?>

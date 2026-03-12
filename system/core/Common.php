@@ -165,6 +165,17 @@ if ( ! function_exists('load_class'))
 
 				break;
 			}
+            elseif (file_exists($path.$directory.'/'.$class.'/'.$class.'.php'))
+            {
+                $name = 'CI_'.$class;
+
+                if (class_exists($name, FALSE) === FALSE)
+                {
+                    require_once($path.$directory.'/'.$class.'/'.$class.'.php');
+                }
+
+                break;
+            }
 		}
 
 		// Is the request a class extension? If so we load it too
