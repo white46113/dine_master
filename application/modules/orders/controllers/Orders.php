@@ -7,14 +7,334 @@ class Orders extends Admin_Controller
     {
         parent::__construct();
         $this->load->model('Order_management_model');
+        $this->load->model('menu/Menu_model');
     }
 
     /**
-     * List all orders
+     * Table Selection Grid (Primary flow)
      */
     public function index()
     {
-        $data['title'] = 'Order Management | Dine Master Admin';
+        $data['title'] = 'Table Selection | Dine Master';
+        $data['page_title'] = 'Select Table';
+        
+        $floors = $this->Order_management_model->get_floors();
+        $tables = $this->Order_management_model->get_tables();
+        
+        $data['floor_tables'] = [];
+        $unique_floors = [];
+        $stats = [
+            'total' => count($tables),
+            'free' => 0,
+            'occupied' => 0,
+            'reserved' => 0
+        ];
+
+        foreach ($floors as $floor) {
+            $unique_floors[$floor['floor_id']] = $floor;
+        }
+        
+        foreach ($tables as $table) {
+            $data['floor_tables'][$table['floor_id']][] = $table;
+            
+            // Calculate Stats
+            if ($table['status'] == 'FREE') $stats['free']++;
+            elseif ($table['status'] == 'OCCUPIED') $stats['occupied']++;
+            elseif ($table['status'] == 'RESERVED') $stats['reserved']++;
+        }
+        
+        $data['floors'] = $unique_floors;
+        $data['stats'] = $stats;
+        $this->render('tables.tpl', $data);
+    }
+
+    /**
+     * Start a new order from a table
+     */
+    public function create()
+    {
+        $table_id = $this->input->get('table_id');
+        if (!$table_id) {
+            redirect('admin/orders');
+        }
+
+        // 1. Create New Order
+        $order_number = 'ORD' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $order_data = [
+            'order_number'  => $order_number,
+            'restaurant_id' => 1, // Defaulting to 1 for now, should be session based
+            'table_id'      => $table_id,
+            'status'        => 'RUNNING',
+            'order_type'    => 'DINE_IN',
+            'waiter_id'     => $this->session->userdata('admin_user_id'),
+            'placed_at'     => date('Y-m-d H:i:s'),
+            'added_by'      => $this->session->userdata('admin_user_id')
+        ];
+
+        $this->db->insert('orders', $order_data);
+        $order_id = $this->db->insert_id();
+
+        // 2. Update Table Status
+        $this->db->where('table_id', $table_id);
+        $this->db->update('dining_tables', [
+            'status'           => 'OCCUPIED',
+            'current_order_id' => $order_id
+        ]);
+
+        redirect('admin/orders/manage/' . $order_id);
+    }
+
+    /**
+     * POS Style Order Management View
+     */
+    public function manage($order_id)
+    {
+        $data['order'] = $this->Order_management_model->get_order_by_id($order_id);
+        if (empty($data['order'])) {
+            show_404();
+        }
+
+        $data['title'] = 'Manage Order #' . $data['order']['order_number'] . ' | Dine Master';
+        $data['categories'] = $this->Menu_model->get_categories();
+        $data['items'] = $this->Menu_model->get_all_items();
+        
+        // Fetch existing items already in this order
+        $data['order_items'] = $this->Order_management_model->get_order_items($order_id);
+        
+        $this->render('manage.tpl', $data);
+    }
+
+    /**
+     * AJAX: Send items to kitchen (KOT)
+     */
+    public function send_to_kitchen()
+    {
+        $order_id = $this->input->post('order_id');
+        $items = $this->input->post('items');
+
+        if (!$order_id || empty($items)) {
+            echo json_encode(['success' => false, 'message' => 'No items or order ID provided']);
+            return;
+        }
+
+        $this->db->trans_start();
+
+        // 1. Create KOT Ticket
+        $kot_data = [
+            'order_id'      => $order_id,
+            'status'        => 'QUEUED',
+            'added_by'      => $this->session->userdata('admin_user_id'),
+            'added_date'    => date('Y-m-d H:i:s')
+        ];
+        $this->db->insert('kot_tickets', $kot_data);
+        $kot_id = $this->db->insert_id();
+
+        // 2. Insert Order Items and KOT Items
+        foreach ($items as $item) {
+            $order_item_data = [
+                'order_id'      => $order_id,
+                'item_id'       => $item['item_id'],
+                'item_name'     => $item['name'],
+                'veg_type'      => $item['veg_type'],
+                'unit_price'    => $item['base_price'],
+                'quantity'      => $item['qty'],
+                'notes'         => $item['note'],
+                'status'        => 'PENDING',
+                'line_subtotal' => $item['base_price'] * $item['qty'],
+                'line_total'    => $item['base_price'] * $item['qty'], // Simplified for now
+                'added_by'      => $this->session->userdata('admin_user_id')
+            ];
+            $this->db->insert('order_items', $order_item_data);
+            $order_item_id = $this->db->insert_id();
+
+            // Insert into KOT items
+            $this->db->insert('kot_items', [
+                'kot_id'         => $kot_id,
+                'order_item_id'  => $order_item_id,
+                'quantity'       => $item['qty'],
+                'added_by'       => $this->session->userdata('admin_user_id')
+            ]);
+        }
+
+        // 3. Update Order Subtotal
+        $this->db->select_sum('line_total');
+        $this->db->where('order_id', $order_id);
+        $subtotal = $this->db->get('order_items')->row()->line_total;
+
+        $this->db->where('order_id', $order_id);
+        $this->db->update('orders', [
+            'subtotal_amount' => $subtotal,
+            'total_payable'   => $subtotal // Simplified, tax will be on billing
+        ]);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        } else {
+            echo json_encode(['success' => true, 'message' => 'KOT generated successfully']);
+        }
+    }
+
+    /**
+     * Bill Generation View
+     */
+    public function bill($order_id)
+    {
+        $data['order'] = $this->Order_management_model->get_order_by_id($order_id);
+        if (empty($data['order'])) {
+            show_404();
+        }
+
+        $data['title'] = 'Generate Bill #' . $data['order']['order_number'] . ' | Dine Master';
+        $data['items'] = $this->Order_management_model->get_order_items($order_id);
+        
+        // Calculations
+        $subtotal = 0;
+        foreach ($data['items'] as $item) {
+            $subtotal += $item['line_total'];
+        }
+        
+        $data['subtotal'] = $subtotal;
+        $data['tax_amount'] = $subtotal * 0.05; // 5% GST
+        $data['total_payable'] = $data['subtotal'] + $data['tax_amount'];
+
+        $this->render('bill.tpl', $data);
+    }
+
+    /**
+     * AJAX: Process Payment and Complete Order
+     */
+    public function process_payment()
+    {
+        $order_id = $this->input->post('order_id');
+        $payment_method = $this->input->post('payment_method');
+        $amount = $this->input->post('amount');
+
+        if (!$order_id || !$payment_method) {
+            echo json_encode(['success' => false, 'message' => 'Invalid data']);
+            return;
+        }
+
+        $this->db->trans_start();
+
+        // 0. Get Order Details (needed for restaurant_id and table reset)
+        $order = $this->Order_management_model->get_order_by_id($order_id);
+        if (!$order) {
+            echo json_encode(['success' => false, 'message' => 'Order not found']);
+            return;
+        }
+
+        // 1. Insert Payment
+        $payment_data = [
+            'order_id'      => $order_id,
+            'restaurant_id' => $order['restaurant_id'], // Get from order instead of session
+            'method'        => $payment_method, // Corrected column name from payment_method to method
+            'amount'        => $amount,
+            'status'        => 'SUCCESS',
+            'added_by'      => $this->session->userdata('admin_user_id'),
+            'paid_at'       => date('Y-m-d H:i:s') // Corrected column name from payment_date to paid_at
+        ];
+        $this->db->insert('payments', $payment_data);
+
+        // 2. Update Order Status
+        $this->db->where('order_id', $order_id);
+        $this->db->update('orders', [
+            'status'         => 'COMPLETED',
+            'payment_status' => 'PAID',
+            'completed_at'   => date('Y-m-d H:i:s')
+        ]);
+
+        // 3. Reset Table Status
+        if ($order && isset($order['table_id'])) {
+            $this->db->where('table_id', $order['table_id']);
+            $this->db->set('status', 'FREE');
+            $this->db->set('current_order_id', NULL);
+            $this->db->update('dining_tables');
+        }
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            echo json_encode(['success' => false, 'message' => 'Database transaction failed']);
+        } else {
+            echo json_encode(['success' => true, 'message' => 'Payment processed successfully']);
+        }
+    }
+
+    /**
+     * AJAX: Cancel Ordered Item
+     */
+    public function cancel_item()
+    {
+        $order_item_id = $this->input->post('order_item_id');
+        if (!$order_item_id) {
+            echo json_encode(['success' => false, 'message' => 'Invalid Request']);
+            return;
+        }
+
+        $this->db->trans_start();
+
+        // 1. Get Order Item Details
+        $this->db->where('order_item_id', $order_item_id);
+        $item = $this->db->get('order_items')->row_array();
+
+        if (!$item) {
+            echo json_encode(['success' => false, 'message' => 'Item not found']);
+            return;
+        }
+
+        // 2. Update status to CANCELLED
+        $this->db->where('order_item_id', $order_item_id);
+        $this->db->update('order_items', ['status' => 'CANCELLED']);
+
+        // 3. Recalculate Order Subtotal (excluding cancelled items)
+        $order_id = $item['order_id'];
+        $this->db->select_sum('line_total');
+        $this->db->where('order_id', $order_id);
+        $this->db->where('status !=', 'CANCELLED');
+        $subtotal = $this->db->get('order_items')->row()->line_total;
+
+        $this->db->where('order_id', $order_id);
+        $this->db->update('orders', [
+            'subtotal_amount' => $subtotal ? $subtotal : 0,
+            'total_payable'   => $subtotal ? $subtotal : 0
+        ]);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        } else {
+            echo json_encode(['success' => true, 'message' => 'Item cancelled successfully']);
+        }
+    }
+
+    /**
+     * AJAX: Release table (Set from CLEANING to FREE)
+     */
+    public function release_table()
+    {
+        $table_id = $this->input->post('table_id');
+        if (!$table_id) {
+            echo json_encode(['success' => false, 'message' => 'Invalid table ID']);
+            return;
+        }
+
+        $this->db->where('table_id', $table_id);
+        if ($this->db->update('dining_tables', ['status' => 'FREE'])) {
+            echo json_encode(['success' => true, 'message' => 'Table is now available']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to release table']);
+        }
+    }
+
+    /**
+     * List all orders (Order History)
+     */
+    public function all()
+    {
+        $data['title'] = 'Order History | Dine Master';
         $data['page_title'] = 'Orders';
         $data['current_status'] = $this->input->get('status');
         

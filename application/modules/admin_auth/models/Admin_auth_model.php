@@ -33,4 +33,13 @@ class Admin_auth_model extends CI_Model
         $this->db->where('user_id', $user_id);
         $this->db->update($this->table, ['last_login_at' => date('Y-m-d H:i:s')]);
     }
+
+    /**
+     * Update user password
+     */
+    public function update_password($user_id, $hashed_password)
+    {
+        $this->db->where('user_id', $user_id);
+        return $this->db->update($this->table, ['user_password' => $hashed_password]);
+    }
 }

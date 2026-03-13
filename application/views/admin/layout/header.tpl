@@ -1,7 +1,7 @@
 <header class="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 glass">
     <div class="flex items-center">
-        <button class="mr-4 text-gray-500 lg:hidden">
-            <i class="fa-solid fa-bars text-xl"></i>
+        <button id="sidebar-toggle-btn" class="mr-4 text-gray-500 hover:text-blue-600 transition-colors">
+            <i class="fa-solid fa-bars-staggered text-xl"></i>
         </button>
         <h1 class="text-xl font-bold text-gray-800"><%$page_title|default:'Admin Dashboard'%></h1>
     </div>

@@ -81,6 +81,25 @@
         .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
             margin-bottom: 1.5rem !important;
         }
+
+        /* Sidebar Collapse Styles */
+        #main-sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-collapsed #main-sidebar {
+            width: 5rem; /* w-20 */
+        }
+        .sidebar-collapsed .sidebar-label {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+        .sidebar-collapsed aside nav p {
+            display: none;
+        }
+        .sidebar-collapsed #main-sidebar aside {
+            width: 5rem;
+        }
     </style>
 
     <!-- Essential Scripts (Loaded in Head to support inline scripts in views) -->
@@ -93,7 +112,9 @@
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <%$sidebar%>
+        <div id="main-sidebar" class="h-full flex flex-col flex-shrink-0">
+            <%$sidebar%>
+        </div>
 
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <!-- Header -->
@@ -113,6 +134,20 @@
 
     <script>
         $(document).ready(function() {
+            // Sidebar Toggle Logic
+            const body = $('body');
+            const sidebarBtn = $('#sidebar-toggle-btn');
+            
+            // Check saved state
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                body.addClass('sidebar-collapsed');
+            }
+
+            sidebarBtn.on('click', function() {
+                body.toggleClass('sidebar-collapsed');
+                localStorage.setItem('sidebar-collapsed', body.hasClass('sidebar-collapsed'));
+            });
+
             // Initialize DataTables
             $('.datatable').DataTable({
                 responsive: true,

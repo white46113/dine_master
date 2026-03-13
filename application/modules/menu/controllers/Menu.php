@@ -41,7 +41,7 @@ class Menu extends Admin_Controller
             $row[] = '
                 <div class="flex items-center">
                     <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 mr-4">
-                        <img src="' . $img_url . '" class="w-full h-full ' . $img_class . '">
+                        <img src="' . $img_url . '" class="w-full h-full ' . $img_class . '" onerror="this.src=\'' . base_url('public/img/food-placeholder.svg') . '\'; this.classList.add(\'opacity-50\'); this.classList.add(\'p-2\');">
                     </div>
                     <div>
                         <div class="font-bold text-gray-800">' . $item->name . '</div>

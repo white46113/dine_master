@@ -15,25 +15,35 @@ class Dashboard_model extends CI_Model
     {
         $stats = [];
         
-        // Total Orders
-        $this->db->from('orders');
-        $stats['total_orders'] = $this->db->count_all_results();
-
-        // Today's Orders
-        $this->db->from('orders');
-        $this->db->where('DATE(placed_at)', date('Y-m-d'));
-        $stats['today_orders'] = $this->db->count_all_results();
-
-        // Total Revenue (Completed Orders)
+        // Today's Revenue (Completed Orders Today)
         $this->db->select_sum('total_payable');
         $this->db->from('orders');
         $this->db->where('status', 'COMPLETED');
-        $query = $this->db->get();
-        $stats['total_revenue'] = isset($query->row()->total_payable) ? $query->row()->total_payable : 0;
+        $this->db->where('DATE(placed_at)', date('Y-m-d'));
+        $stats['today_revenue'] = (float)($this->db->get()->row()->total_payable ?? 0);
 
-        // Total Menu Items
-        $this->db->from('menu_items');
-        $stats['menu_items'] = $this->db->count_all_results();
+        // Occupied Tables
+        $this->db->from('dining_tables');
+        $this->db->where('status', 'OCCUPIED');
+        $stats['occupied_tables'] = $this->db->count_all_results();
+
+        // Available Tables
+        $this->db->from('dining_tables');
+        $this->db->where('status', 'FREE');
+        $stats['available_tables'] = $this->db->count_all_results();
+
+        // Active Orders (Not Completed/Cancelled)
+        $this->db->from('orders');
+        $this->db->where_in('status', ['PLACED', 'PREPARING', 'READY', 'SERVED']);
+        $stats['active_orders'] = $this->db->count_all_results();
+
+        // Total Tables
+        $this->db->from('dining_tables');
+        $stats['total_tables'] = $this->db->count_all_results();
+
+        // Total Orders (All time)
+        $this->db->from('orders');
+        $stats['total_orders'] = $this->db->count_all_results();
 
         return $stats;
     }

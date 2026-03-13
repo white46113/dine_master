@@ -131,4 +131,33 @@ class Order_management_model extends CI_Model
         $this->db->where('order_id', $id);
         return $this->db->update($this->table, $data);
     }
+    /**
+     * Get all floors
+     */
+    public function get_floors()
+    {
+        $this->db->from('floors');
+        $this->db->where('is_active', 1);
+        $this->db->order_by('sort_order', 'ASC');
+        return $this->db->get()->result_array();
+    }
+
+    /**
+     * Get all tables for a specific floor or all floors
+     */
+    public function get_tables($floor_id = null)
+    {
+        $this->db->select('t.*, o.order_number, o.status as order_status');
+        $this->db->from('dining_tables t');
+        $this->db->join('orders o', 'o.order_id = t.current_order_id', 'left');
+        $this->db->where('t.is_active', 1);
+        
+        if ($floor_id) {
+            $this->db->where('t.floor_id', $floor_id);
+        }
+        
+        $this->db->order_by('t.floor_id', 'ASC');
+        $this->db->order_by('t.table_id', 'ASC');
+        return $this->db->get()->result_array();
+    }
 }

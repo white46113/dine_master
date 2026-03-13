@@ -1,46 +1,76 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-5 mb-8">
+    <!-- Today's Revenue -->
+    <div class="bg-gradient-to-br from-blue-600 to-blue-700 p-5 rounded-2xl shadow-lg shadow-blue-500/20 text-white">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-lg backdrop-blur-md">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-widest opacity-60">Revenue</span>
+        </div>
+        <p class="text-[10px] font-bold opacity-80 uppercase tracking-wider mb-1">Today's Total</p>
+        <h3 class="text-xl font-black">₹<%$stats.today_revenue|number_format:0%></h3>
+    </div>
+
+    <!-- Active Orders -->
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-orange-500">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-lg">
+                <i class="fa-solid fa-fire-burner"></i>
+            </div>
+            <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-[8px] font-black uppercase tracking-tighter">
+                <span class="w-1 h-1 bg-orange-600 rounded-full animate-pulse"></span> LIVE
+            </div>
+        </div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Active Orders</p>
+        <h3 class="text-xl font-black text-gray-800"><%$stats.active_orders%></h3>
+    </div>
+
+    <!-- Occupied Tables -->
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-red-500">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-lg">
+                <i class="fa-solid fa-chair"></i>
+            </div>
+            <span class="text-[8px] font-black text-red-400 uppercase tracking-widest">BUSY</span>
+        </div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Occupied Tables</p>
+        <h3 class="text-xl font-black text-gray-800"><%$stats.occupied_tables%></h3>
+    </div>
+
+    <!-- Available Tables -->
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-green-500">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-lg">
+                <i class="fa-solid fa-check-to-slot"></i>
+            </div>
+            <span class="text-[8px] font-black text-green-400 uppercase tracking-widest">FREE</span>
+        </div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Available Tables</p>
+        <h3 class="text-xl font-black text-gray-800"><%$stats.available_tables%></h3>
+    </div>
+
     <!-- Total Orders -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
-        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mr-4 text-xl">
-            <i class="fa-solid fa-receipt"></i>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-blue-400">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <span class="text-[8px] font-black text-blue-300 uppercase tracking-widest">HISTORY</span>
         </div>
-        <div>
-            <p class="text-sm text-gray-500 font-medium">Total Orders</p>
-            <h3 class="text-2xl font-bold"><%$stats.total_orders%></h3>
-        </div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Orders</p>
+        <h3 class="text-xl font-black text-gray-800"><%$stats.total_orders%></h3>
     </div>
 
-    <!-- Today's Orders -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
-        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mr-4 text-xl">
-            <i class="fa-solid fa-calendar-day"></i>
+     <!-- Total Tables -->
+     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-gray-400">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center text-lg">
+                <i class="fa-solid fa-table"></i>
+            </div>
+            <span class="text-[8px] font-black text-gray-300 uppercase tracking-widest">ASSETS</span>
         </div>
-        <div>
-            <p class="text-sm text-gray-500 font-medium">Today's Orders</p>
-            <h3 class="text-2xl font-bold"><%$stats.today_orders%></h3>
-        </div>
-    </div>
-
-    <!-- Total Revenue -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
-        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mr-4 text-xl">
-            <i class="fa-solid fa-indian-rupee-sign"></i>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500 font-medium">Total Revenue</p>
-            <h3 class="text-2xl font-bold">₹<%$stats.total_revenue|default:0|number_format:2%></h3>
-        </div>
-    </div>
-
-    <!-- Menu Items -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
-        <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mr-4 text-xl">
-            <i class="fa-solid fa-bowl-food"></i>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500 font-medium">Menu Items</p>
-            <h3 class="text-2xl font-bold"><%$stats.menu_items%></h3>
-        </div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Tables</p>
+        <h3 class="text-xl font-black text-gray-800"><%$stats.total_tables%></h3>
     </div>
 </div>
 

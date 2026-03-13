@@ -12,7 +12,11 @@ $route['admin/logout'] = 'admin_auth/logout';
 $route['admin/dashboard'] = 'dashboard/index';
 $route['admin/menu(.*)'] = 'menu$1';
 $route['admin/orders(.*)'] = 'orders$1';
+$route['admin/orders/bill/(:any)'] = 'orders/bill/$1';
+$route['admin/kitchen(.*)'] = 'kitchen$1';
 $route['admin/restaurant(.*)'] = 'restaurant$1';
+$route['admin/tables(.*)'] = 'tables$1';
+$route['admin/reports(.*)'] = 'reports/reports$1';
 
 
 $route['user_list'] = 'user1/user_login/start';

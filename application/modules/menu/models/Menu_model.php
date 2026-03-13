@@ -101,10 +101,12 @@ class Menu_model extends CI_Model
      */
     public function get_categories($restaurant_id = null)
     {
+        $this->db->select('name, MAX(category_id) as category_id');
         $this->db->from('categories');
         if ($restaurant_id) {
             $this->db->where('restaurant_id', $restaurant_id);
         }
+        $this->db->group_by('name');
         $query = $this->db->get();
         return $query->result_array();
     }
