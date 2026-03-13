@@ -114,43 +114,63 @@ $(document).ready(function() {
         }
     });
 
-    // Form Submission
-    $('#restaurantForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        const btn = $('#saveBtn');
-        const formData = new FormData(this);
-        
-        btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Saving...');
+    // jQuery Validation
+    $("#restaurantForm").validate({
+        rules: {
+            name: { required: true, minlength: 2 },
+            contact_email: { required: true, email: true },
+            contact_phone: { required: true, minlength: 10 },
+            address_line1: { required: true }
+        },
+        messages: {
+            name: { required: "Please enter restaurant name" },
+            contact_email: { required: "Email is required", email: "Enter a valid email" },
+            contact_phone: { required: "Phone number is required" },
+            address_line1: { required: "Street address is required" }
+        },
+        errorElement: 'span',
+        errorClass: 'text-red-500 text-xs mt-1 block',
+        highlight: function(element) {
+            $(element).addClass('border-red-500').removeClass('border-gray-200');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('border-red-500').addClass('border-gray-200');
+        },
+        submitHandler: function(form) {
+            const btn = $('#saveBtn');
+            const formData = new FormData(form);
+            
+            btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Saving...');
 
-        $.ajax({
-            url: '<%base_url("admin/restaurant/save")%>',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Updated!',
-                        text: response.message,
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire('Info', response.message, 'info');
+            $.ajax({
+                url: '<%base_url("admin/restaurant/save")%>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                        btn.prop('disabled', false).html('Save Changes');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'An unexpected error occurred.', 'error');
                     btn.prop('disabled', false).html('Save Changes');
                 }
-            },
-            error: function() {
-                Swal.fire('Error', 'Failed to save changes.', 'error');
-                btn.prop('disabled', false).html('Save Changes');
-            }
-        });
+            });
+        }
     });
 });
 </script>

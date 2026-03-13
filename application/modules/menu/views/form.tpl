@@ -81,7 +81,7 @@
                         <%if $item.image_url%>
                         <img src="<%$item.image_url%>" class="w-full h-full object-cover">
                         <%else%>
-                        <i class="fa-solid fa-cloud-arrow-up text-gray-300 text-2xl"></i>
+                        <img src="<%base_url('public/img/food-placeholder.svg')%>" class="w-full h-full object-cover opacity-50 p-4">
                         <%/if%>
                     </div>
                     <div>

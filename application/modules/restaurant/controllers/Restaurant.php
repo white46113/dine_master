@@ -46,7 +46,7 @@ class Restaurant extends Admin_Controller
         if (!empty($_FILES['logo']['name'])) {
             $config['upload_path']   = './public/uploads/restaurant/';
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
-            $config['file_name']     = 'logo_' . time();
+            $config['encrypt_name']  = TRUE;
             
             if (!is_dir($config['upload_path'])) {
                 mkdir($config['upload_path'], 0777, true);
@@ -57,6 +57,9 @@ class Restaurant extends Admin_Controller
             if ($this->upload->do_upload('logo')) {
                 $upload_data = $this->upload->data();
                 $data['logo_url'] = base_url('public/uploads/restaurant/' . $upload_data['file_name']);
+            } else {
+                echo json_encode(['success' => false, 'message' => $this->upload->display_errors('', '')]);
+                return;
             }
         }
 

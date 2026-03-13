@@ -38,24 +38,24 @@ class MY_Controller extends MX_Controller
             ),
             'admin_auth' => array(
                 'admin_auth' => array(
-                    'login'
+                    'admin','login'
                 )
             )
       );
 
       if(isset($admin_allow_arr[$current_folder][$controller_route])){
         if(!in_array($current_route, $admin_allow_arr[$current_folder][$controller_route])){
-            redirect(base_url("login"));
+            redirect(base_url("admin/login"));
         }
       }else{
-        redirect(base_url("login"));
+        redirect(base_url("admin/login"));
       }
     }
   }
   public function checkSession(){
     $session_data = $this->session->userdata;
     $return = true;
-    if(!isset($session_data['user_id'])){
+    if(!isset($session_data['user_id']) && !isset($session_data['admin_user_id'])){
       $return = false;
     }
 

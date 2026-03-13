@@ -11,6 +11,66 @@ class Menu_model extends CI_Model
     }
 
     /**
+     * DataTables Server-side
+     */
+    private function _get_datatables_query()
+    {
+        $this->db->select('m.*, c.name as category_name');
+        $this->db->from($this->table . ' m');
+        $this->db->join('categories c', 'c.category_id = m.category_id', 'left');
+
+        if ($this->input->post('restaurant_id')) {
+            $this->db->where('m.restaurant_id', $this->input->post('restaurant_id'));
+        }
+
+        $column_order = [null, 'm.name', 'c.name', 'm.base_price', 'm.veg_type', 'm.is_available', null];
+        $column_search = ['m.name', 'c.name', 'm.item_id'];
+
+        $i = 0;
+        foreach ($column_search as $item) {
+            if ($_POST['search']['value']) {
+                if ($i === 0) {
+                    $this->db->group_start();
+                    $this->db->like($item, $_POST['search']['value']);
+                } else {
+                    $this->db->or_like($item, $_POST['search']['value']);
+                }
+                if (count($column_search) - 1 == $i)
+                    $this->db->group_end();
+            }
+            $i++;
+        }
+
+        if (isset($_POST['order'])) {
+            $this->db->order_by($column_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
+        } else {
+            $this->db->order_by('m.item_id', 'DESC');
+        }
+    }
+
+    public function get_datatables()
+    {
+        $this->_get_datatables_query();
+        if ($_POST['length'] != -1)
+            $this->db->limit($_POST['length'], $_POST['start']);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function count_filtered()
+    {
+        $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function count_all()
+    {
+        $this->db->from($this->table);
+        return $this->db->count_all_results();
+    }
+
+    /**
      * Get all menu items with category names
      */
     public function get_all_items($restaurant_id = null)

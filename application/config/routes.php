@@ -2,13 +2,8 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 #------------ Login -----------------------------
-$route['default_controller'] = 'LogonDashboard/login';
-// $route['login'] = 'LogonDashboard/login';
-/* login & forgot password */
-$route['login'] = 'user/login/index';
-$route['forgot_password/(:any)/(:any)'] = 'user/login/forgot_password/$1/$2';
-$route['logout'] = 'user/login/logout';
-$route['login1'] = 'login_old';
+$route['default_controller'] = 'admin_auth/login';
+
 
 /* admin panel */
 $route['admin'] = 'dashboard/index';
@@ -19,7 +14,7 @@ $route['admin/menu(.*)'] = 'menu$1';
 $route['admin/orders(.*)'] = 'orders$1';
 $route['admin/restaurant(.*)'] = 'restaurant$1';
 
-$route['sitemap'] = 'user/login/site_map';
+
 $route['user_list'] = 'user1/user_login/start';
 $route['group_master'] = 'user/user/groupMaster';
 $route['group_menu'] = 'user/user/groupMenu';
@@ -41,5 +36,5 @@ $route['WS/(.*)'] = "wsengine/api_execute/wscontroller/$1";
 
 $GLOBALS['is_ws'] = false;
 if (isset($this->uri->segments[1]) && ($this->uri->segments[1] == "WS" || $this->uri->segments[1] == "api_docs")) {
-$GLOBALS['is_ws'] = true;
+    $GLOBALS['is_ws'] = true;
 }
