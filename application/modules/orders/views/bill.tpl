@@ -1,3 +1,6 @@
+<!-- QZ Tray for Raw Printing -->
+<script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.3/qz-tray.js"></script>
+
 <div class="max-w-4xl mx-auto">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
@@ -114,27 +117,251 @@
                 </button>
             </div>
 
-            <div class="bg-white rounded-[2rem] p-6 border border-gray-100 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
-                    <i class="fa-solid fa-print"></i>
+            <div class="bg-white rounded-[2rem] p-6 border border-gray-100 flex flex-col gap-4 w-full text-left hover:bg-gray-50 transition-all cursor-pointer" onclick="printReceipt()">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                        <i class="fa-solid fa-print"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-800 text-sm">Print Receipt</div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thermal Printer (ESC/POS)</p>
+                    </div>
                 </div>
-                <div>
-                    <div class="font-bold text-gray-800 text-sm">Print Receipt</div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thermal Printer (ESC/POS)</p>
+                <div class="pt-4 border-t border-gray-50 flex items-center justify-between">
+                    <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Printer Status</span>
+                    <span id="printer-status" class="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <div class="w-1.5 h-1.5 rounded-full bg-gray-300 status-dot"></div>
+                        <span>Connecting...</span>
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Printable Receipt (Hidden from screen) -->
+<div id="printable-receipt" class="hidden print:block font-mono text-black p-4 bg-white" style="width: 58mm; margin: 0 auto; line-height: 1.2;">
+    <div class="text-center mb-4">
+        <h2 class="text-lg font-black uppercase">DINE MASTER</h2>
+        <p class="text-[10px] font-bold tracking-tight"><%$restaurant.name|default:'Restaurant Name'%></p>
+        <p class="text-[10px]"><%$restaurant.address|default:'Pune, India'%></p>
+        
+        <div class="border-b border-black my-2"></div>
+        
+        <div class="text-left text-[10px] space-y-0.5">
+            <div class="flex justify-between">
+                <span>Order ID :</span>
+                <span class="font-bold">#<%$order.order_number%></span>
+            </div>
+            <div class="flex justify-between">
+                <span>Table :</span>
+                <span class="font-bold"><%$order.table_no%></span>
+            </div>
+            <div class="flex justify-between">
+                <span>Date :</span>
+                <span><%$order.placed_at|date_format:"%d %b %Y"%></span>
+            </div>
+            <div class="flex justify-between">
+                <span>Time :</span>
+                <span><%$order.placed_at|date_format:"%I:%M %p"%></span>
+            </div>
+        </div>
+
+        <div class="border-b border-black my-2"></div>
+
+        <table class="w-full text-[10px] mb-2">
+            <thead>
+                <tr class="text-left">
+                    <th class="font-bold">Item</th>
+                    <th class="text-center font-bold">Qty</th>
+                    <th class="text-right font-bold">Amt</th>
+                </tr>
+            </thead>
+            <tbody class="border-t border-black pt-1">
+                <%foreach $items as $item%>
+                <tr>
+                    <td class="py-0.5"><%$item.item_name%></td>
+                    <td class="text-center"><%$item.quantity%></td>
+                    <td class="text-right"><%$item.line_total|number_format:0%></td>
+                </tr>
+                <%/foreach%>
+            </tbody>
+        </table>
+
+        <div class="border-b border-black my-2"></div>
+
+        <div class="text-[10px] space-y-0.5 text-left">
+            <div class="flex justify-between">
+                <span>Subtotal</span>
+                <span><%$subtotal|number_format:0%></span>
+            </div>
+            <div class="flex justify-between">
+                <span>GST 5%</span>
+                <span><%$tax_amount|number_format:1%></span>
+            </div>
+            <div class="flex justify-between font-bold">
+                <span>Total</span>
+                <span><%$total_payable|number_format:1%></span>
+            </div>
+        </div>
+
+        <div class="border-b border-black my-2"></div>
+
+        <div class="text-[10px] text-left">
+            <span>Payment : <span id="receipt-payment-method">CASH</span></span>
+        </div>
+
+        <div class="mt-6 text-[10px]">
+            <p>Thank You!</p>
+            <p>Visit Again</p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 58mm Thermal Print Optimization */
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+    #printable-receipt, #printable-receipt * {
+        visibility: visible !important;
+    }
+    #printable-receipt {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 58mm !important;
+        background: white !important;
+        margin: 0 !important;
+        padding: 5mm !important;
+    }
+    
+    @page {
+        size: 58mm auto;
+        margin: 0;
+    }
+    
+    html, body {
+        height: auto !important;
+        overflow: visible !important;
+        background: white !important;
+    }
+}
+</style>
+
 <script>
+// QZ Tray Configuration
+let isQzConnected = false;
+const printerName = "HOP-H58"; 
+
+function updatePrinterStatus(message, colorClass, dotColor) {
+    const $status = $('#printer-status');
+    $status.find('span').text(message);
+    $status.removeClass('text-gray-400 text-green-500 text-red-500').addClass(colorClass);
+    $status.find('.status-dot').removeClass('bg-gray-300 bg-green-500 bg-red-500').addClass(dotColor);
+}
+
+function connectQZ() {
+    updatePrinterStatus("Connecting...", "text-gray-400", "bg-gray-300");
+    
+    qz.websocket.connect().then(() => {
+        isQzConnected = true;
+        updatePrinterStatus("Connected", "text-green-500", "bg-green-500");
+        return qz.printers.find(printerName);
+    }).then((printer) => {
+        console.log("Printer found:", printer);
+    }).catch((err) => {
+        isQzConnected = false;
+        updatePrinterStatus("Offline", "text-red-500", "bg-red-500");
+        console.error("QZ Connection Error:", err);
+    });
+}
+
+// Helper for raw formatting (32 chars for 58mm)
+function pad(left, right, width = 32) {
+    const spaceCount = width - (left.length + right.length);
+    return left + " ".repeat(Math.max(0, spaceCount)) + right;
+}
+
+function getRawData() {
+    const method = $('#selected_method').val();
+    const subtotal = '<%$subtotal|number_format:0%>';
+    const tax = '<%$tax_amount|number_format:1%>';
+    const total = '<%$total_payable|number_format:1%>';
+    const orderNo = '<%$order.order_number%>';
+    const tableNo = '<%$order.table_no%>';
+    const restaurant = '<%$restaurant.name|default:"Restaurant Name"%>';
+    const address = '<%$restaurant.address|default:"Pune, India"%>';
+    const placedAt = new Date('<%$order.placed_at%>');
+    
+    const formattedDate = placedAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const formattedTime = placedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
+
+    let data = [
+        '\x1B\x61\x01', // Center align
+        '\x1B\x45\x01', // Bold on
+        'DINE MASTER\n',
+        restaurant + '\n',
+        '\x1B\x45\x00', // Bold off
+        address + '\n',
+        '\x1B\x61\x00', // Left align
+        '-'.repeat(30) + '\n',
+        'Order ID : ' + orderNo + '\n',
+        'Table    : ' + tableNo + '\n',
+        'Date     : ' + formattedDate + '\n',
+        'Time     : ' + formattedTime + '\n',
+        '-'.repeat(30) + '\n',
+        '\x1B\x45\x01', // Bold on
+        pad('Item', 'Qty Amt', 30) + '\n',
+        '\x1B\x45\x00', // Bold off
+    ];
+
+    <%foreach $items as $item%>
+    data.push(pad('<%$item.item_name%>'.substring(0, 18), '<%$item.quantity%>' + '   ' + '<%$item.line_total|number_format:0%>', 30) + '\n');
+    <%/foreach%>
+
+    data.push('-'.repeat(30) + '\n');
+    data.push(pad('Subtotal', subtotal, 30) + '\n');
+    data.push(pad('GST 5%', tax, 30) + '\n');
+    data.push('\x1B\x45\x01'); // Bold on
+    data.push(pad('Total', total, 30) + '\n');
+    data.push('\x1B\x45\x00'); // Bold off
+    data.push('-'.repeat(30) + '\n');
+    data.push('Payment : ' + method + '\n\n');
+    data.push('\x1B\x61\x01'); // Center align
+    data.push('Thank You!\n');
+    data.push('Visit Again\n');
+    data.push('\n\n\n\n'); // Carriage returns
+    data.push('\x1B\x69'); // Cut paper
+    
+    return data;
+}
+
 function selectMethod(method, el) {
     $('#selected_method').val(method);
+    $('#receipt-payment-method').text(method);
     $('.space-y-4 > div').removeClass('border-l-4 border-l-blue-500 bg-white/10').addClass('bg-white/5');
     $('.space-y-4 > div i.fa-solid.fa-circle-check').removeClass('fa-solid fa-circle-check text-blue-500').addClass('fa-solid fa-circle text-white/10');
     
     $(el).addClass('border-l-4 border-l-blue-500 bg-white/10').removeClass('bg-white/5');
     $(el).find('i.fa-circle').removeClass('fa-circle text-white/10').addClass('fa-circle-check text-blue-500');
+}
+
+function printReceipt() {
+    if (isQzConnected) {
+        const config = qz.configs.create(printerName);
+        const data = getRawData();
+        
+        qz.print(config, data).then(() => {
+            console.log("Raw print successful");
+        }).catch((err) => {
+            console.error("Raw print error:", err);
+            window.print(); // Fallback
+        });
+    } else {
+        window.print();
+    }
 }
 
 function processPayment() {
@@ -163,10 +390,17 @@ function processPayment() {
                     if (response.success) {
                         Swal.fire({
                             title: 'Paid Successfully!',
-                            text: response.message,
+                            text: "Payment processed successfully. Receipt will now be printed.",
                             icon: 'success',
-                            confirmButtonText: 'Back to Tables'
-                        }).then(() => {
+                            showCancelButton: true,
+                            confirmButtonColor: '#2563eb',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Print Receipt',
+                            cancelButtonText: 'Done'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                printReceipt();
+                            }
                             window.location.href = '<%base_url("admin/orders")%>';
                         });
                     }
@@ -175,4 +409,9 @@ function processPayment() {
         }
     });
 }
+
+// Connect to QZ on Load
+$(document).ready(() => {
+    connectQZ();
+});
 </script>

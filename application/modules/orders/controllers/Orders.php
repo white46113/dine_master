@@ -181,10 +181,14 @@ class Orders extends Admin_Controller
      */
     public function bill($order_id)
     {
+        $this->load->model('restaurant/Restaurant_model');
         $data['order'] = $this->Order_management_model->get_order_by_id($order_id);
+        
         if (empty($data['order'])) {
             show_404();
         }
+
+        $data['restaurant'] = $this->Restaurant_model->get_details($data['order']['restaurant_id'] ?: 1);
 
         $data['title'] = 'Generate Bill #' . $data['order']['order_number'] . ' | Dine Master';
         $data['items'] = $this->Order_management_model->get_order_items($order_id);
