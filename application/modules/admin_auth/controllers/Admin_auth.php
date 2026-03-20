@@ -52,7 +52,7 @@ class Admin_auth extends Admin_Controller
                     'user_email'    => $user['user_email'],
                     'role_id'       => $user['user_role'],
                     'user_role'     => $user['user_role'],
-                    'role_name'     => $user['role_name'] ?? 'Admin',
+                    'role_name'     => isset($user['role_name']) ? $user['role_name'] : 'Admin',
                     'restaurant_id' => $user['restaurant_id']
                 ]
             ];
@@ -118,15 +118,15 @@ class Admin_auth extends Admin_Controller
             try {
                 // SMTP Configuration
                 $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
+                $mail->Host       = $this->config->item('smtp_host');
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'codecrafter.help@gmail.com';
-                $mail->Password   = 'fleb drah mxbj yuim';
-                $mail->SMTPSecure = 'ssl';
-                $mail->Port       = 465;
+                $mail->Username   = $this->config->item('smtp_user');
+                $mail->Password   = $this->config->item('smtp_pass');
+                $mail->SMTPSecure = $this->config->item('smtp_crypto');
+                $mail->Port       = $this->config->item('smtp_port');
 
                 // Email components: to, subject, message
-                $mail->setFrom('codecrafter.help@gmail.com', 'Dine Master');
+                $mail->setFrom($this->config->item('smtp_from_email'), $this->config->item('smtp_from_name'));
                 $mail->clearAddresses();
                 $mail->addAddress($email);
                 $mail->isHTML(true);
