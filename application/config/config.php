@@ -551,6 +551,7 @@ if($config['is_webservice'] == TRUE){
 
 
 
-// Razorpay Credentials
-$config['razorpay_key_id'] = 'rzp_live_S7QGBHpZXxjH9b';
-$config['razorpay_key_secret'] = 'm2Btkv5IuIy5NQ7fJDvyqK1J';
+// Include secrets
+if (file_exists(APPPATH . 'config/secrets.php')) {
+    include(APPPATH . 'config/secrets.php');
+}

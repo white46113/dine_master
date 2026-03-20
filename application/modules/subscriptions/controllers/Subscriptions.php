@@ -120,12 +120,14 @@ class Subscriptions extends Admin_Controller
 
         if ($this->db->trans_status() === FALSE || !$activated) {
             $error = $this->db->error();
+            $this->db->trans_rollback();
             echo json_encode([
                 'success' => false, 
-                'message' => 'Failed to activate subscription. ' . (isset($error['message']) ? $error['message'] : ''),
-                'db_error' => $error
+                'message' => 'Failed to activate subscription. ' . (isset($error['message']) ? $error['message'] : 'Unknown database error'),
+                'error_details' => $error
             ]);
         } else {
+            $this->db->trans_commit();
             echo json_encode(['success' => true, 'message' => 'Subscription activated successfully!']);
         }
     }

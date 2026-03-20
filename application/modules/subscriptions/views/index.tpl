@@ -174,11 +174,14 @@ function verifyAndActivate(planId, paymentId) {
         error: function(xhr) {
             Swal.close();
             console.error("Payment Verification Error:", xhr.responseText);
-            let errorMsg = 'Service unavailable. ';
-            if (xhr.responseText) {
-                errorMsg += 'Server Response: ' + xhr.responseText.substring(0, 100);
-            }
-            Swal.fire('Error', errorMsg, 'error');
+            let errorMsg = 'Payment verification failed on the server. ';
+            let responseContent = xhr.responseText ? xhr.responseText.substring(0, 300) : 'No response from server.';
+            
+            Swal.fire({
+                title: 'Server Error',
+                html: '<div class="text-left"><p>' + errorMsg + '</p><pre class="bg-gray-100 p-2 rounded mt-2 text-[10px] overflow-auto max-h-40">' + responseContent + '</pre></div>',
+                icon: 'error'
+            });
         }
     });
 }
