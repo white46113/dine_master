@@ -18,7 +18,7 @@ class Admin_Controller extends MY_Controller
         // 1. Check Authentication
         if (!$this->is_admin_logged_in()) {
             // Allow login and forgot password pages
-            $allowed_methods = ['login', 'forgot_password', 'authenticate'];
+            $allowed_methods = ['login', 'forgot_password', 'authenticate', 'send_reset_link', 'reset_password', 'update_new_password'];
             $current_method = $this->router->fetch_method();
             $current_class = $this->router->fetch_class();
 

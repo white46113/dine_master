@@ -10,18 +10,32 @@ class Order_management_model extends CI_Model
         parent::__construct();
     }
 
+    private function _is_superadmin() {
+        $admin_data = $this->session->userdata('admin_user');
+        return (isset($admin_data['role_id']) && $admin_data['role_id'] == 1) || 
+               (isset($admin_data['user_role']) && $admin_data['user_role'] == 1);
+    }
+
     /**
      * Get all orders with customer and table details
      */
     public function get_all_orders($status = null)
     {
-        $this->db->select('o.*, c.name as customer_name, t.table_no');
+        $this->db->select('o.*, c.name as customer_name, t.table_no, r.name as restaurant_name');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');
+        $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
         
         if ($status) {
             $this->db->where('o.status', $status);
+        }
+        
+        if (!$this->_is_superadmin()) {
+            $admin_data = $this->session->userdata('admin_user');
+            if (isset($admin_data['restaurant_id'])) {
+                $this->db->where('o.restaurant_id', $admin_data['restaurant_id']);
+            }
         }
         
         $this->db->order_by('o.placed_at', 'DESC');
@@ -34,17 +48,30 @@ class Order_management_model extends CI_Model
      */
     private function _get_datatables_query()
     {
-        $this->db->select('o.*, c.name as customer_name, t.table_no');
+        $this->db->select('o.*, c.name as customer_name, t.table_no, r.name as restaurant_name');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');
+        $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
 
         if ($this->input->post('status')) {
             $this->db->where('o.status', $this->input->post('status'));
         }
+        
+        if (!$this->_is_superadmin()) {
+            $admin_data = $this->session->userdata('admin_user');
+            if (isset($admin_data['restaurant_id'])) {
+                $this->db->where('o.restaurant_id', $admin_data['restaurant_id']);
+            }
+        }
 
-        $column_order = [null, 'o.order_id', 'c.name', 't.table_no', 'o.total_payable', 'o.status', 'o.placed_at'];
-        $column_search = ['o.order_id', 'c.name', 't.table_no'];
+        if ($this->_is_superadmin()) {
+            $column_order = [null, 'o.order_id', 'r.name', 't.table_no', 'o.total_payable', 'o.status', 'o.placed_at'];
+            $column_search = ['o.order_id', 'c.name', 't.table_no', 'r.name'];
+        } else {
+            $column_order = [null, 'o.order_id', 'c.name', 't.table_no', 'o.total_payable', 'o.status', 'o.placed_at'];
+            $column_search = ['o.order_id', 'c.name', 't.table_no'];
+        }
 
         $i = 0;
         foreach ($column_search as $item) {
@@ -86,7 +113,13 @@ class Order_management_model extends CI_Model
 
     public function count_all()
     {
-        $this->db->from($this->table);
+        $this->db->from($this->table . ' o');
+        if (!$this->_is_superadmin()) {
+            $admin_data = $this->session->userdata('admin_user');
+            if (isset($admin_data['restaurant_id'])) {
+                $this->db->where('o.restaurant_id', $admin_data['restaurant_id']);
+            }
+        }
         return $this->db->count_all_results();
     }
 
@@ -95,11 +128,20 @@ class Order_management_model extends CI_Model
      */
     public function get_order_by_id($id)
     {
-        $this->db->select('o.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, t.table_no');
+        $this->db->select('o.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, t.table_no, r.name as restaurant_name, r.address_line1 as restaurant_address');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');
+        $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
         $this->db->where('o.order_id', $id);
+        
+        if (!$this->_is_superadmin()) {
+            $admin_data = $this->session->userdata('admin_user');
+            if (isset($admin_data['restaurant_id'])) {
+                $this->db->where('o.restaurant_id', $admin_data['restaurant_id']);
+            }
+        }
+        
         $query = $this->db->get();
         return $query->row_array();
     }
@@ -131,14 +173,25 @@ class Order_management_model extends CI_Model
         $this->db->where('order_id', $id);
         return $this->db->update($this->table, $data);
     }
+    
     /**
      * Get all floors
      */
     public function get_floors()
     {
-        $this->db->from('floors');
-        $this->db->where('is_active', 1);
-        $this->db->order_by('sort_order', 'ASC');
+        $this->db->select('f.*, r.name as restaurant_name');
+        $this->db->from('floors f');
+        $this->db->join('restaurants r', 'r.restaurant_id = f.restaurant_id', 'left');
+        $this->db->where('f.is_active', 1);
+        
+        if (!$this->_is_superadmin()) {
+            $admin_data = $this->session->userdata('admin_user');
+            if (isset($admin_data['restaurant_id'])) {
+                $this->db->where('f.restaurant_id', $admin_data['restaurant_id']);
+            }
+        }
+        
+        $this->db->order_by('f.sort_order', 'ASC');
         return $this->db->get()->result_array();
     }
 
@@ -147,13 +200,21 @@ class Order_management_model extends CI_Model
      */
     public function get_tables($floor_id = null)
     {
-        $this->db->select('t.*, o.order_number, o.status as order_status');
+        $this->db->select('t.*, o.order_number, o.status as order_status, r.name as restaurant_name');
         $this->db->from('dining_tables t');
         $this->db->join('orders o', 'o.order_id = t.current_order_id', 'left');
+        $this->db->join('restaurants r', 'r.restaurant_id = t.restaurant_id', 'left');
         $this->db->where('t.is_active', 1);
         
         if ($floor_id) {
             $this->db->where('t.floor_id', $floor_id);
+        }
+        
+        if (!$this->_is_superadmin()) {
+            $admin_data = $this->session->userdata('admin_user');
+            if (isset($admin_data['restaurant_id'])) {
+                $this->db->where('t.restaurant_id', $admin_data['restaurant_id']);
+            }
         }
         
         $this->db->order_by('t.floor_id', 'ASC');

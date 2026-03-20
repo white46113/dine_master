@@ -5,9 +5,17 @@ class Api_docs extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+        $this->load->library('session');
+        $this->load->helper('url');
     }
 
     public function index() {
+        // Enforce Super Admin only
+        $admin_data = $this->session->userdata('admin_user');
+        if (!$admin_data || ($admin_data['role_id'] != 1 && $admin_data['user_role'] != 1)) {
+            show_404();
+        }
+
         $data['title'] = "Dine Master API Reference";
         
         // Define all APIs in a structured array
@@ -29,7 +37,8 @@ class Api_docs extends CI_Controller {
         "id": "1",
         "token": "eyJhbG...",
         "name": "John Doe",
-        "email": "john@example.com"
+        "email": "john@example.com",
+        "restaurant_id": "1"
     }
 }'
             ],

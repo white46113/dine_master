@@ -15,7 +15,7 @@
             <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Table Code</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-hashtag text-xs"></i>
                     </span>
                     <input type="text" name="code" required placeholder="e.g. T101"
@@ -27,7 +27,7 @@
             <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Display Name</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-signature text-xs"></i>
                     </span>
                     <input type="text" name="name" required placeholder="e.g. Window Side 4"
@@ -39,13 +39,13 @@
             <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Location (Floor)</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-layer-group text-xs"></i>
                     </span>
                     <select name="floor_id" required 
                             class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700 appearance-none">
                         <%foreach $floors as $floor%>
-                        <option value="<%$floor.floor_id%>"><%$floor.name%></option>
+                        <option value="<%$floor.floor_id%>"><%$floor.name%><%if isset($is_superadmin) && $is_superadmin%> (<%$floor.restaurant_name%>)<%/if%></option>
                         <%/foreach%>
                     </select>
                 </div>
@@ -55,7 +55,7 @@
             <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Seating Capacity</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-users text-xs"></i>
                     </span>
                     <input type="number" name="capacity" required min="1" max="20" value="4"
@@ -72,3 +72,68 @@
         </div>
     </form>
 </div>
+
+<!-- Select2 Integration -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('select').select2({
+        width: '100%',
+        minimumResultsForSearch: 5
+    });
+});
+</script>
+<style>
+/* Select2 Tailwind Integration */
+.select2-container--default .select2-selection--single {
+    background-color: #f9fafb !important;
+    border: none !important;
+    border-radius: 1rem !important;
+    height: 3.5rem !important;
+    padding-left: 2rem !important;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    color: #374151;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #374151 !important;
+    font-weight: 700;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 3.5rem !important;
+    right: 1rem !important;
+}
+.select2-dropdown {
+    border: none !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.select2-search__field {
+    border-radius: 0.5rem !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 0.5rem 0.75rem !important;
+    outline: none !important;
+}
+.select2-search__field:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+.select2-results__option {
+    padding: 0.75rem 1.25rem !important;
+    font-weight: 600;
+    color: #4b5563;
+    transition: all 0.2s;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #2563eb !important;
+    color: white !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #eff6ff !important;
+    color: #2563eb !important;
+}
+</style>

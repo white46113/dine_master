@@ -1,32 +1,29 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">Restaurant Tables</h2>
-        <p class="text-gray-500 text-sm">Manage floors, seating capacity, and table status</p>
+        <h2 class="text-2xl font-bold text-gray-800">Waiter Management</h2>
+        <p class="text-gray-500 text-sm">Manage restaurant service staff</p>
     </div>
-    <a href="<%base_url('admin/tables/add')%>" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+    <a href="<%base_url('admin/waiter/add')%>" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
         <i class="fa-solid fa-plus text-xs"></i>
-        ADD NEW TABLE
+        ADD NEW WAITER
     </a>
 </div>
 
 <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
     <div class="p-8">
-        <table id="tablesTable" class="w-full border-collapse">
+        <table id="waitersTable" class="w-full border-collapse">
             <thead class="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
                 <tr>
-                    <th class="px-6 py-5 text-left">Table Info</th>
-                    <%if isset($is_superadmin) && $is_superadmin%>
+                    <th class="px-6 py-5 text-left">Waiter Info</th>
+                    <th class="px-6 py-5 text-left">Phone</th>
+                    <%if $is_superadmin%>
                     <th class="px-6 py-5 text-left">Restaurant</th>
                     <%/if%>
-                    <th class="px-6 py-5 text-left">Floor</th>
-                    <th class="px-6 py-5 text-left">Capacity</th>
                     <th class="px-6 py-5 text-left">Status</th>
-                    <th class="px-6 py-5 text-left">Active</th>
                     <th class="px-6 py-5 text-center">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
-                <!-- DataTables will populate this -->
             </tbody>
         </table>
     </div>
@@ -35,26 +32,31 @@
 <script>
 let table;
 $(document).ready(function() {
-    table = $('#tablesTable').DataTable({
+    table = $('#waitersTable').DataTable({
         "processing": true,
         "serverSide": true,
         "order": [],
         "ajax": {
-            "url": "<%base_url('admin/tables/ajax_list')%>",
+            "url": "<%base_url('admin/waiter/ajax_list')%>",
             "type": "POST"
         },
         "columnDefs": [
-            { "targets": "_all", "orderable": true },
-            { "targets": [0, -1], "orderable": false },
-            { "targets": [-1], "className": "text-center" }
+            <%if $is_superadmin%>
+            { "targets": [1, 2, 3], "orderable": true },
+            { "targets": [0, 4], "orderable": false },
+            { "targets": [4], "className": "text-center" }
+            <%else%>
+            { "targets": [1, 2], "orderable": true },
+            { "targets": [0, 3], "orderable": false },
+            { "targets": [3], "className": "text-center" }
+            <%/if%>
         ],
         "language": {
-            "searchPlaceholder": "Search by code, name or floor...",
+            "searchPlaceholder": "Search name, email, phone...",
             "search": "",
             "lengthMenu": "_MENU_ per page",
         },
         "drawCallback": function() {
-            // Apply premium styling to DT elements after draw
             $('.dataTables_paginate .paginate_button').addClass('rounded-xl border-none font-bold text-xs mx-1');
             $('.dataTables_filter input').addClass('bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all');
             $('.dataTables_length select').addClass('bg-gray-50 border-none rounded-xl px-2 py-1 text-sm');
@@ -66,38 +68,15 @@ function reloadTable() {
     table.ajax.reload(null, false);
 }
 
-function toggleStatus(id) {
-    $.ajax({
-        url: '<%base_url("admin/tables/toggle_status/")%>' + id,
-        type: 'POST',
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Status updated successfully'
-                });
-            }
-        }
-    });
-}
-
-function deleteTable(id) {
+function deleteWaiter(id) {
     Swal.fire({
-        title: 'Delete this table?',
-        text: "This action cannot be undone and will remove all associated data.",
+        title: 'Delete this waiter?',
+        text: "This action cannot be undone.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Yes, delete it',
+        confirmButtonText: 'Yes, delete',
         cancelButtonText: 'Cancel',
         background: '#fff',
         customClass: {
@@ -109,7 +88,7 @@ function deleteTable(id) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '<%base_url("admin/tables/delete/")%>' + id,
+                url: '<%base_url("admin/waiter/delete/")%>' + id,
                 type: 'POST',
                 dataType: 'json',
                 success: function(response) {
@@ -133,7 +112,6 @@ function deleteTable(id) {
 </script>
 
 <style>
-/* DataTable Tweaks */
 .dataTables_wrapper .dataTables_length, 
 .dataTables_wrapper .dataTables_filter {
     padding-bottom: 2rem;

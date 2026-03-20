@@ -10,6 +10,12 @@ class Orders extends Admin_Controller
         $this->load->model('menu/Menu_model');
     }
 
+    private function _is_superadmin() {
+        $admin_data = $this->session->userdata('admin_user');
+        return (isset($admin_data['role_id']) && $admin_data['role_id'] == 1) || 
+               (isset($admin_data['user_role']) && $admin_data['user_role'] == 1);
+    }
+
     /**
      * Table Selection Grid (Primary flow)
      */
@@ -20,9 +26,11 @@ class Orders extends Admin_Controller
         
         $floors = $this->Order_management_model->get_floors();
         $tables = $this->Order_management_model->get_tables();
+        $is_superadmin = $this->_is_superadmin();
         
-        $data['floor_tables'] = [];
-        $unique_floors = [];
+        $data['is_superadmin'] = $is_superadmin;
+        
+        $restaurants = [];
         $stats = [
             'total' => count($tables),
             'free' => 0,
@@ -30,12 +38,10 @@ class Orders extends Admin_Controller
             'reserved' => 0
         ];
 
-        foreach ($floors as $floor) {
-            $unique_floors[$floor['floor_id']] = $floor;
-        }
-        
+        // First map tables to floors
+        $floor_tables = [];
         foreach ($tables as $table) {
-            $data['floor_tables'][$table['floor_id']][] = $table;
+            $floor_tables[$table['floor_id']][] = $table;
             
             // Calculate Stats
             if ($table['status'] == 'FREE') $stats['free']++;
@@ -43,7 +49,22 @@ class Orders extends Admin_Controller
             elseif ($table['status'] == 'RESERVED') $stats['reserved']++;
         }
         
-        $data['floors'] = $unique_floors;
+        // Map floors to restaurants
+        foreach ($floors as $floor) {
+            $rest_id = $floor['restaurant_id'] ?? 1;
+            if (!isset($restaurants[$rest_id])) {
+                $restaurants[$rest_id] = [
+                    'restaurant_id' => $rest_id,
+                    'restaurant_name' => $floor['restaurant_name'] ?: 'Unknown Restaurant',
+                    'floors' => []
+                ];
+            }
+            
+            $floor['tables'] = $floor_tables[$floor['floor_id']] ?? [];
+            $restaurants[$rest_id]['floors'][] = $floor;
+        }
+        
+        $data['restaurants'] = array_values($restaurants); // re-key numerically
         $data['stats'] = $stats;
         $this->render('tables.tpl', $data);
     }
@@ -57,12 +78,19 @@ class Orders extends Admin_Controller
         if (!$table_id) {
             redirect('admin/orders');
         }
+        
+        // Find the table to get its restaurant_id
+        $this->db->where('table_id', $table_id);
+        $table = $this->db->get('dining_tables')->row_array();
+        if (!$table) {
+            redirect('admin/orders');
+        }
 
         // 1. Create New Order
         $order_number = 'ORD' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
         $order_data = [
             'order_number'  => $order_number,
-            'restaurant_id' => 1, // Defaulting to 1 for now, should be session based
+            'restaurant_id' => $table['restaurant_id'], 
             'table_id'      => $table_id,
             'status'        => 'RUNNING',
             'order_type'    => 'DINE_IN',
@@ -96,6 +124,8 @@ class Orders extends Admin_Controller
 
         $data['title'] = 'Manage Order #' . $data['order']['order_number'] . ' | Dine Master';
         $data['categories'] = $this->Menu_model->get_categories();
+        
+        // Ideally we fetch items only for this restaurant, but Menu_model might handle that or it's a future step
         $data['items'] = $this->Menu_model->get_all_items();
         
         // Fetch existing items already in this order
@@ -232,12 +262,12 @@ class Orders extends Admin_Controller
         // 1. Insert Payment
         $payment_data = [
             'order_id'      => $order_id,
-            'restaurant_id' => $order['restaurant_id'], // Get from order instead of session
-            'method'        => $payment_method, // Corrected column name from payment_method to method
+            'restaurant_id' => $order['restaurant_id'], 
+            'method'        => $payment_method, 
             'amount'        => $amount,
             'status'        => 'SUCCESS',
             'added_by'      => $this->session->userdata('admin_user_id'),
-            'paid_at'       => date('Y-m-d H:i:s') // Corrected column name from payment_date to paid_at
+            'paid_at'       => date('Y-m-d H:i:s') 
         ];
         $this->db->insert('payments', $payment_data);
 
@@ -310,7 +340,7 @@ class Orders extends Admin_Controller
         if ($this->db->trans_status() === FALSE) {
             echo json_encode(['success' => false, 'message' => 'Database error']);
         } else {
-            echo json_encode(['success' => true, 'message' => 'Item cancelled successfully']);
+            echo json_encode(['success' => true, 'message' => 'Item cancelled cancelled successfully']);
         }
     }
 
@@ -341,6 +371,7 @@ class Orders extends Admin_Controller
         $data['title'] = 'Order History | Dine Master';
         $data['page_title'] = 'Orders';
         $data['current_status'] = $this->input->get('status');
+        $data['is_superadmin']  = $this->_is_superadmin();
         
         $this->render('index.tpl', $data);
     }
@@ -351,6 +382,7 @@ class Orders extends Admin_Controller
     public function ajax_list()
     {
         $list = $this->Order_management_model->get_datatables();
+        $is_superadmin = $this->_is_superadmin();
         $data = [];
         $no = $_POST['start'];
         
@@ -369,6 +401,10 @@ class Orders extends Admin_Controller
                         <div class="text-xs text-gray-400">' . date('h:i A, d M', strtotime($order->placed_at)) . '</div>
                     </div>
                 </div>';
+                
+            if ($is_superadmin) {
+                $row[] = '<span class="px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-widest rounded-lg">' . ($order->restaurant_name ?: "Unknown") . '</span>';
+            }
             
             // Table
             $row[] = '<span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">' . ($order->table_no ?: "N/A") . '</span>';

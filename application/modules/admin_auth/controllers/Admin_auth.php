@@ -47,10 +47,13 @@ class Admin_auth extends Admin_Controller
             $session_data = [
                 'admin_user_id' => $user['user_id'],
                 'admin_user' => [
-                    'user_id'   => $user['user_id'],
-                    'user_name' => $user['user_name'],
-                    'user_email' => $user['user_email'],
-                    'role_id'   => $user['user_role']
+                    'user_id'       => $user['user_id'],
+                    'user_name'     => $user['user_name'],
+                    'user_email'    => $user['user_email'],
+                    'role_id'       => $user['user_role'],
+                    'user_role'     => $user['user_role'],
+                    'role_name'     => $user['role_name'] ?? 'Admin',
+                    'restaurant_id' => $user['restaurant_id']
                 ]
             ];
             $this->session->set_userdata($session_data);
@@ -73,5 +76,140 @@ class Admin_auth extends Admin_Controller
         $this->session->unset_userdata('admin_user');
         $this->session->sess_destroy();
         redirect(base_url('admin/login'));
+    }
+
+    /**
+     * Forgot Password Page
+     */
+    public function forgot_password()
+    {
+        $data['title'] = 'Forgot Password | Dine Master';
+        $this->smarty->display('forgot_password.tpl');
+    }
+
+    /**
+     * Send Reset Link AJAX
+     */
+    public function send_reset_link()
+    {
+        $email = $this->input->post('email');
+        if (empty($email)) {
+            echo json_encode(['success' => false, 'message' => 'Please enter your email address.']);
+            return;
+        }
+
+        $user = $this->Admin_auth_model->get_user_by_username($email);
+        if (!$user) {
+            echo json_encode(['success' => false, 'message' => 'Email address not found in our records.']);
+            return;
+        }
+
+        // Generate Token
+        $token = bin2hex(random_bytes(32));
+        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+        if ($this->Admin_auth_model->update_reset_token($email, $token, $expiry)) {
+            // Send Email
+            $reset_link = base_url('admin_auth/reset_password/' . $token);
+            
+            $this->load->library('phpmailer_lib');
+            $mail = $this->phpmailer_lib->load();
+            
+            try {
+                // SMTP Configuration
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'codecrafter.help@gmail.com';
+                $mail->Password   = 'fleb drah mxbj yuim';
+                $mail->SMTPSecure = 'ssl';
+                $mail->Port       = 465;
+
+                // Email components: to, subject, message
+                $mail->setFrom('codecrafter.help@gmail.com', 'Dine Master');
+                $mail->clearAddresses();
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = 'Password Reset Request - Dine Master';
+                $mail->Body    = "
+                    <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+                        <h2 style='color: #2563eb;'>Password Reset Request</h2>
+                        <p>You requested a password reset for your Dine Master Admin account.</p>
+                        <p>Please click the button below to reset your password. This link will expire in 1 hour.</p>
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <a href='{$reset_link}' style='background-color: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Reset Password</a>
+                        </div>
+                        <p style='color: #666; font-size: 12px;'>If you're having trouble clicking the button, copy and paste the link below into your web browser:</p>
+                        <p style='color: #666; font-size: 12px;'>{$reset_link}</p>
+                        <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;'>
+                        <p style='color: #999; font-size: 12px;'>If you did not request this, please ignore this email.</p>
+                    </div>
+                ";
+
+                if ($mail->send()) {
+                    echo json_encode(['success' => true, 'message' => 'A password reset link has been sent to your email.']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to send email. Error: ' . $mail->ErrorInfo]);
+                }
+            } catch (\Exception $e) {
+                echo json_encode(['success' => false, 'message' => "An error occurred: {$e->getMessage()}"]);
+            } catch (\Throwable $t) {
+                echo json_encode(['success' => false, 'message' => "A critical system error occurred."]);
+            }
+        }
+    }
+
+    /**
+     * Reset Password Page
+     */
+    public function reset_password($token = NULL)
+    {
+        if (!$token) {
+            redirect(base_url('admin/login'));
+        }
+
+        $user = $this->Admin_auth_model->get_user_by_reset_token($token);
+        if (!$user) {
+            $this->session->set_flashdata('error', 'Invalid or expired reset token.');
+            redirect(base_url('admin/login'));
+        }
+
+        $data['title'] = 'Reset Password | Dine Master';
+        $data['token'] = $token;
+        $this->smarty->assign($data);
+        $this->smarty->display('reset_password.tpl');
+    }
+
+    /**
+     * Update New Password AJAX
+     */
+    public function update_new_password()
+    {
+        $token = $this->input->post('token');
+        $password = $this->input->post('password');
+        $confirm_password = $this->input->post('confirm_password');
+
+        if (empty($password) || empty($confirm_password)) {
+            echo json_encode(['success' => false, 'message' => 'Please fill in all fields.']);
+            return;
+        }
+
+        if ($password !== $confirm_password) {
+            echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
+            return;
+        }
+
+        $user = $this->Admin_auth_model->get_user_by_reset_token($token);
+        if (!$user) {
+            echo json_encode(['success' => false, 'message' => 'Invalid or expired reset token.']);
+            return;
+        }
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        if ($this->Admin_auth_model->update_password($user['user_id'], $hashed_password)) {
+            echo json_encode(['success' => true, 'message' => 'Password reset successful! You can now log in.', 'redirect' => base_url('admin/login')]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to reset password. Please try again.']);
+        }
     }
 }

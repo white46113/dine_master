@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 11, 2026 at 04:09 PM
+-- Generation Time: Mar 20, 2026 at 11:38 AM
 -- Server version: 8.0.45-0ubuntu0.22.04.1
 -- PHP Version: 8.1.2-1ubuntu2.23
 
@@ -392,9 +392,10 @@ CREATE TABLE `dining_tables` (
   `restaurant_id` bigint UNSIGNED NOT NULL,
   `floor_id` bigint UNSIGNED NOT NULL,
   `code` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `table_no` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `capacity` int NOT NULL DEFAULT '2',
-  `status` enum('FREE','OCCUPIED','RESERVED','BLOCKED') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'FREE',
+  `status` enum('FREE','OCCUPIED','RESERVED','BLOCKED','CLEANING') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'FREE',
   `current_order_id` bigint UNSIGNED DEFAULT NULL,
   `qr_token` char(36) COLLATE utf8mb4_general_ci NOT NULL,
   `qr_image_url` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -409,67 +410,67 @@ CREATE TABLE `dining_tables` (
 -- Dumping data for table `dining_tables`
 --
 
-INSERT INTO `dining_tables` (`table_id`, `restaurant_id`, `floor_id`, `code`, `name`, `capacity`, `status`, `current_order_id`, `qr_token`, `qr_image_url`, `is_active`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
-(1, 1, 1, 'T1', 'Table 1', 6, 'FREE', NULL, 'b41322ab-fe10-3038-bf93-67b9544a4752', 'https://via.placeholder.com/640x480.png/0055ee?text=molestiae', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(2, 1, 1, 'T2', 'Table 2', 6, 'FREE', NULL, '8a704892-af5f-37da-b7f9-9843dded5db0', 'https://via.placeholder.com/640x480.png/0000dd?text=est', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(3, 1, 1, 'T3', 'Table 3', 4, 'FREE', NULL, '0d1a7b75-ef81-3909-b551-7143b31ba247', 'https://via.placeholder.com/640x480.png/0055dd?text=voluptatem', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(4, 1, 2, 'T1', 'Table 1', 4, 'FREE', NULL, '189c57f0-23a6-3c00-990b-f13a3d6e3251', 'https://via.placeholder.com/640x480.png/003311?text=modi', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(5, 1, 2, 'T2', 'Table 2', 6, 'FREE', NULL, 'd36be3b4-3841-3867-8a2a-26f2f711d9d4', 'https://via.placeholder.com/640x480.png/00aa55?text=est', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(6, 1, 2, 'T3', 'Table 3', 2, 'FREE', NULL, '87773888-21e9-3914-80a6-c3a098dc5d29', 'https://via.placeholder.com/640x480.png/00bb66?text=possimus', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(7, 2, 3, 'T1', 'Table 1', 4, 'FREE', NULL, '0527ecf8-319f-3389-b214-a5e517c3c2d2', 'https://via.placeholder.com/640x480.png/008822?text=eum', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(8, 2, 3, 'T2', 'Table 2', 6, 'FREE', NULL, '9bdc579f-23e6-3344-a1df-9c6df1e87d51', 'https://via.placeholder.com/640x480.png/00ee44?text=recusandae', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(9, 2, 3, 'T3', 'Table 3', 4, 'FREE', NULL, '8b3ba410-ca4e-3752-81d3-76e739de3c73', 'https://via.placeholder.com/640x480.png/00ddcc?text=illo', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(10, 2, 4, 'T1', 'Table 1', 6, 'FREE', NULL, '16a45a4b-2783-3634-8802-558233ccd121', 'https://via.placeholder.com/640x480.png/0066aa?text=magnam', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(11, 2, 4, 'T2', 'Table 2', 6, 'FREE', NULL, 'f6c54cdf-ee58-3c76-882a-1d661a138cd7', 'https://via.placeholder.com/640x480.png/00bbff?text=provident', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(12, 2, 4, 'T3', 'Table 3', 3, 'FREE', NULL, '65946391-45cf-334d-b2a0-5067fd734a78', 'https://via.placeholder.com/640x480.png/003344?text=aspernatur', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(13, 3, 5, 'T1', 'Table 1', 4, 'FREE', NULL, '1f67a82f-2138-35db-8202-ab6e38add264', 'https://via.placeholder.com/640x480.png/00cc99?text=quaerat', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(14, 3, 5, 'T2', 'Table 2', 4, 'FREE', NULL, '0edf9091-fd22-3e3e-ab1e-644fba5f29b3', 'https://via.placeholder.com/640x480.png/0022bb?text=possimus', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(15, 3, 5, 'T3', 'Table 3', 5, 'FREE', NULL, '34c03272-266e-39c2-b2bd-5160eb1f2fc4', 'https://via.placeholder.com/640x480.png/00eeaa?text=veniam', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(16, 3, 6, 'T1', 'Table 1', 5, 'FREE', NULL, 'a43dac4a-d7c5-3c18-b994-0671d3efcf4a', 'https://via.placeholder.com/640x480.png/00bb00?text=earum', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(17, 3, 6, 'T2', 'Table 2', 2, 'FREE', NULL, '87ebb70f-b455-327c-bdac-05fee71ad92e', 'https://via.placeholder.com/640x480.png/0055ff?text=impedit', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(18, 3, 6, 'T3', 'Table 3', 4, 'FREE', NULL, 'd6e5f26a-dd4f-374e-b4cc-9d722e35b4c4', 'https://via.placeholder.com/640x480.png/007711?text=et', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(19, 4, 7, 'T1', 'Table 1', 2, 'FREE', NULL, '2a71d6e6-dcdc-367b-a625-0fd21cd71d3a', 'https://via.placeholder.com/640x480.png/0077bb?text=libero', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(20, 4, 7, 'T2', 'Table 2', 3, 'FREE', NULL, '53c2b73c-71c1-357f-ab4b-aba4e1f8c24a', 'https://via.placeholder.com/640x480.png/00bb55?text=porro', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(21, 4, 7, 'T3', 'Table 3', 6, 'FREE', NULL, '19fa637e-7dab-398a-ba3a-39cd82b45f07', 'https://via.placeholder.com/640x480.png/00ff77?text=laudantium', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(22, 4, 8, 'T1', 'Table 1', 6, 'FREE', NULL, '87849bfd-b43b-355f-8a2a-93424a76f398', 'https://via.placeholder.com/640x480.png/00aa44?text=aut', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(23, 4, 8, 'T2', 'Table 2', 6, 'FREE', NULL, '721699e3-9630-3b42-a714-b0b3cafce52c', 'https://via.placeholder.com/640x480.png/009977?text=suscipit', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(24, 4, 8, 'T3', 'Table 3', 2, 'FREE', NULL, 'b925a787-5c5b-341e-9a0f-ab449fc28c57', 'https://via.placeholder.com/640x480.png/006611?text=dolore', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(25, 5, 9, 'T1', 'Table 1', 3, 'FREE', NULL, 'fa2ae148-e682-38cb-bd1b-5b8040d4c7e0', 'https://via.placeholder.com/640x480.png/00aa99?text=eveniet', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(26, 5, 9, 'T2', 'Table 2', 6, 'FREE', NULL, '51c351f0-8281-3fbe-8eee-a624a1d989e7', 'https://via.placeholder.com/640x480.png/001199?text=dignissimos', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(27, 5, 9, 'T3', 'Table 3', 6, 'FREE', NULL, '681ed2fd-cbf3-322e-a2d8-96000251094d', 'https://via.placeholder.com/640x480.png/00dd88?text=nihil', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(28, 5, 10, 'T1', 'Table 1', 3, 'FREE', NULL, '1eaa74e5-11af-33af-a542-95868594038e', 'https://via.placeholder.com/640x480.png/00bb44?text=est', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(29, 5, 10, 'T2', 'Table 2', 5, 'FREE', NULL, '8ca2f7e8-4c2d-38e5-ae87-1f9ff030228d', 'https://via.placeholder.com/640x480.png/00bb44?text=molestiae', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(30, 5, 10, 'T3', 'Table 3', 4, 'FREE', NULL, '242ba7cb-d423-362e-aec2-618bac3c9446', 'https://via.placeholder.com/640x480.png/00cc33?text=sequi', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(31, 6, 11, 'T1', 'Table 1', 6, 'FREE', NULL, '00f5bb5e-9e7a-3fe5-9584-928c27f20550', 'https://via.placeholder.com/640x480.png/0011bb?text=tenetur', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(32, 6, 11, 'T2', 'Table 2', 2, 'FREE', NULL, '1ec25c74-23bd-370f-9bd0-1ca8b26b0d03', 'https://via.placeholder.com/640x480.png/008877?text=beatae', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(33, 6, 11, 'T3', 'Table 3', 2, 'FREE', NULL, '7248e6cf-94dd-3f11-bd2d-faa99e08b2db', 'https://via.placeholder.com/640x480.png/00ff00?text=eum', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(34, 6, 12, 'T1', 'Table 1', 4, 'FREE', NULL, '3706c3f3-d2d4-3c5b-af4c-5f5ab24a2bf3', 'https://via.placeholder.com/640x480.png/006655?text=dolor', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(35, 6, 12, 'T2', 'Table 2', 5, 'FREE', NULL, '7a6e2e35-2040-3a55-a7e5-fe3d4a460c00', 'https://via.placeholder.com/640x480.png/009911?text=et', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(36, 6, 12, 'T3', 'Table 3', 6, 'FREE', NULL, 'f484c6f9-070d-3758-95f5-e50d85f0aec5', 'https://via.placeholder.com/640x480.png/00ee55?text=odio', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(37, 7, 13, 'T1', 'Table 1', 6, 'FREE', NULL, 'e7b8bb99-a1a3-338d-8964-9bd7bde2be1c', 'https://via.placeholder.com/640x480.png/0055ff?text=enim', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(38, 7, 13, 'T2', 'Table 2', 5, 'FREE', NULL, '3a7f3d2a-cba5-33e4-942b-b277c2c7e2a6', 'https://via.placeholder.com/640x480.png/002222?text=repellat', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(39, 7, 13, 'T3', 'Table 3', 4, 'FREE', NULL, '3e9a8822-6780-308f-8b97-e46da7411572', 'https://via.placeholder.com/640x480.png/004422?text=qui', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(40, 7, 14, 'T1', 'Table 1', 4, 'FREE', NULL, '7fafc9ba-4ecc-36f7-9ca8-bda4f16020b6', 'https://via.placeholder.com/640x480.png/004444?text=rerum', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(41, 7, 14, 'T2', 'Table 2', 4, 'FREE', NULL, 'a4cc5085-973e-38b5-a803-41361f081096', 'https://via.placeholder.com/640x480.png/006644?text=quisquam', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(42, 7, 14, 'T3', 'Table 3', 5, 'FREE', NULL, '42a748e2-9b59-37a6-ac58-aecb0080ff7e', 'https://via.placeholder.com/640x480.png/0000ee?text=voluptatibus', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(43, 8, 15, 'T1', 'Table 1', 5, 'FREE', NULL, '8a079dbc-770c-3ab1-830b-19f31d89f321', 'https://via.placeholder.com/640x480.png/008800?text=et', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(44, 8, 15, 'T2', 'Table 2', 2, 'FREE', NULL, 'e0c42650-3701-3b18-8984-fcce558cd2af', 'https://via.placeholder.com/640x480.png/009999?text=sunt', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(45, 8, 15, 'T3', 'Table 3', 2, 'FREE', NULL, '7bc321d1-1c0f-3474-be15-fbba9f50e181', 'https://via.placeholder.com/640x480.png/00dd33?text=molestias', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(46, 8, 16, 'T1', 'Table 1', 2, 'FREE', NULL, 'afea5c95-a1ac-3850-bf7d-fffa6fc8682b', 'https://via.placeholder.com/640x480.png/009955?text=hic', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(47, 8, 16, 'T2', 'Table 2', 4, 'FREE', NULL, 'b241b287-3349-3a5c-aaad-d9a3d5935254', 'https://via.placeholder.com/640x480.png/0099bb?text=culpa', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(48, 8, 16, 'T3', 'Table 3', 2, 'FREE', NULL, '41fc5435-02d1-32a8-9243-a2db960d6290', 'https://via.placeholder.com/640x480.png/0099ff?text=accusantium', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(49, 9, 17, 'T1', 'Table 1', 6, 'FREE', NULL, '6dbb48f1-83d1-370e-9686-b18bd852e50e', 'https://via.placeholder.com/640x480.png/006611?text=optio', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(50, 9, 17, 'T2', 'Table 2', 3, 'FREE', NULL, '6e493fdc-bad2-39c0-aa88-c8f638e49366', 'https://via.placeholder.com/640x480.png/00ff77?text=nulla', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(51, 9, 17, 'T3', 'Table 3', 4, 'FREE', NULL, '50bd9c7d-f8f2-3f08-9010-5cc63d834c71', 'https://via.placeholder.com/640x480.png/000066?text=nihil', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(52, 9, 18, 'T1', 'Table 1', 6, 'FREE', NULL, '08d5a127-9147-30d0-b421-7ac367b9fa31', 'https://via.placeholder.com/640x480.png/00ee99?text=enim', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(53, 9, 18, 'T2', 'Table 2', 2, 'FREE', NULL, 'e2a41d8b-390f-3690-a723-cd1110c29465', 'https://via.placeholder.com/640x480.png/00aa00?text=cum', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(54, 9, 18, 'T3', 'Table 3', 3, 'FREE', NULL, 'e25c9995-43d4-3ed0-a176-cdf6c43f9f88', 'https://via.placeholder.com/640x480.png/00ff66?text=eos', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(55, 10, 19, 'T1', 'Table 1', 5, 'FREE', NULL, '4840e208-f51a-317d-a978-68ad8ec85719', 'https://via.placeholder.com/640x480.png/0000bb?text=accusamus', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(56, 10, 19, 'T2', 'Table 2', 6, 'FREE', NULL, '7739531f-4aab-3bc2-b733-fb8e9d632559', 'https://via.placeholder.com/640x480.png/00ff44?text=amet', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(57, 10, 19, 'T3', 'Table 3', 4, 'FREE', NULL, '22327af5-8de2-379d-a06e-0a70e98bc876', 'https://via.placeholder.com/640x480.png/00bbbb?text=enim', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(58, 10, 20, 'T1', 'Table 1', 6, 'FREE', NULL, 'e093160b-42bd-3274-ad0a-c73f769fa0fd', 'https://via.placeholder.com/640x480.png/00dd88?text=nemo', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(59, 10, 20, 'T2', 'Table 2', 6, 'FREE', NULL, 'c3a16cbd-7a4d-33a4-a7ce-ca4eece7f72e', 'https://via.placeholder.com/640x480.png/00ff88?text=aperiam', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38'),
-(60, 10, 20, 'T3', 'Table 3', 2, 'FREE', NULL, 'c797d814-3976-3a29-8be2-20a37208daa2', 'https://via.placeholder.com/640x480.png/0033cc?text=architecto', 1, 1, NULL, '2025-09-06 16:46:38', '2025-09-06 16:46:38');
+INSERT INTO `dining_tables` (`table_id`, `restaurant_id`, `floor_id`, `code`, `table_no`, `name`, `capacity`, `status`, `current_order_id`, `qr_token`, `qr_image_url`, `is_active`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
+(1, 1, 1, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, 'b41322ab-fe10-3038-bf93-67b9544a4752', 'https://via.placeholder.com/640x480.png/0055ee?text=molestiae', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-14 12:15:12'),
+(2, 1, 1, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, '8a704892-af5f-37da-b7f9-9843dded5db0', 'https://via.placeholder.com/640x480.png/0000dd?text=est', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 11:41:27'),
+(3, 1, 1, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, '0d1a7b75-ef81-3909-b551-7143b31ba247', 'https://via.placeholder.com/640x480.png/0055dd?text=voluptatem', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 08:52:14'),
+(4, 1, 2, 'T1', 'T1', 'Table 1', 4, 'FREE', NULL, '189c57f0-23a6-3c00-990b-f13a3d6e3251', 'https://via.placeholder.com/640x480.png/003311?text=modi', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(5, 1, 2, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, 'd36be3b4-3841-3867-8a2a-26f2f711d9d4', 'https://via.placeholder.com/640x480.png/00aa55?text=est', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(6, 1, 2, 'T3', 'T3', 'Table 3', 2, 'FREE', NULL, '87773888-21e9-3914-80a6-c3a098dc5d29', 'https://via.placeholder.com/640x480.png/00bb66?text=possimus', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(7, 2, 3, 'T1', 'T1', 'Table 1', 4, 'FREE', NULL, '0527ecf8-319f-3389-b214-a5e517c3c2d2', 'https://via.placeholder.com/640x480.png/008822?text=eum', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 08:51:59'),
+(8, 2, 3, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, '9bdc579f-23e6-3344-a1df-9c6df1e87d51', 'https://via.placeholder.com/640x480.png/00ee44?text=recusandae', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(9, 2, 3, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, '8b3ba410-ca4e-3752-81d3-76e739de3c73', 'https://via.placeholder.com/640x480.png/00ddcc?text=illo', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(10, 2, 4, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, '16a45a4b-2783-3634-8802-558233ccd121', 'https://via.placeholder.com/640x480.png/0066aa?text=magnam', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(11, 2, 4, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, 'f6c54cdf-ee58-3c76-882a-1d661a138cd7', 'https://via.placeholder.com/640x480.png/00bbff?text=provident', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(12, 2, 4, 'T3', 'T3', 'Table 3', 3, 'FREE', NULL, '65946391-45cf-334d-b2a0-5067fd734a78', 'https://via.placeholder.com/640x480.png/003344?text=aspernatur', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(13, 3, 5, 'T1', 'T1', 'Table 1', 4, 'FREE', NULL, '1f67a82f-2138-35db-8202-ab6e38add264', 'https://via.placeholder.com/640x480.png/00cc99?text=quaerat', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(14, 3, 5, 'T2', 'T2', 'Table 2', 4, 'FREE', NULL, '0edf9091-fd22-3e3e-ab1e-644fba5f29b3', 'https://via.placeholder.com/640x480.png/0022bb?text=possimus', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(15, 3, 5, 'T3', 'T3', 'Table 3', 5, 'FREE', NULL, '34c03272-266e-39c2-b2bd-5160eb1f2fc4', 'https://via.placeholder.com/640x480.png/00eeaa?text=veniam', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(16, 3, 6, 'T1', 'T1', 'Table 1', 5, 'FREE', NULL, 'a43dac4a-d7c5-3c18-b994-0671d3efcf4a', 'https://via.placeholder.com/640x480.png/00bb00?text=earum', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(17, 3, 6, 'T2', 'T2', 'Table 2', 2, 'FREE', NULL, '87ebb70f-b455-327c-bdac-05fee71ad92e', 'https://via.placeholder.com/640x480.png/0055ff?text=impedit', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(18, 3, 6, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, 'd6e5f26a-dd4f-374e-b4cc-9d722e35b4c4', 'https://via.placeholder.com/640x480.png/007711?text=et', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(19, 4, 7, 'T1', 'T1', 'Table 1', 2, 'FREE', NULL, '2a71d6e6-dcdc-367b-a625-0fd21cd71d3a', 'https://via.placeholder.com/640x480.png/0077bb?text=libero', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(20, 4, 7, 'T2', 'T2', 'Table 2', 3, 'FREE', NULL, '53c2b73c-71c1-357f-ab4b-aba4e1f8c24a', 'https://via.placeholder.com/640x480.png/00bb55?text=porro', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(21, 4, 7, 'T3', 'T3', 'Table 3', 6, 'FREE', NULL, '19fa637e-7dab-398a-ba3a-39cd82b45f07', 'https://via.placeholder.com/640x480.png/00ff77?text=laudantium', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(22, 4, 8, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, '87849bfd-b43b-355f-8a2a-93424a76f398', 'https://via.placeholder.com/640x480.png/00aa44?text=aut', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(23, 4, 8, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, '721699e3-9630-3b42-a714-b0b3cafce52c', 'https://via.placeholder.com/640x480.png/009977?text=suscipit', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(24, 4, 8, 'T3', 'T3', 'Table 3', 2, 'FREE', NULL, 'b925a787-5c5b-341e-9a0f-ab449fc28c57', 'https://via.placeholder.com/640x480.png/006611?text=dolore', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(25, 5, 9, 'T1', 'T1', 'Table 1', 3, 'FREE', NULL, 'fa2ae148-e682-38cb-bd1b-5b8040d4c7e0', 'https://via.placeholder.com/640x480.png/00aa99?text=eveniet', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(26, 5, 9, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, '51c351f0-8281-3fbe-8eee-a624a1d989e7', 'https://via.placeholder.com/640x480.png/001199?text=dignissimos', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(27, 5, 9, 'T3', 'T3', 'Table 3', 6, 'FREE', NULL, '681ed2fd-cbf3-322e-a2d8-96000251094d', 'https://via.placeholder.com/640x480.png/00dd88?text=nihil', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(28, 5, 10, 'T1', 'T1', 'Table 1', 3, 'FREE', NULL, '1eaa74e5-11af-33af-a542-95868594038e', 'https://via.placeholder.com/640x480.png/00bb44?text=est', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(29, 5, 10, 'T2', 'T2', 'Table 2', 5, 'FREE', NULL, '8ca2f7e8-4c2d-38e5-ae87-1f9ff030228d', 'https://via.placeholder.com/640x480.png/00bb44?text=molestiae', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(30, 5, 10, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, '242ba7cb-d423-362e-aec2-618bac3c9446', 'https://via.placeholder.com/640x480.png/00cc33?text=sequi', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(31, 6, 11, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, '00f5bb5e-9e7a-3fe5-9584-928c27f20550', 'https://via.placeholder.com/640x480.png/0011bb?text=tenetur', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(32, 6, 11, 'T2', 'T2', 'Table 2', 2, 'FREE', NULL, '1ec25c74-23bd-370f-9bd0-1ca8b26b0d03', 'https://via.placeholder.com/640x480.png/008877?text=beatae', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(33, 6, 11, 'T3', 'T3', 'Table 3', 2, 'FREE', NULL, '7248e6cf-94dd-3f11-bd2d-faa99e08b2db', 'https://via.placeholder.com/640x480.png/00ff00?text=eum', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(34, 6, 12, 'T1', 'T1', 'Table 1', 4, 'FREE', NULL, '3706c3f3-d2d4-3c5b-af4c-5f5ab24a2bf3', 'https://via.placeholder.com/640x480.png/006655?text=dolor', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(35, 6, 12, 'T2', 'T2', 'Table 2', 5, 'FREE', NULL, '7a6e2e35-2040-3a55-a7e5-fe3d4a460c00', 'https://via.placeholder.com/640x480.png/009911?text=et', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(36, 6, 12, 'T3', 'T3', 'Table 3', 6, 'FREE', NULL, 'f484c6f9-070d-3758-95f5-e50d85f0aec5', 'https://via.placeholder.com/640x480.png/00ee55?text=odio', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(37, 7, 13, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, 'e7b8bb99-a1a3-338d-8964-9bd7bde2be1c', 'https://via.placeholder.com/640x480.png/0055ff?text=enim', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(38, 7, 13, 'T2', 'T2', 'Table 2', 5, 'FREE', NULL, '3a7f3d2a-cba5-33e4-942b-b277c2c7e2a6', 'https://via.placeholder.com/640x480.png/002222?text=repellat', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(39, 7, 13, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, '3e9a8822-6780-308f-8b97-e46da7411572', 'https://via.placeholder.com/640x480.png/004422?text=qui', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(40, 7, 14, 'T1', 'T1', 'Table 1', 4, 'FREE', NULL, '7fafc9ba-4ecc-36f7-9ca8-bda4f16020b6', 'https://via.placeholder.com/640x480.png/004444?text=rerum', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(41, 7, 14, 'T2', 'T2', 'Table 2', 4, 'FREE', NULL, 'a4cc5085-973e-38b5-a803-41361f081096', 'https://via.placeholder.com/640x480.png/006644?text=quisquam', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(42, 7, 14, 'T3', 'T3', 'Table 3', 5, 'FREE', NULL, '42a748e2-9b59-37a6-ac58-aecb0080ff7e', 'https://via.placeholder.com/640x480.png/0000ee?text=voluptatibus', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(43, 8, 15, 'T1', 'T1', 'Table 1', 5, 'FREE', NULL, '8a079dbc-770c-3ab1-830b-19f31d89f321', 'https://via.placeholder.com/640x480.png/008800?text=et', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(44, 8, 15, 'T2', 'T2', 'Table 2', 2, 'FREE', NULL, 'e0c42650-3701-3b18-8984-fcce558cd2af', 'https://via.placeholder.com/640x480.png/009999?text=sunt', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(45, 8, 15, 'T3', 'T3', 'Table 3', 2, 'FREE', NULL, '7bc321d1-1c0f-3474-be15-fbba9f50e181', 'https://via.placeholder.com/640x480.png/00dd33?text=molestias', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(46, 8, 16, 'T1', 'T1', 'Table 1', 2, 'FREE', NULL, 'afea5c95-a1ac-3850-bf7d-fffa6fc8682b', 'https://via.placeholder.com/640x480.png/009955?text=hic', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(47, 8, 16, 'T2', 'T2', 'Table 2', 4, 'FREE', NULL, 'b241b287-3349-3a5c-aaad-d9a3d5935254', 'https://via.placeholder.com/640x480.png/0099bb?text=culpa', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(48, 8, 16, 'T3', 'T3', 'Table 3', 2, 'FREE', NULL, '41fc5435-02d1-32a8-9243-a2db960d6290', 'https://via.placeholder.com/640x480.png/0099ff?text=accusantium', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(49, 9, 17, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, '6dbb48f1-83d1-370e-9686-b18bd852e50e', 'https://via.placeholder.com/640x480.png/006611?text=optio', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(50, 9, 17, 'T2', 'T2', 'Table 2', 3, 'FREE', NULL, '6e493fdc-bad2-39c0-aa88-c8f638e49366', 'https://via.placeholder.com/640x480.png/00ff77?text=nulla', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(51, 9, 17, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, '50bd9c7d-f8f2-3f08-9010-5cc63d834c71', 'https://via.placeholder.com/640x480.png/000066?text=nihil', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(52, 9, 18, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, '08d5a127-9147-30d0-b421-7ac367b9fa31', 'https://via.placeholder.com/640x480.png/00ee99?text=enim', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(53, 9, 18, 'T2', 'T2', 'Table 2', 2, 'FREE', NULL, 'e2a41d8b-390f-3690-a723-cd1110c29465', 'https://via.placeholder.com/640x480.png/00aa00?text=cum', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(54, 9, 18, 'T3', 'T3', 'Table 3', 3, 'FREE', NULL, 'e25c9995-43d4-3ed0-a176-cdf6c43f9f88', 'https://via.placeholder.com/640x480.png/00ff66?text=eos', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(55, 10, 19, 'T1', 'T1', 'Table 1', 5, 'FREE', NULL, '4840e208-f51a-317d-a978-68ad8ec85719', 'https://via.placeholder.com/640x480.png/0000bb?text=accusamus', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(56, 10, 19, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, '7739531f-4aab-3bc2-b733-fb8e9d632559', 'https://via.placeholder.com/640x480.png/00ff44?text=amet', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(57, 10, 19, 'T3', 'T3', 'Table 3', 4, 'FREE', NULL, '22327af5-8de2-379d-a06e-0a70e98bc876', 'https://via.placeholder.com/640x480.png/00bbbb?text=enim', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(58, 10, 20, 'T1', 'T1', 'Table 1', 6, 'FREE', NULL, 'e093160b-42bd-3274-ad0a-c73f769fa0fd', 'https://via.placeholder.com/640x480.png/00dd88?text=nemo', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(59, 10, 20, 'T2', 'T2', 'Table 2', 6, 'FREE', NULL, 'c3a16cbd-7a4d-33a4-a7ce-ca4eece7f72e', 'https://via.placeholder.com/640x480.png/00ff88?text=aperiam', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 07:21:06'),
+(60, 10, 20, 'T3', 'T3', 'Table 3', 2, 'FREE', NULL, 'c797d814-3976-3a29-8be2-20a37208daa2', 'https://via.placeholder.com/640x480.png/0033cc?text=architecto', 1, 1, NULL, '2025-09-06 16:46:38', '2026-03-13 09:05:46');
 
 -- --------------------------------------------------------
 
@@ -741,6 +742,34 @@ CREATE TABLE `kot_items` (
   `added_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `kot_items`
+--
+
+INSERT INTO `kot_items` (`kot_item_id`, `kot_id`, `order_item_id`, `quantity`, `added_by`, `added_date`) VALUES
+(1, 21, 15, '1.00', 2, '2026-03-13 08:20:54'),
+(2, 21, 16, '1.00', 2, '2026-03-13 08:20:54'),
+(3, 22, 17, '1.00', 2, '2026-03-13 08:22:18'),
+(4, 23, 18, '2.00', 2, '2026-03-13 08:25:53'),
+(5, 24, 19, '1.00', 2, '2026-03-13 08:28:24'),
+(6, 25, 20, '1.00', 2, '2026-03-13 08:30:21'),
+(7, 26, 21, '1.00', 2, '2026-03-13 08:31:53'),
+(8, 26, 22, '1.00', 2, '2026-03-13 08:31:53'),
+(9, 27, 23, '1.00', 2, '2026-03-13 09:16:52'),
+(10, 27, 24, '12.00', 2, '2026-03-13 09:16:52'),
+(11, 28, 25, '1.00', 2, '2026-03-13 09:31:41'),
+(12, 29, 26, '4.00', 2, '2026-03-13 09:53:46'),
+(13, 30, 27, '1.00', 2, '2026-03-13 09:54:03'),
+(14, 31, 28, '1.00', 2, '2026-03-13 11:13:22'),
+(15, 32, 29, '3.00', 2, '2026-03-13 11:30:41'),
+(16, 33, 30, '1.00', 2, '2026-03-13 11:41:20'),
+(17, 34, 31, '2.00', 2, '2026-03-13 17:28:08'),
+(18, 34, 32, '2.00', 2, '2026-03-13 17:28:09'),
+(19, 35, 33, '2.00', 2, '2026-03-13 17:28:37'),
+(20, 36, 34, '1.00', 2, '2026-03-13 17:29:26'),
+(21, 37, 35, '1.00', 2, '2026-03-14 12:14:42'),
+(22, 37, 36, '1.00', 2, '2026-03-14 12:14:42');
+
 -- --------------------------------------------------------
 
 --
@@ -781,7 +810,24 @@ INSERT INTO `kot_tickets` (`kot_ticket_id`, `order_id`, `status`, `printer_name`
 (17, 17, 'QUEUED', 'Printer1', '2025-09-06 16:46:39', 1, NULL),
 (18, 18, 'QUEUED', 'Printer1', '2025-09-06 16:46:39', 1, NULL),
 (19, 19, 'QUEUED', 'Printer1', '2025-09-06 16:46:39', 1, NULL),
-(20, 20, 'QUEUED', 'Printer1', '2025-09-06 16:46:39', 1, NULL);
+(20, 20, 'QUEUED', 'Printer1', '2025-09-06 16:46:39', 1, NULL),
+(21, 24, 'QUEUED', NULL, '2026-03-13 08:20:54', 2, NULL),
+(22, 24, 'QUEUED', NULL, '2026-03-13 08:22:18', 2, NULL),
+(23, 24, 'QUEUED', NULL, '2026-03-13 08:25:53', 2, NULL),
+(24, 25, 'QUEUED', NULL, '2026-03-13 08:28:24', 2, NULL),
+(25, 26, 'QUEUED', NULL, '2026-03-13 08:30:21', 2, NULL),
+(26, 26, 'QUEUED', NULL, '2026-03-13 08:31:53', 2, NULL),
+(27, 24, 'QUEUED', NULL, '2026-03-13 09:16:52', 2, NULL),
+(28, 25, 'QUEUED', NULL, '2026-03-13 09:31:41', 2, NULL),
+(29, 27, 'QUEUED', NULL, '2026-03-13 09:53:46', 2, NULL),
+(30, 27, 'QUEUED', NULL, '2026-03-13 09:54:03', 2, NULL),
+(31, 27, 'QUEUED', NULL, '2026-03-13 11:13:22', 2, NULL),
+(32, 28, 'QUEUED', NULL, '2026-03-13 11:30:41', 2, NULL),
+(33, 23, 'QUEUED', NULL, '2026-03-13 11:41:20', 2, NULL),
+(34, 29, 'QUEUED', NULL, '2026-03-13 17:28:08', 2, NULL),
+(35, 29, 'QUEUED', NULL, '2026-03-13 17:28:37', 2, NULL),
+(36, 29, 'QUEUED', NULL, '2026-03-13 17:29:26', 2, NULL),
+(37, 30, 'QUEUED', NULL, '2026-03-14 12:14:42', 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -1110,7 +1156,7 @@ INSERT INTO `menu_items` (`item_id`, `restaurant_id`, `category_id`, `name`, `co
 (91, 8, 31, 'nam', 'QVB618', 'Quibusdam qui voluptatem voluptatem dolor dolores.', '101.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/007700?text=vitae', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
 (92, 8, 31, 'quia', 'KBF411', 'Facilis mollitia et omnis.', '185.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/00aa88?text=voluptatem', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
 (93, 8, 31, 'esse', 'PLH815', 'Consequatur sed provident earum est id cumque.', '237.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/003377?text=eos', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(94, 8, 32, 'ab', 'HKX406', 'Quia dolores vero sapiente sapiente.', '181.00', 'EGG', 'https://via.placeholder.com/640x480.png/00bb88?text=cupiditate', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(94, 1, 32, 'ab', 'HKX406', 'Quia dolores vero sapiente sapiente.', '181.00', 'EGG', 'https://via.placeholder.com/640x480.png/00bb88?text=cupiditate', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 2, NULL, '2025-09-06 16:46:39', '2026-03-13 07:34:45'),
 (95, 8, 32, 'quia', 'WCE915', 'Dolorum est ut a atque numquam.', '208.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/00aaee?text=illo', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
 (96, 8, 32, 'perspiciatis', 'IGY108', 'Animi quasi qui veniam consequatur.', '138.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/009911?text=in', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
 (97, 9, 33, 'eos', 'YQK398', 'Dolores facere soluta nemo ipsam nulla non mollitia.', '277.00', 'VEG', 'https://via.placeholder.com/640x480.png/00aa99?text=beatae', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
@@ -1136,7 +1182,8 @@ INSERT INTO `menu_items` (`item_id`, `restaurant_id`, `category_id`, `name`, `co
 (117, 10, 39, 'eum', 'DEW044', 'Eos atque harum odio.', '264.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/00aa44?text=rerum', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
 (118, 10, 40, 'nemo', 'STZ277', 'Nihil fuga quam iure necessitatibus.', '420.00', 'VEG', 'https://via.placeholder.com/640x480.png/003399?text=laudantium', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
 (119, 10, 40, 'aliquam', 'TMW967', 'Non alias laborum harum aut dolorum.', '260.00', 'EGG', 'https://via.placeholder.com/640x480.png/00ff33?text=voluptas', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(120, 10, 40, 'harum', 'XRF476', 'Optio itaque magni velit blanditiis velit qui.', '281.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/00ee77?text=qui', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39');
+(120, 10, 40, 'harum', 'XRF476', 'Optio itaque magni velit blanditiis velit qui.', '281.00', 'NON_VEG', 'https://via.placeholder.com/640x480.png/00ee77?text=qui', 1, 1, '5.00', '{\"cgst\": 2.5, \"sgst\": 2.5}', 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(121, 1, 2, 'New', NULL, 'Test', '875.00', 'VEG', 'http://localhost/dine_master/public/uploads/menu/3b1f20e5d3d3553de72a0a43d63d387d.jpg', 1, 1, '0.00', NULL, 2, NULL, '2026-03-13 07:37:55', '2026-03-13 07:43:50');
 
 -- --------------------------------------------------------
 
@@ -1160,12 +1207,13 @@ CREATE TABLE `menu_master` (
 
 CREATE TABLE `orders` (
   `order_id` bigint UNSIGNED NOT NULL,
+  `order_number` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `restaurant_id` bigint UNSIGNED NOT NULL,
   `table_id` bigint UNSIGNED DEFAULT NULL,
   `customer_id` bigint UNSIGNED DEFAULT NULL,
   `waiter_id` bigint UNSIGNED DEFAULT NULL,
   `order_type` enum('DINE_IN','TAKEAWAY') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'DINE_IN',
-  `status` enum('PLACED','PREPARING','READY','SERVED','COMPLETED','CANCELLED') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PLACED',
+  `status` enum('PLACED','RUNNING','PREPARING','READY','SERVED','COMPLETED','CANCELLED') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PLACED',
   `placed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `completed_at` datetime DEFAULT NULL,
   `subtotal_amount` decimal(12,2) NOT NULL DEFAULT '0.00',
@@ -1189,27 +1237,37 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `restaurant_id`, `table_id`, `customer_id`, `waiter_id`, `order_type`, `status`, `placed_at`, `completed_at`, `subtotal_amount`, `discount_amount`, `service_charge_pct`, `service_charge_amt`, `tax_amount`, `rounding_adjustment`, `total_payable`, `tax_breakdown`, `notes`, `payment_status`, `is_active`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
-(1, 1, 4, 2, 4, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '897.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Temporibus consectetur quaerat autem vitae quia.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(2, 1, 4, 4, 5, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '765.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Cumque quo harum dolores impedit earum quam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(3, 2, 7, 8, 11, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '230.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'A repellendus voluptas at iste sint impedit.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(4, 2, 8, 10, 7, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '906.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Magni et non sed facere omnis eum accusamus.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(5, 3, 15, 15, 17, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '232.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Nam recusandae exercitationem quo sapiente.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(6, 3, 14, 14, 14, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '486.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Illo quaerat ducimus necessitatibus.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(7, 4, 21, 20, 19, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '671.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Et soluta qui possimus vel molestiae.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(8, 4, 19, 17, 22, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '588.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Quia earum et provident esse nemo in repellendus est.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(9, 5, 29, 21, 30, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '680.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Fugiat omnis modi repudiandae ab.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(10, 5, 25, 22, 28, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '846.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Quasi dolorum autem quasi velit ea aut aperiam veniam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(11, 6, 34, 30, 36, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '749.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Quia dolor ut ipsam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(12, 6, 35, 28, 35, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '135.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Et et qui architecto sunt et totam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(13, 7, 40, 33, 42, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '794.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Autem et omnis nostrum quas aut.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(14, 7, 41, 32, 41, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '514.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Est dicta quidem consequuntur ratione suscipit.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(15, 8, 45, 36, 45, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '765.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Aut nam illo consequatur placeat et.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(16, 8, 47, 37, 48, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '515.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Voluptatem ea provident aut dignissimos quo.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(17, 9, 50, 41, 54, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '206.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Modi quia dignissimos dignissimos sit sed.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(18, 9, 49, 44, 52, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '856.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Laudantium repudiandae labore sit.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(19, 10, 60, 48, 55, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '401.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Tenetur perferendis consequatur qui nobis.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
-(20, 10, 56, 48, 60, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '751.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Dignissimos sint dolorum nostrum qui illum.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39');
+INSERT INTO `orders` (`order_id`, `order_number`, `restaurant_id`, `table_id`, `customer_id`, `waiter_id`, `order_type`, `status`, `placed_at`, `completed_at`, `subtotal_amount`, `discount_amount`, `service_charge_pct`, `service_charge_amt`, `tax_amount`, `rounding_adjustment`, `total_payable`, `tax_breakdown`, `notes`, `payment_status`, `is_active`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
+(1, NULL, 1, 4, 2, 4, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '897.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Temporibus consectetur quaerat autem vitae quia.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(2, NULL, 1, 4, 4, 5, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '765.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Cumque quo harum dolores impedit earum quam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(3, NULL, 2, 7, 8, 11, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '230.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'A repellendus voluptas at iste sint impedit.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(4, NULL, 2, 8, 10, 7, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '906.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Magni et non sed facere omnis eum accusamus.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(5, NULL, 3, 15, 15, 17, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '232.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Nam recusandae exercitationem quo sapiente.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(6, NULL, 3, 14, 14, 14, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '486.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Illo quaerat ducimus necessitatibus.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(7, NULL, 4, 21, 20, 19, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '671.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Et soluta qui possimus vel molestiae.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(8, NULL, 4, 19, 17, 22, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '588.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Quia earum et provident esse nemo in repellendus est.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(9, NULL, 5, 29, 21, 30, 'DINE_IN', 'SERVED', '2025-09-06 16:46:39', NULL, '680.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Fugiat omnis modi repudiandae ab.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2026-03-13 07:22:12'),
+(10, NULL, 5, 25, 22, 28, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '846.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Quasi dolorum autem quasi velit ea aut aperiam veniam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(11, NULL, 6, 34, 30, 36, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '749.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Quia dolor ut ipsam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(12, NULL, 6, 35, 28, 35, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '135.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Et et qui architecto sunt et totam.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(13, NULL, 7, 40, 33, 42, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '794.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Autem et omnis nostrum quas aut.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(14, NULL, 7, 41, 32, 41, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '514.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Est dicta quidem consequuntur ratione suscipit.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(15, NULL, 8, 45, 36, 45, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '765.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Aut nam illo consequatur placeat et.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(16, NULL, 8, 47, 37, 48, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '515.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Voluptatem ea provident aut dignissimos quo.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(17, NULL, 9, 50, 41, 54, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '206.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Modi quia dignissimos dignissimos sit sed.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(18, NULL, 9, 49, 44, 52, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '856.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Laudantium repudiandae labore sit.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(19, NULL, 10, 60, 48, 55, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '401.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Tenetur perferendis consequatur qui nobis.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(20, NULL, 10, 56, 48, 60, 'DINE_IN', 'PLACED', '2025-09-06 16:46:39', NULL, '751.00', '0.00', '5.00', '50.00', '30.00', '0.00', '1080.00', '{\"cgst\": 15, \"sgst\": 15}', 'Dignissimos sint dolorum nostrum qui illum.', 'UNPAID', 1, 1, NULL, '2025-09-06 16:46:39', '2025-09-06 16:46:39'),
+(21, NULL, 4, 1, NULL, NULL, 'DINE_IN', 'PLACED', '2026-03-12 14:56:55', NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', NULL, NULL, 'UNPAID', 1, 1, NULL, '2026-03-12 09:26:55', '2026-03-12 09:26:55'),
+(22, NULL, 4, 1, NULL, NULL, 'DINE_IN', 'COMPLETED', '2026-03-12 15:00:15', '2026-03-13 14:29:10', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', NULL, NULL, 'PAID', 1, 1, NULL, '2026-03-12 09:30:15', '2026-03-13 08:59:10'),
+(23, 'ORD9497', 1, 2, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 13:45:29', '2026-03-13 17:11:27', '420.00', '0.00', '0.00', '0.00', '0.00', '0.00', '420.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 08:15:29', '2026-03-13 11:41:27'),
+(24, 'ORD3921', 1, 1, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 13:46:35', '2026-03-13 14:47:20', '6514.00', '0.00', '0.00', '0.00', '0.00', '0.00', '6514.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 08:16:35', '2026-03-13 09:17:20'),
+(25, 'ORD6093', 1, 3, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 13:58:20', '2026-03-13 14:22:14', '840.00', '0.00', '0.00', '0.00', '0.00', '0.00', '840.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 08:28:20', '2026-03-13 09:31:41'),
+(26, 'ORD4055', 1, 7, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 14:00:17', '2026-03-13 14:29:04', '1100.00', '0.00', '0.00', '0.00', '0.00', '0.00', '1100.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 08:30:17', '2026-03-13 08:59:04'),
+(27, 'ORD2129', 1, 1, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 15:23:26', '2026-03-13 16:44:24', '1665.00', '0.00', '0.00', '0.00', '0.00', '0.00', '1665.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 09:53:26', '2026-03-13 11:14:24'),
+(28, 'ORD6211', 1, 1, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 16:45:34', '2026-03-13 17:05:36', '1125.00', '0.00', '0.00', '0.00', '0.00', '0.00', '1125.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 11:15:34', '2026-03-13 11:35:36'),
+(29, 'ORD7701', 1, 1, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-13 22:57:28', '2026-03-13 22:59:48', '3500.00', '0.00', '0.00', '0.00', '0.00', '0.00', '3500.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-13 17:27:28', '2026-03-13 17:29:48'),
+(30, 'ORD8911', 1, 1, NULL, 2, 'DINE_IN', 'COMPLETED', '2026-03-14 17:44:16', '2026-03-14 17:45:12', '541.00', '0.00', '0.00', '0.00', '0.00', '0.00', '541.00', NULL, NULL, 'PAID', 1, 2, NULL, '2026-03-14 12:14:16', '2026-03-14 12:15:12');
 
 -- --------------------------------------------------------
 
@@ -1226,6 +1284,7 @@ CREATE TABLE `order_items` (
   `unit_price` decimal(12,2) NOT NULL,
   `quantity` decimal(10,2) NOT NULL DEFAULT '1.00',
   `notes` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` enum('PENDING','PREPARING','READY','SERVED') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING',
   `tax_rate` decimal(5,2) NOT NULL DEFAULT '0.00',
   `tax_breakdown` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `tax_amount` decimal(12,2) NOT NULL DEFAULT '0.00',
@@ -1242,17 +1301,43 @@ CREATE TABLE `order_items` (
 -- Dumping data for table `order_items`
 --
 
-INSERT INTO `order_items` (`order_item_id`, `order_id`, `item_id`, `item_name`, `veg_type`, `unit_price`, `quantity`, `notes`, `tax_rate`, `tax_breakdown`, `tax_amount`, `line_subtotal`, `line_discount`, `line_total`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
-(1, 1, 1, 'Paneer Tikka', 'VEG', '250.00', '2.00', NULL, '5.00', NULL, '25.00', '500.00', '0.00', '525.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(2, 1, 5, 'Butter Naan', 'VEG', '60.00', '3.00', NULL, '5.00', NULL, '9.00', '180.00', '0.00', '189.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(3, 1, 8, 'Mango Lassi', 'VEG', '150.00', '1.00', NULL, '5.00', NULL, '7.50', '150.00', '0.00', '157.50', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(4, 2, 2, 'Chicken Tikka', 'NON_VEG', '300.00', '2.00', NULL, '5.00', NULL, '30.00', '600.00', '0.00', '630.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(5, 2, 3, 'Butter Chicken', 'NON_VEG', '350.00', '1.00', NULL, '5.00', NULL, '17.50', '350.00', '0.00', '367.50', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(6, 2, 5, 'Butter Naan', 'VEG', '60.00', '2.00', NULL, '5.00', NULL, '6.00', '120.00', '0.00', '126.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(7, 2, 8, 'Mango Lassi', 'VEG', '150.00', '1.00', NULL, '5.00', NULL, '7.50', '150.00', '0.00', '157.50', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(8, 3, 4, 'Paneer Butter Masala', 'VEG', '320.00', '1.00', NULL, '5.00', NULL, '16.00', '320.00', '0.00', '336.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(9, 3, 5, 'Butter Naan', 'VEG', '60.00', '2.00', NULL, '5.00', NULL, '6.00', '120.00', '0.00', '126.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
-(10, 3, 6, 'Vegetable Biryani', 'VEG', '280.00', '1.00', NULL, '5.00', NULL, '14.00', '280.00', '0.00', '294.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27');
+INSERT INTO `order_items` (`order_item_id`, `order_id`, `item_id`, `item_name`, `veg_type`, `unit_price`, `quantity`, `notes`, `status`, `tax_rate`, `tax_breakdown`, `tax_amount`, `line_subtotal`, `line_discount`, `line_total`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
+(1, 1, 1, 'Paneer Tikka', 'VEG', '250.00', '2.00', NULL, 'PENDING', '5.00', NULL, '25.00', '500.00', '0.00', '525.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(2, 1, 5, 'Butter Naan', 'VEG', '60.00', '3.00', NULL, 'PENDING', '5.00', NULL, '9.00', '180.00', '0.00', '189.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(3, 1, 8, 'Mango Lassi', 'VEG', '150.00', '1.00', NULL, 'PENDING', '5.00', NULL, '7.50', '150.00', '0.00', '157.50', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(4, 2, 2, 'Chicken Tikka', 'NON_VEG', '300.00', '2.00', NULL, 'PENDING', '5.00', NULL, '30.00', '600.00', '0.00', '630.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(5, 2, 3, 'Butter Chicken', 'NON_VEG', '350.00', '1.00', NULL, 'PENDING', '5.00', NULL, '17.50', '350.00', '0.00', '367.50', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(6, 2, 5, 'Butter Naan', 'VEG', '60.00', '2.00', NULL, 'PENDING', '5.00', NULL, '6.00', '120.00', '0.00', '126.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(7, 2, 8, 'Mango Lassi', 'VEG', '150.00', '1.00', NULL, 'PENDING', '5.00', NULL, '7.50', '150.00', '0.00', '157.50', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(8, 3, 4, 'Paneer Butter Masala', 'VEG', '320.00', '1.00', NULL, 'PENDING', '5.00', NULL, '16.00', '320.00', '0.00', '336.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(9, 3, 5, 'Butter Naan', 'VEG', '60.00', '2.00', NULL, 'PENDING', '5.00', NULL, '6.00', '120.00', '0.00', '126.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(10, 3, 6, 'Vegetable Biryani', 'VEG', '280.00', '1.00', NULL, 'PENDING', '5.00', NULL, '14.00', '280.00', '0.00', '294.00', 1, 1, '2025-09-09 05:38:59', '2025-10-02 16:13:27'),
+(11, 21, 1, 'Paneer Tikka', 'VEG', '250.00', '2.00', NULL, 'PENDING', '0.00', NULL, '0.00', '0.00', '0.00', '0.00', 1, NULL, '2026-03-12 09:26:55', '2026-03-12 09:26:55'),
+(12, 21, 2, 'Butter Naan', 'VEG', '40.00', '4.00', NULL, 'PENDING', '0.00', NULL, '0.00', '0.00', '0.00', '0.00', 1, NULL, '2026-03-12 09:26:55', '2026-03-12 09:26:55'),
+(13, 22, 1, 'Paneer Tikka', 'VEG', '250.00', '2.00', NULL, 'PENDING', '0.00', NULL, '0.00', '0.00', '0.00', '0.00', 1, NULL, '2026-03-12 09:30:15', '2026-03-12 09:30:15'),
+(14, 22, 2, 'Butter Naan', 'VEG', '40.00', '4.00', NULL, 'PENDING', '0.00', NULL, '0.00', '0.00', '0.00', '0.00', 1, NULL, '2026-03-12 09:30:15', '2026-03-12 09:30:15'),
+(15, 24, 121, 'New', 'VEG', '875.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '875.00', '0.00', '875.00', 2, NULL, '2026-03-13 08:20:54', '2026-03-13 08:20:54'),
+(16, 24, 120, 'harum', 'NON_VEG', '281.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '281.00', '0.00', '281.00', 2, NULL, '2026-03-13 08:20:54', '2026-03-13 08:20:54'),
+(17, 24, 116, 'quam', 'EGG', '487.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '487.00', '0.00', '487.00', 2, NULL, '2026-03-13 08:22:18', '2026-03-13 08:22:18'),
+(18, 24, 114, 'accusantium', 'VEG', '397.00', '2.00', '', 'PENDING', '0.00', NULL, '0.00', '794.00', '0.00', '794.00', 2, NULL, '2026-03-13 08:25:53', '2026-03-13 08:25:53'),
+(19, 25, 118, 'nemo', 'VEG', '420.00', '1.00', '', '', '0.00', NULL, '0.00', '420.00', '0.00', '420.00', 2, NULL, '2026-03-13 08:28:24', '2026-03-13 09:31:21'),
+(20, 26, 118, 'nemo', 'VEG', '420.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '420.00', '0.00', '420.00', 2, NULL, '2026-03-13 08:30:21', '2026-03-13 08:30:21'),
+(21, 26, 119, 'aliquam', 'EGG', '260.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '260.00', '0.00', '260.00', 2, NULL, '2026-03-13 08:31:53', '2026-03-13 08:31:53'),
+(22, 26, 118, 'nemo', 'VEG', '420.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '420.00', '0.00', '420.00', 2, NULL, '2026-03-13 08:31:53', '2026-03-13 08:31:53'),
+(23, 24, 40, 'pariatur', 'VEG', '417.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '417.00', '0.00', '417.00', 2, NULL, '2026-03-13 09:16:52', '2026-03-13 09:16:52'),
+(24, 24, 34, 'fugit', 'EGG', '305.00', '12.00', '', 'PENDING', '0.00', NULL, '0.00', '3660.00', '0.00', '3660.00', 2, NULL, '2026-03-13 09:16:52', '2026-03-13 09:16:52'),
+(25, 25, 118, 'nemo', 'VEG', '420.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '420.00', '0.00', '420.00', 2, NULL, '2026-03-13 09:31:41', '2026-03-13 09:31:41'),
+(26, 27, 120, 'harum', 'NON_VEG', '281.00', '4.00', 'swwet', '', '0.00', NULL, '0.00', '1124.00', '0.00', '1124.00', 2, NULL, '2026-03-13 09:53:46', '2026-03-13 09:53:53'),
+(27, 27, 120, 'harum', 'NON_VEG', '281.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '281.00', '0.00', '281.00', 2, NULL, '2026-03-13 09:54:03', '2026-03-13 09:54:03'),
+(28, 27, 119, 'aliquam', 'EGG', '260.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '260.00', '0.00', '260.00', 2, NULL, '2026-03-13 11:13:22', '2026-03-13 11:13:22'),
+(29, 28, 115, 'ut', 'EGG', '375.00', '3.00', '', 'PENDING', '0.00', NULL, '0.00', '1125.00', '0.00', '1125.00', 2, NULL, '2026-03-13 11:30:41', '2026-03-13 11:30:41'),
+(30, 23, 118, 'nemo', 'VEG', '420.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '420.00', '0.00', '420.00', 2, NULL, '2026-03-13 11:41:20', '2026-03-13 11:41:20'),
+(31, 29, 121, 'New', 'VEG', '875.00', '2.00', '', 'PENDING', '0.00', NULL, '0.00', '1750.00', '0.00', '1750.00', 2, NULL, '2026-03-13 17:28:08', '2026-03-13 17:28:08'),
+(32, 29, 120, 'harum', 'NON_VEG', '281.00', '2.00', 'test', 'PENDING', '0.00', NULL, '0.00', '562.00', '0.00', '562.00', 2, NULL, '2026-03-13 17:28:09', '2026-03-13 17:28:09'),
+(33, 29, 114, 'accusantium', 'VEG', '397.00', '2.00', '', 'PENDING', '0.00', NULL, '0.00', '794.00', '0.00', '794.00', 2, NULL, '2026-03-13 17:28:37', '2026-03-13 17:28:37'),
+(34, 29, 113, 'et', 'NON_VEG', '394.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '394.00', '0.00', '394.00', 2, NULL, '2026-03-13 17:29:26', '2026-03-13 17:29:26'),
+(35, 30, 120, 'harum', 'NON_VEG', '281.00', '1.00', 'More spicy ', 'PENDING', '0.00', NULL, '0.00', '281.00', '0.00', '281.00', 2, NULL, '2026-03-14 12:14:42', '2026-03-14 12:14:42'),
+(36, 30, 119, 'aliquam', 'EGG', '260.00', '1.00', '', 'PENDING', '0.00', NULL, '0.00', '260.00', '0.00', '260.00', 2, NULL, '2026-03-14 12:14:42', '2026-03-14 12:14:42');
 
 -- --------------------------------------------------------
 
@@ -1269,6 +1354,14 @@ CREATE TABLE `order_item_addons` (
   `added_by` bigint UNSIGNED NOT NULL,
   `added_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_item_addons`
+--
+
+INSERT INTO `order_item_addons` (`order_item_addon_id`, `order_item_id`, `addon_option_id`, `addon_name`, `price_delta`, `added_by`, `added_date`) VALUES
+(1, 11, 10, 'Extra Cheese', '30.00', 1, '2026-03-12 09:26:55'),
+(2, 13, 10, 'Extra Cheese', '30.00', 1, '2026-03-12 09:30:15');
 
 -- --------------------------------------------------------
 
@@ -1360,7 +1453,15 @@ INSERT INTO `payments` (`payment_id`, `restaurant_id`, `order_id`, `bill_id`, `m
 (17, 9, 17, NULL, 'CASH', '358.00', 'SUCCESS', 'TXN58075', 'DummyGateway', '{\"info\": \"dummy\"}', '2025-09-06 16:46:40', 1, NULL, '2025-09-06 16:46:40', '2025-09-06 16:46:40'),
 (18, 9, 18, NULL, 'CASH', '356.00', 'SUCCESS', 'TXN51729', 'DummyGateway', '{\"info\": \"dummy\"}', '2025-09-06 16:46:40', 1, NULL, '2025-09-06 16:46:40', '2025-09-06 16:46:40'),
 (19, 10, 19, NULL, 'CASH', '245.00', 'SUCCESS', 'TXN06290', 'DummyGateway', '{\"info\": \"dummy\"}', '2025-09-06 16:46:40', 1, NULL, '2025-09-06 16:46:40', '2025-09-06 16:46:40'),
-(20, 10, 20, NULL, 'CASH', '105.00', 'SUCCESS', 'TXN08062', 'DummyGateway', '{\"info\": \"dummy\"}', '2025-09-06 16:46:40', 1, NULL, '2025-09-06 16:46:40', '2025-09-06 16:46:40');
+(20, 10, 20, NULL, 'CASH', '105.00', 'SUCCESS', 'TXN08062', 'DummyGateway', '{\"info\": \"dummy\"}', '2025-09-06 16:46:40', 1, NULL, '2025-09-06 16:46:40', '2025-09-06 16:46:40'),
+(21, 1, 26, NULL, 'CASH', '1155.00', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 14:21:59', 2, NULL, '2026-03-13 08:51:59', '2026-03-13 08:51:59'),
+(22, 1, 25, NULL, 'CASH', '441.00', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 14:22:14', 2, NULL, '2026-03-13 08:52:14', '2026-03-13 08:52:14'),
+(23, 1, 24, NULL, 'CASH', '6839.70', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 14:47:20', 2, NULL, '2026-03-13 09:17:20', '2026-03-13 09:17:20'),
+(24, 1, 27, NULL, 'CASH', '1748.25', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 16:44:24', 2, NULL, '2026-03-13 11:14:24', '2026-03-13 11:14:24'),
+(25, 1, 28, NULL, 'CASH', '1181.25', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 17:05:36', 2, NULL, '2026-03-13 11:35:36', '2026-03-13 11:35:36'),
+(26, 1, 23, NULL, 'CASH', '441.00', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 17:11:27', 2, NULL, '2026-03-13 11:41:27', '2026-03-13 11:41:27'),
+(27, 1, 29, NULL, 'CASH', '3675.00', 'SUCCESS', NULL, NULL, NULL, '2026-03-13 22:59:48', 2, NULL, '2026-03-13 17:29:48', '2026-03-13 17:29:48'),
+(28, 1, 30, NULL, 'CARD', '568.05', 'SUCCESS', NULL, NULL, NULL, '2026-03-14 17:45:12', 2, NULL, '2026-03-14 12:15:12', '2026-03-14 12:15:12');
 
 -- --------------------------------------------------------
 
@@ -1468,7 +1569,7 @@ CREATE TABLE `restaurants` (
 --
 
 INSERT INTO `restaurants` (`restaurant_id`, `name`, `legal_name`, `gstin`, `contact_email`, `contact_phone`, `address_line1`, `address_line2`, `city`, `state`, `postal_code`, `country`, `logo_url`, `timezone`, `is_active`, `added_by`, `updated_by`, `added_date`, `updated_date`) VALUES
-(1, 'Thiel, Batz and Labadie', 'Hansen LLC Pvt Ltd', 'HL6566745535R', 'kiarra.gleason@hotmail.com', '+1 (832) 383-6175', '7567 Hegmann Stream Suite 462', 'Apt. 810', 'Lisandrobury', 'District of Columbia', '44205', 'India', 'https://via.placeholder.com/640x480.png/002244?text=itaque', 'Asia/Kolkata', 1, 1, NULL, '2025-09-06 16:46:34', '2025-09-06 16:46:34'),
+(1, 'Thiel, Batz and Labadie', 'Hansen LLC Pvt Ltd', 'HL6566745535R', 'kiarra.gleason@hotmail.com', '+1 (832) 383-6175', '7567 Hegmann Stream Suite 462', 'Apt. 810', 'Lisandrobury', 'District of Columbia', '44205', 'India', 'http://localhost/dine_master/public/uploads/restaurant/f5a7b38cfd146cbf210c2b7b8ffb7d77.jpg', 'Asia/Kolkata', 1, 1, 2, '2025-09-06 16:46:34', '2026-03-13 07:34:18'),
 (2, 'Bartoletti, Macejkovic and Tromp', 'Nienow, Kuhn and Hodkiewicz Pvt Ltd', 'UV2389528818D', 'ivah.lynch@yahoo.com', '952.424.0782', '1726 Ewell Orchard', 'Suite 739', 'Bryonmouth', 'Mississippi', '16516-1166', 'India', 'https://via.placeholder.com/640x480.png/0033ff?text=magni', 'Asia/Kolkata', 1, 1, NULL, '2025-09-06 16:46:34', '2025-09-06 16:46:34'),
 (3, 'Boehm, Hills and Rosenbaum', 'Von Inc Pvt Ltd', 'UP6492584105F', 'gorczany.ida@hotmail.com', '+1-720-718-6303', '47045 Gunner Knoll', 'Suite 006', 'Flatleyton', 'New York', '78773-1503', 'India', 'https://via.placeholder.com/640x480.png/00cc33?text=aut', 'Asia/Kolkata', 1, 1, NULL, '2025-09-06 16:46:34', '2025-09-06 16:46:34'),
 (4, 'Hermann, Hane and Hermiston', 'Kemmer PLC Pvt Ltd', 'SX6832448263W', 'stephen85@gmail.com', '283.490.9504', '681 Ibrahim Divide', 'Suite 255', 'East Dorothy', 'North Dakota', '44154', 'India', 'https://via.placeholder.com/640x480.png/00ff99?text=laboriosam', 'Asia/Kolkata', 1, 1, NULL, '2025-09-06 16:46:34', '2025-09-06 16:46:34'),
@@ -1814,8 +1915,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `restaurant_id`, `user_role`, `user_email`, `phone`, `user_name`, `user_password`, `last_login_at`, `added_by`, `updated_by`, `added_date`, `updated_date`, `login_attempt`, `status`, `api_token`, `token_issued_at`) VALUES
-(1, 1, '1', 'adrienne.schaden@gmail.com', '260.346.8607', 'odell44', '$2y$10$UJvdT4G5RZe/bSp4QaS0yOQMueyr59kBFlV3FTLoelDj49PAFO8I6', '2025-05-23 00:08:33', 1, NULL, '2025-09-06 16:46:35', '2026-03-10 08:29:00', 0, 'Active', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwiaWF0IjoxNzczMTMxMzQwLCJleHAiOjE3NzMxMzQ5NDB9.6ohgaeF2GJsIOvEIsrB_ICf61rbVVZS0_JJNth09BSU', '2026-03-10 08:29:00'),
-(2, 1, '1', 'spouros@hotmail.com', '386-488-8555', 'eldred57', '$2y$10$10QZmyGsW7l8hRFuihSZdetEHfUC1qvdNS2ze.NncJlnO0Y5opJZS', '2025-07-18 22:56:42', 1, NULL, '2025-09-06 16:46:35', '2025-09-06 16:46:35', 0, 'Active', '', '2025-09-10 17:38:19'),
+(1, 1, '1', 'adrienne.schaden@gmail.com', '260.346.8607', 'odell44', '$2y$10$7Wm7o4LGO/nelgWBatCgsujrgg5kfXAB/AVe7TEfukD/c972o1qXq', '2026-03-12 19:52:45', 1, NULL, '2025-09-06 16:46:35', '2026-03-12 14:22:45', 0, 'Active', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwiaWF0IjoxNzczMzA2NjgwLCJleHAiOjE3NzMzMTAyODB9.wobCMWQpF3CBf-LXyHZZhi8VOaSwEAVdtU9u1TI7VC8', '2026-03-12 09:11:20'),
+(2, 1, '1', 'admin@gmail.com', '386-488-8555', 'eldred57', '$2y$10$7Wm7o4LGO/nelgWBatCgsujrgg5kfXAB/AVe7TEfukD/c972o1qXq', '2026-03-20 11:36:24', 1, NULL, '2025-09-06 16:46:35', '2026-03-20 06:06:24', 0, 'Active', '', '2025-09-10 17:38:19'),
 (3, 1, '2', 'vpacocha@yahoo.com', '240.365.6190', 'heidenreich.daisy', '$2y$10$kOJkug7qvUYlAeeWNTvLS.9ONyWz613B7F7xzgjHPcVrt5spNZsYa', '2025-02-06 04:54:35', 1, NULL, '2025-09-06 16:46:35', '2025-09-06 16:46:35', 0, 'Active', '', '2025-09-10 17:38:19'),
 (4, 1, '2', 'xbatz@jacobson.com', '1-385-409-8705', 'breana.stanton', '$2y$10$AIPIB7Hk6j780WA3O8us3.2zMFlsE7gFErDwMN2g2qH9ZqNP8le.q', '2025-02-04 13:42:05', 1, NULL, '2025-09-06 16:46:35', '2025-09-06 16:46:35', 0, 'Active', '', '2025-09-10 17:38:19'),
 (5, 1, '3', 'jgraham@trantow.com', '+1.701.486.4854', 'russel.moises', '$2y$10$tGvH9d5xkJ5401v.YEvtc.QhhpVgPm1yE3IE/LshQz5w0ZkrlRBh2', '2025-01-29 23:50:34', 1, NULL, '2025-09-06 16:46:35', '2025-09-06 16:46:35', 0, 'Active', '', '2025-09-10 17:38:19'),
@@ -2103,13 +2204,13 @@ ALTER TABLE `floors`
 -- AUTO_INCREMENT for table `kot_items`
 --
 ALTER TABLE `kot_items`
-  MODIFY `kot_item_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `kot_item_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `kot_tickets`
 --
 ALTER TABLE `kot_tickets`
-  MODIFY `kot_ticket_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `kot_ticket_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `loyalty_transactions`
@@ -2145,7 +2246,7 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `order_item_addons`
 --
 ALTER TABLE `order_item_addons`
-  MODIFY `order_item_addon_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `order_item_addon_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `order_status_history`

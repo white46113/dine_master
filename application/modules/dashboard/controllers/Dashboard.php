@@ -18,6 +18,12 @@ class Dashboard extends Admin_Controller
         $data['stats'] = $this->Dashboard_model->get_stats();
         $data['recent_orders'] = $this->Dashboard_model->get_recent_orders(5);
 
+        // Fetch subscription if not superadmin
+        if ($this->admin_data['role_id'] != 1) {
+            $this->load->model('subscriptions/Subscription_model');
+            $data['active_sub'] = $this->Subscription_model->get_active_subscription($this->admin_data['restaurant_id']);
+        }
+
         $this->render('index.tpl', $data);
     }
 }

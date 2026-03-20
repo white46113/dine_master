@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Dine Master Admin</title>
+    <title>Forgot Password | Dine Master Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,56 +19,39 @@
             <div class="p-8">
                 <div class="flex justify-center mb-8">
                     <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/50">
-                        <i class="fa-solid fa-utensils text-3xl text-white"></i>
+                        <i class="fa-solid fa-key text-3xl text-white"></i>
                     </div>
                 </div>
 
                 <div class="text-center mb-10">
-                    <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
-                    <p class="text-gray-500 mt-2">Sign in to manage your restaurant</p>
+                    <h2 class="text-3xl font-bold text-gray-800">Forgot Password?</h2>
+                    <p class="text-gray-500 mt-2">Enter your email to receive a reset link</p>
                 </div>
 
-                <form id="loginForm" class="space-y-6">
+                <form id="forgotPasswordForm" class="space-y-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Username or Email</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                <i class="fa-solid fa-user"></i>
+                                <i class="fa-solid fa-envelope"></i>
                             </span>
-                            <input type="text" name="username" required 
+                            <input type="email" name="email" required 
                                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none" 
-                                placeholder="Enter your username">
+                                placeholder="Enter your email">
                         </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between mb-2">
-                            <label class="block text-sm font-semibold text-gray-700">Password</label>
-                            <a href="<%base_url('admin/login/forgot_password')%>" class="text-sm font-semibold text-blue-600 hover:text-blue-500">Forgot?</a>
-                        </div>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                <i class="fa-solid fa-lock"></i>
-                            </span>
-                            <input type="password" id="password" name="password" required 
-                                class="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none" 
-                                placeholder="••••••••">
-                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
-                                <i class="fa-solid fa-eye" id="eyeIcon"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center">
-                        <input type="checkbox" id="remember" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                        <label for="remember" class="ml-2 text-sm text-gray-600">Remember me for 30 days</label>
                     </div>
 
                     <button type="submit" id="submitBtn"
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center">
-                        <span>Sign In</span>
-                        <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                        <span>Send Reset Link</span>
+                        <i class="fa-solid fa-paper-plane ml-2 text-sm"></i>
                     </button>
+                    
+                    <div class="text-center mt-4">
+                        <a href="<%base_url('admin/login')%>" class="text-sm font-semibold text-blue-600 hover:text-blue-500">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Login
+                        </a>
+                    </div>
                 </form>
             </div>
 
@@ -78,17 +61,12 @@
                 </p>
             </div>
         </div>
-        
-        <p class="text-center text-gray-400 text-xs mt-8 uppercase tracking-widest">
-            Authorized Personnel Only
-        </p>
     </div>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Global Toasts (Replaces Swal success/error) -->
     <script>
     function showToast(type, title, message) {
         const container = document.getElementById('toast-container') || (function() {
@@ -179,35 +157,18 @@
         
         return originalSwalFire.apply(this, args);
     };
-    </script>
 
-    <script>
-        $(document).ready(function() {
-            // Password toggle functionality
-            $('#togglePassword').on('click', function() {
-                const passwordField = $('#password');
-                const eyeIcon = $('#eyeIcon');
-                
-                if (passwordField.attr('type') === 'password') {
-                    passwordField.attr('type', 'text');
-                    eyeIcon.removeClass('fa-eye').addClass('fa-eye-slash');
-                } else {
-                    passwordField.attr('type', 'password');
-                    eyeIcon.removeClass('fa-eye-slash').addClass('fa-eye');
-                }
-            });
-
-            $('#loginForm').on('submit', function(e) {
+    $(document).ready(function() {
+            $('#forgotPasswordForm').on('submit', function(e) {
                 e.preventDefault();
                 
                 const btn = $('#submitBtn');
                 const btnContent = btn.html();
                 
-                // Loading state
-                btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Signing in...');
+                btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Sending...');
 
                 $.ajax({
-                    url: '<%base_url("admin_auth/authenticate")%>',
+                    url: '<%base_url("admin_auth/send_reset_link")%>',
                     type: 'POST',
                     data: $(this).serialize(),
                     dataType: 'json',
@@ -215,17 +176,16 @@
                         if (response.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Success!',
+                                title: 'Link Sent!',
                                 text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
+                                confirmButtonColor: '#3b82f6'
                             }).then(() => {
-                                window.location.href = response.redirect;
+                                window.location.href = '<%base_url("admin/login")%>';
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Login Failed',
+                                title: 'Error',
                                 text: response.message,
                                 confirmButtonColor: '#3b82f6'
                             });

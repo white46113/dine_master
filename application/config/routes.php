@@ -8,6 +8,8 @@ $route['default_controller'] = 'admin_auth/login';
 /* admin panel */
 $route['admin'] = 'dashboard/index';
 $route['admin/login'] = 'admin_auth/login';
+$route['admin/login/forgot_password'] = 'admin_auth/forgot_password';
+$route['admin/login/reset_password/(:any)'] = 'admin_auth/reset_password/$1';
 $route['admin/logout'] = 'admin_auth/logout';
 $route['admin/dashboard'] = 'dashboard/index';
 $route['admin/menu(.*)'] = 'menu$1';
@@ -16,6 +18,8 @@ $route['admin/orders/bill/(:any)'] = 'orders/bill/$1';
 $route['admin/kitchen(.*)'] = 'kitchen$1';
 $route['admin/restaurant(.*)'] = 'restaurant$1';
 $route['admin/tables(.*)'] = 'tables$1';
+$route['admin/waiter(.*)'] = 'waiter$1';
+$route['admin/subscriptions(.*)'] = 'subscriptions$1';
 $route['admin/reports(.*)'] = 'reports/reports$1';
 
 

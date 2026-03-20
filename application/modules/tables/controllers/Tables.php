@@ -9,6 +9,11 @@ class Tables extends Admin_Controller
         $this->load->model('Tables_model');
     }
 
+    private function _is_superadmin() {
+        return (isset($this->admin_data['role_id']) && $this->admin_data['role_id'] == 1) || 
+               (isset($this->admin_data['user_role']) && $this->admin_data['user_role'] == 1);
+    }
+
     /**
      * List all tables
      */
@@ -16,6 +21,7 @@ class Tables extends Admin_Controller
     {
         $data['title'] = 'Table Management | Dine Master Admin';
         $data['page_title'] = 'Restaurant Tables';
+        $data['is_superadmin'] = $this->_is_superadmin();
         
         $this->render('index.tpl', $data);
     }
@@ -28,6 +34,7 @@ class Tables extends Admin_Controller
         $list = $this->Tables_model->get_datatables();
         $data = [];
         $no = $_POST['start'];
+        $is_superadmin = $this->_is_superadmin();
         
         foreach ($list as $table) {
             $no++;
@@ -45,6 +52,11 @@ class Tables extends Admin_Controller
                     </div>
                 </div>';
             
+            // Restaurant (SuperAdmin Info)
+            if ($is_superadmin) {
+                $row[] = '<span class="px-3 py-1 bg-orange-50 text-orange-600 text-[10px] font-black rounded-lg uppercase tracking-widest">' . ($table->restaurant_name ?: "Unknown") . '</span>';
+            }
+                
             // Floor
             $row[] = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black rounded-lg uppercase tracking-widest">' . ($table->floor_name ?: "Main Floor") . '</span>';
             
@@ -102,9 +114,15 @@ class Tables extends Admin_Controller
     public function add()
     {
         if ($this->input->post()) {
+            
+            $floor_id = $this->input->post('floor_id');
+            // Extract the correct restaurant_id based on the floor chosen
+            $this->db->where('floor_id', $floor_id);
+            $floor = $this->db->get('floors')->row_array();
+            
             $data = [
-                'restaurant_id' => $this->admin_data['restaurant_id'] ?? 1,
-                'floor_id'      => $this->input->post('floor_id'),
+                'restaurant_id' => $floor['restaurant_id'] ?? ($this->admin_data['restaurant_id'] ?? 1),
+                'floor_id'      => $floor_id,
                 'code'          => $this->input->post('code'),
                 'name'          => $this->input->post('name'),
                 'capacity'      => $this->input->post('capacity'),
@@ -121,6 +139,7 @@ class Tables extends Admin_Controller
 
         $data['title'] = 'Add New Table | Dine Master Admin';
         $data['floors'] = $this->Tables_model->get_floors();
+        $data['is_superadmin'] = $this->_is_superadmin();
         $this->render('add.tpl', $data);
     }
 
@@ -129,9 +148,20 @@ class Tables extends Admin_Controller
      */
     public function edit($id)
     {
+        $table = $this->Tables_model->get_by_id($id);
+        if (!$table) {
+            show_404();
+        }
+
         if ($this->input->post()) {
+            
+            $floor_id = $this->input->post('floor_id');
+            $this->db->where('floor_id', $floor_id);
+            $floor = $this->db->get('floors')->row_array();
+            
             $data = [
-                'floor_id' => $this->input->post('floor_id'),
+                'restaurant_id' => $floor['restaurant_id'] ?? ($this->admin_data['restaurant_id'] ?? 1),
+                'floor_id' => $floor_id,
                 'code'     => $this->input->post('code'),
                 'name'     => $this->input->post('name'),
                 'capacity' => $this->input->post('capacity'),
@@ -145,8 +175,9 @@ class Tables extends Admin_Controller
         }
 
         $data['title'] = 'Edit Table | Dine Master Admin';
-        $data['table'] = $this->Tables_model->get_by_id($id);
+        $data['table'] = $table;
         $data['floors'] = $this->Tables_model->get_floors();
+        $data['is_superadmin'] = $this->_is_superadmin();
         $this->render('edit.tpl', $data);
     }
 

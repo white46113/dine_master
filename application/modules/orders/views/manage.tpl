@@ -43,49 +43,74 @@
                     <button onclick="filterDiet('VEG')" class="diet-btn px-4 py-2 rounded-xl text-gray-400 hover:bg-gray-50 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-green-500"></div> Veg
                     </button>
-                    <button onclick="filterDiet('NON-VEG')" class="diet-btn px-4 py-2 rounded-xl text-gray-400 hover:bg-gray-50 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                    <button onclick="filterDiet('NON_VEG')" class="diet-btn px-4 py-2 rounded-xl text-gray-400 hover:bg-gray-50 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-red-500"></div> Non-Veg
                     </button>
                 </div>
-            </div>
-
-            <!-- Scrollable Menu Grid -->
+            </div>            <!-- Scrollable Menu Grid (Now List) -->
             <div class="custom-scrollbar pr-2 overflow-y-auto" style="height: calc(100vh - 350px);">
-                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6" id="menu-grid">
+                <div class="flex flex-col gap-4" id="menu-grid">
                     <%foreach $items as $item%>
-                    <div class="menu-item bg-white rounded-[2rem] p-4 border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer group relative" 
+                    <div class="menu-item bg-white rounded-3xl p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-6 group relative" 
                          data-cat="<%$item.category_id%>"
                          data-diet="<%$item.veg_type%>"
                          data-item='<%$item|json_encode|escape:"html"%>'>
                         
-                        <div class="item-badge absolute -top-2 -right-2 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-xs shadow-lg scale-0 transition-all z-20" id="badge-<%$item.item_id%>">0</div>
-                        
-                        <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-gray-50">
+                        <!-- Image Section -->
+                        <div class="relative w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100">
                             <img src="<%$item.image_url|default:base_url('public/img/food-placeholder.svg')%>" 
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                 onerror="this.src='<%base_url('public/img/food-placeholder.svg')%>'; this.classList.add('opacity-50'); this.classList.add('p-4');">
+                                 onerror="this.src='<%base_url('public/img/food-placeholder.svg')%>'; this.classList.add('opacity-50'); this.classList.add('p-3');">
                             
                             <!-- Diet Icon -->
-                            <div class="absolute top-3 right-3 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm z-10 border border-gray-100">
-                                <div class="w-2.5 h-2.5 rounded-full <%if $item.veg_type == 'VEG'%>bg-green-500<%else%>bg-red-50<%/if%> <%if $item.veg_type != 'VEG'%>border-2 border-red-500 bg-transparent<%/if%>"></div>
-                            </div>
-
-                            <!-- Click to Add Overlay -->
-                            <div class="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <div class="bg-blue-600 text-white p-3 rounded-2xl shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform">
-                                    <i class="fa-solid fa-plus"></i>
-                                </div>
+                            <div class="absolute top-2 right-2 w-6 h-6 bg-white/95 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-md z-10 border border-gray-100">
+                                <div class="w-2.5 h-2.5 rounded-full <%if $item.veg_type == 'VEG'%>bg-green-500<%else%>bg-red-500<%if $item.veg_type != 'VEG'%> border-2 border-red-500 bg-transparent<%/if%><%/if%>"></div>
                             </div>
                         </div>
 
-                        <div class="px-1">
-                            <h4 class="font-bold text-gray-800 text-sm mb-1 truncate leading-tight"><%$item.name%></h4>
-                            <p class="text-blue-600 font-black text-base">₹<%$item.base_price%></p>
+                        <!-- Info Section -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h4 class="font-black text-gray-800 text-lg truncate"><%$item.name%></h4>
+                                <span class="bg-gray-100 text-gray-400 text-[10px] font-black px-2 py-0.5 rounded-lg tracking-widest uppercase">#<%$item.item_id%></span>
+                            </div>
+                            
+                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-lg uppercase border border-blue-100 tracking-wider"><%$item.category_name|default:'Uncategorized'%></span>
+                                
+                                <%if $item.veg_type == 'VEG'%>
+                                <span class="flex items-center text-green-600 text-[10px] font-black uppercase tracking-wider"><i class="fa-solid fa-leaf mr-1.5"></i> VEG</span>
+                                <%elseif $item.veg_type == 'NON_VEG'%>
+                                <span class="flex items-center text-red-600 text-[10px] font-black uppercase tracking-wider"><i class="fa-solid fa-meat mr-1.5"></i> NON-VEG</span>
+                                <%else%>
+                                <span class="flex items-center text-orange-600 text-[10px] font-black uppercase tracking-wider"><i class="fa-solid fa-egg mr-1.5"></i> EGG</span>
+                                <%/if%>
+
+                                <%if !$item.is_available%>
+                                <span class="flex items-center text-red-400 text-[10px] font-black uppercase tracking-wider"><i class="fa-solid fa-circle-xmark mr-1.5"></i> Sold Out</span>
+                                <%/if%>
+                            </div>
+                        </div>
+
+                        <!-- Price & Controls Section -->
+                        <div class="flex flex-col items-end gap-3 pr-2">
+                            <p class="text-2xl font-black text-gray-900 tracking-tighter">₹<%$item.base_price%></p>
+                            
+                            <div class="flex items-center bg-gray-50 rounded-2xl p-1 border border-gray-100 shadow-inner group/qty">
+                                <button type="button" class="minus-qty w-8 h-8 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 transition-all shadow-sm" data-id="<%$item.item_id%>">
+                                    <i class="fa-solid fa-minus text-[10px]"></i>
+                                </button>
+                                <span class="w-10 text-center font-black text-sm text-gray-800 item-qty-badge" id="list-qty-<%$item.item_id%>" data-id="<%$item.item_id%>">0</span>
+                                <button type="button" class="plus-qty w-8 h-8 flex items-center justify-center rounded-xl bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20" data-id="<%$item.item_id%>">
+                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <%/foreach%>
                 </div>
             </div>
+
         </div>
 
         <!-- Sidebar: Cart & Order (Right) -->
@@ -146,7 +171,7 @@
 
                 <!-- Actions Footer -->
                 <div class="p-6 space-y-3 bg-gray-50/50 border-t border-gray-50">
-                    <button onclick="sendToKitchen()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-500/30 transition-all flex items-center justify-center gap-2 text-sm tracking-wide group">
+                    <button id="kotBtn" onclick="sendToKitchen()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-500/30 transition-all flex items-center justify-center gap-2 text-sm tracking-wide group">
                          KITCHEN (KOT)
                          <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                     </button>
@@ -200,20 +225,45 @@ function filterDiet(diet) {
         $('.diet-btn').eq(0).addClass('bg-gray-900 text-white shadow-lg').removeClass('text-gray-400 hover:bg-gray-50');
     } else if (diet === 'VEG') {
         $('.diet-btn').eq(1).addClass('bg-gray-900 text-white shadow-lg').removeClass('text-gray-400 hover:bg-gray-50');
-    } else if (diet === 'NON-VEG') {
+    } else if (diet === 'NON_VEG') {
         $('.diet-btn').eq(2).addClass('bg-gray-900 text-white shadow-lg').removeClass('text-gray-400 hover:bg-gray-50');
     }
     searchItems();
 }
 
-$(document).on('click', '.menu-item', function() {
+$(document).on('click', '.menu-item', function(e) {
+    if ($(e.target).closest('button').length) return; // Ignore if button was clicked
+    
     const item = $(this).data('item');
     addToCart(item);
     
     // Smooth Animation for badge
     const badge = $(`#badge-${item.item_id || item.id}`);
-    badge.addClass('scale-125');
-    setTimeout(() => badge.removeClass('scale-125'), 200);
+    const listQty = $(`#list-qty-${item.item_id || item.id}`);
+    [badge, listQty].forEach(el => {
+        el.addClass('scale-125');
+        setTimeout(() => el.removeClass('scale-125'), 200);
+    });
+});
+
+$(document).on('click', '.plus-qty', function(e) {
+    e.stopPropagation();
+    const item = $(this).closest('.menu-item').data('item');
+    addToCart(item);
+    
+    const listQty = $(`#list-qty-${item.item_id || item.id}`);
+    listQty.addClass('scale-125');
+    setTimeout(() => listQty.removeClass('scale-125'), 200);
+});
+
+$(document).on('click', '.minus-qty', function(e) {
+    e.stopPropagation();
+    const id = $(this).data('id');
+    updateQty(id, -1);
+    
+    const listQty = $(`#list-qty-${id}`);
+    listQty.addClass('scale-90');
+    setTimeout(() => listQty.removeClass('scale-90'), 200);
 });
 
 $(document).on('click', '.cart-qty-btn', function() {
@@ -306,11 +356,16 @@ function renderCart() {
     $('#cart-subtotal').text('₹' + subtotal.toFixed(2));
     
     // Sync Badges on Menu Cards
-    $('.item-badge').addClass('hidden scale-0').text('0');
+    $('.item-badge, .item-qty-badge').text('0');
     cart.forEach(item => {
         const badge = $(`#badge-${item.item_id}`);
+        const listQty = $(`#list-qty-${item.item_id}`);
+        
         if(badge.length) {
             badge.text(item.qty).removeClass('hidden').addClass('scale-100');
+        }
+        if(listQty.length) {
+            listQty.text(item.qty);
         }
     });
 }
@@ -325,6 +380,10 @@ function sendToKitchen() {
         });
         return;
     }
+
+    const btn = $('#kotBtn');
+    const originalContent = btn.html();
+    btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> PROCESSING...');
 
     $.ajax({
         url: '<%base_url("admin/orders/send_to_kitchen")%>',
@@ -345,7 +404,14 @@ function sendToKitchen() {
                 }).then(() => {
                     window.location.reload();
                 });
+            } else {
+                Swal.fire('Error', response.message || 'Failed to send to kitchen', 'error');
+                btn.prop('disabled', false).html(originalContent);
             }
+        },
+        error: function() {
+            Swal.fire('Error', 'Something went wrong!', 'error');
+            btn.prop('disabled', false).html(originalContent);
         }
     });
 }
@@ -366,6 +432,14 @@ function cancelItem(orderItemId, itemName) {
         cancelButtonText: 'No, keep it'
     }).then((result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Cancelling...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             $.ajax({
                 url: '<%base_url("admin/orders/cancel_item")%>',
                 type: 'POST',
@@ -385,6 +459,9 @@ function cancelItem(orderItemId, itemName) {
                     } else {
                         Swal.fire('Error', response.message || 'Failed to cancel item', 'error');
                     }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Something went wrong!', 'error');
                 }
             });
         }

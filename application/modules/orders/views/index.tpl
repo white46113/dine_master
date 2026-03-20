@@ -26,6 +26,9 @@
             <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                 <tr>
                     <th class="px-6 py-4 text-left">Order & Customer</th>
+                    <%if isset($is_superadmin) && $is_superadmin%>
+                    <th class="px-6 py-4 text-left">Restaurant</th>
+                    <%/if%>
                     <th class="px-6 py-4 text-left">Table</th>
                     <th class="px-6 py-4 text-left">Amount</th>
                     <th class="px-6 py-4 text-left">Status</th>
@@ -54,9 +57,9 @@ $(document).ready(function() {
             }
         },
         "columnDefs": [
-            { "targets": [0, 1, 2, 3, 4], "orderable": true },
-            { "targets": [4], "orderable": false },
-            { "targets": [4], "className": "text-center" }
+            { "targets": "_all", "orderable": true },
+            { "targets": [-1], "orderable": false },
+            { "targets": [-1], "className": "text-center" }
         ],
         "language": {
             "searchPlaceholder": "Search by ID, name or table...",

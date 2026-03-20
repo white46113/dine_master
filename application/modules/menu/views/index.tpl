@@ -16,6 +16,9 @@
                 <tr>
                     <th class="px-6 py-4 text-left">Item</th>
                     <th class="px-6 py-4 text-left">Category</th>
+                    <%if $role_id == 1%>
+                    <th class="px-6 py-4 text-left">Restaurant</th>
+                    <%/if%>
                     <th class="px-6 py-4 text-left">Price</th>
                     <th class="px-6 py-4 text-left">Type</th>
                     <th class="px-6 py-4 text-left">Availability</th>
@@ -41,14 +44,15 @@ $(document).ready(function() {
             "type": "POST"
         },
         "columnDefs": [
-            { "targets": [0, 1, 2, 3, 4, 5], "orderable": true },
-            { "targets": [0, 5], "orderable": false },
-            { "targets": [5], "className": "text-center" }
+            { "targets": "_all", "orderable": true },
+            { "targets": [0, -1], "orderable": false },
+            { "targets": [-1], "className": "text-center" }
         ],
         "language": {
             "searchPlaceholder": "Search by name or category...",
             "search": "",
             "lengthMenu": "_MENU_ per page",
+            "infoFiltered": ""
         }
     });
 });
@@ -68,6 +72,14 @@ function deleteItem(id) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             $.ajax({
                 url: '<%base_url("admin/menu/delete/")%>' + id,
                 type: 'POST',
@@ -76,7 +88,12 @@ function deleteItem(id) {
                     if (response.success) {
                         Swal.fire('Deleted!', response.message, 'success');
                         reloadTable();
+                    } else {
+                        Swal.fire('Error', response.message || 'Failed to delete item', 'error');
                     }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Something went wrong!', 'error');
                 }
             });
         }

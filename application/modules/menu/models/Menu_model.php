@@ -13,18 +13,26 @@ class Menu_model extends CI_Model
     /**
      * DataTables Server-side
      */
-    private function _get_datatables_query()
+    private function _get_datatables_query($role_id = null, $restaurant_id = null)
     {
-        $this->db->select('m.*, c.name as category_name');
+        $this->db->select('m.*, c.name as category_name, r.name as restaurant_name');
         $this->db->from($this->table . ' m');
         $this->db->join('categories c', 'c.category_id = m.category_id', 'left');
+        $this->db->join('restaurants r', 'r.restaurant_id = m.restaurant_id', 'left');
+
+        // Role-based filtering
+        if ($role_id != 1) { // Not Superadmin
+            if ($restaurant_id) {
+                $this->db->where('m.restaurant_id', $restaurant_id);
+            }
+        }
 
         if ($this->input->post('restaurant_id')) {
             $this->db->where('m.restaurant_id', $this->input->post('restaurant_id'));
         }
 
-        $column_order = [null, 'm.name', 'c.name', 'm.base_price', 'm.veg_type', 'm.is_available', null];
-        $column_search = ['m.name', 'c.name', 'm.item_id'];
+        $column_order = [null, 'm.name', 'c.name', 'm.base_price', 'm.veg_type', 'm.is_available', 'r.name', null];
+        $column_search = ['m.name', 'c.name', 'm.item_id', 'r.name'];
 
         $i = 0;
         foreach ($column_search as $item) {
@@ -48,18 +56,18 @@ class Menu_model extends CI_Model
         }
     }
 
-    public function get_datatables()
+    public function get_datatables($role_id = null, $restaurant_id = null)
     {
-        $this->_get_datatables_query();
+        $this->_get_datatables_query($role_id, $restaurant_id);
         if ($_POST['length'] != -1)
             $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
     }
 
-    public function count_filtered()
+    public function count_filtered($role_id = null, $restaurant_id = null)
     {
-        $this->_get_datatables_query();
+        $this->_get_datatables_query($role_id, $restaurant_id);
         $query = $this->db->get();
         return $query->num_rows();
     }

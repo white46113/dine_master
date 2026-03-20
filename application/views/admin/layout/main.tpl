@@ -107,7 +107,99 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+
+    <!-- Custom Global Toasts (Replaces Swal success/error) -->
+    <script>
+    function showToast(type, title, message) {
+        const container = document.getElementById('toast-container') || (function() {
+            const div = document.createElement('div');
+            div.id = 'toast-container';
+            div.className = 'fixed top-6 right-6 z-[9999] flex flex-col gap-4 max-w-sm w-full';
+            document.body.appendChild(div);
+            return div;
+        })();
+
+        const isSuccess = type === 'success';
+        const bgColor = isSuccess ? 'bg-[#c6f0c2]' : 'bg-[#fecdd3]';
+        const iconColor = isSuccess ? 'text-green-500' : 'text-red-500';
+        const iconClass = isSuccess ? 'fa-check' : 'fa-exclamation';
+        const darkBlobClass = isSuccess ? 'bg-green-300' : 'bg-red-300';
+
+        const blobs = `
+            <div class="absolute -left-4 -top-4 w-24 h-24 ${darkBlobClass} rounded-full mix-blend-multiply filter blur-xl opacity-40"></div>
+            <div class="absolute -right-4 -bottom-4 w-24 h-24 ${darkBlobClass} rounded-full mix-blend-multiply filter blur-xl opacity-40"></div>
+        `;
+
+        const toastHTML = `
+            <div class="relative overflow-hidden w-full ${bgColor} rounded-[2rem] p-5 flex items-start gap-4 shadow-2xl transform transition-all duration-300 translate-x-full opacity-0 pointer-events-auto border border-white/40">
+                ${blobs}
+                <div class="relative z-10 flex-shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
+                    <i class="fa-solid ${iconClass} ${iconColor} text-xl"></i>
+                </div>
+                <div class="relative z-10 flex-1 min-w-0 pr-6 pt-1">
+                    <h4 class="text-sm font-black text-gray-900 mb-1 truncate tracking-tight text-opacity-90">${title}</h4>
+                    <p class="text-[11px] font-bold text-gray-700 leading-tight tracking-wide text-opacity-70">${message}</p>
+                </div>
+                <button class="relative z-10 absolute top-5 right-5 text-gray-500 hover:text-gray-800 transition-colors" onclick="this.closest('.relative').remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        `;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = toastHTML.trim();
+        const toastEl = tempDiv.firstChild;
+        
+        container.appendChild(toastEl);
+        
+        requestAnimationFrame(() => {
+            toastEl.classList.remove('translate-x-full', 'opacity-0');
+            toastEl.classList.add('translate-x-0', 'opacity-100');
+        });
+
+        setTimeout(() => {
+            if(toastEl.parentNode) {
+                toastEl.classList.remove('translate-x-0', 'opacity-100');
+                toastEl.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toastEl.remove(), 300);
+            }
+        }, 4000);
+    }
+
+    // Intercept Swal.fire
+    const originalSwalFire = Swal.fire;
+    Swal.fire = function(...args) {
+        let config = args[0];
+        let type = null;
+        let title = '';
+        let message = '';
+        let timer = 0;
+
+        if (typeof config === 'string') {
+            title = args[0];
+            message = args[1] || '';
+            type = args[2];
+        } else if (config && typeof config === 'object') {
+            type = config.icon;
+            title = config.title || '';
+            message = config.text || '';
+            timer = config.timer || 0;
+        }
+
+        if (type === 'success' || type === 'error') {
+            showToast(type, title || (type === 'success' ? 'Success' : 'Error'), message);
+            
+            return new Promise((resolve) => {
+                const delay = timer > 0 ? timer : 2000;
+                setTimeout(() => {
+                    resolve({ isConfirmed: true, isDismissed: true });
+                }, delay);
+            });
+        }
+        
+        return originalSwalFire.apply(this, args);
+    };
+    </script>
 <body class="bg-gray-50 text-gray-900">
 
     <div class="flex h-screen overflow-hidden">

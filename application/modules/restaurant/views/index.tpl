@@ -1,7 +1,14 @@
 <div class="max-w-5xl mx-auto">
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Restaurant Information</h2>
-        <p class="text-gray-500 text-sm">Manage your restaurant's public profile, branding, and contact settings</p>
+    <div class="flex items-center gap-4 mb-8">
+        <%if $admin_user.user_role == 1 || $admin_user.role_id == 1%>
+        <a href="<%base_url('admin/restaurant')%>" class="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <%/if%>
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Restaurant Information</h2>
+            <p class="text-gray-500 text-sm">Manage your restaurant's public profile, branding, and contact settings</p>
+        </div>
     </div>
 
     <form id="restaurantForm" class="space-y-8" enctype="multipart/form-data">
@@ -172,5 +179,12 @@ $(document).ready(function() {
             });
         }
     });
+
+    <%if isset($mode) && $mode == 'view'%>
+    // Read-only View Mode Setup
+    $('#restaurantForm input, #restaurantForm select, #restaurantForm textarea').prop('disabled', true).addClass('bg-gray-50/50 cursor-not-allowed opacity-80 border-gray-100');
+    $('#saveBtn').hide();
+    $('.group-hover\\:opacity-100').removeClass('group-hover:opacity-100').addClass('hidden'); // Hide logo upload overlay capability
+    <%/if%>
 });
 </script>

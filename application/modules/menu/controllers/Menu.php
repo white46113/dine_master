@@ -16,6 +16,7 @@ class Menu extends Admin_Controller
     {
         $data['title'] = 'Menu Management | Dine Master Admin';
         $data['page_title'] = 'Menu Items';
+        $data['role_id'] = $this->admin_data['role_id'];
         
         $this->render('index.tpl', $data);
     }
@@ -25,8 +26,10 @@ class Menu extends Admin_Controller
      */
     public function ajax_list()
     {
-        $restaurant_id = $this->admin_data['restaurant_id'] ?? 1;
-        $list = $this->Menu_model->get_datatables();
+        $role_id = $this->admin_data['role_id'];
+        $restaurant_id = $this->admin_data['restaurant_id'];
+        
+        $list = $this->Menu_model->get_datatables($role_id, $restaurant_id);
         $data = [];
         $no = $_POST['start'];
         
@@ -52,6 +55,11 @@ class Menu extends Admin_Controller
             // Category
             $row[] = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">' . ($item->category_name ?: "Uncategorized") . '</span>';
             
+            // Restaurant (Only for Super Admin)
+            if ($role_id == 1) {
+                $row[] = '<span class="font-semibold text-gray-700">' . ($item->restaurant_name ?: "N/A") . '</span>';
+            }
+
             // Price
             $row[] = '<div class="font-bold text-gray-900">₹' . number_format($item->base_price, 2) . '</div>';
             
@@ -88,7 +96,7 @@ class Menu extends Admin_Controller
         $output = [
             "draw" => $_POST['draw'],
             "recordsTotal" => $this->Menu_model->count_all(),
-            "recordsFiltered" => $this->Menu_model->count_filtered(),
+            "recordsFiltered" => $this->Menu_model->count_filtered($role_id, $restaurant_id),
             "data" => $data,
         ];
         echo json_encode($output);
@@ -101,7 +109,8 @@ class Menu extends Admin_Controller
     {
         $data['title'] = 'Add Menu Item | Dine Master Admin';
         $data['page_title'] = 'Add New Item';
-        $data['categories'] = $this->Menu_model->get_categories();
+        $restaurant_id = $this->admin_data['role_id'] == 1 ? null : $this->admin_data['restaurant_id'];
+        $data['categories'] = $this->Menu_model->get_categories($restaurant_id);
         
         $this->render('form.tpl', $data);
     }
@@ -114,7 +123,9 @@ class Menu extends Admin_Controller
         $data['title'] = 'Edit Menu Item | Dine Master Admin';
         $data['page_title'] = 'Edit Item';
         $data['item'] = $this->Menu_model->get_item_by_id($id);
-        $data['categories'] = $this->Menu_model->get_categories();
+        
+        $restaurant_id = $this->admin_data['role_id'] == 1 ? null : $this->admin_data['restaurant_id'];
+        $data['categories'] = $this->Menu_model->get_categories($restaurant_id);
         
         if (empty($data['item'])) {
             show_404();
