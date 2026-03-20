@@ -96,6 +96,15 @@ class Subscriptions extends Admin_Controller
 
         // Log Transaction First
         $plan = $this->Subscription_model->get_plan($plan_id);
+        
+        if (!$plan) {
+            echo json_encode(['success' => false, 'message' => 'Invalid plan selected.']);
+            return;
+        }
+
+        $this->db->db_debug = FALSE;
+        $this->db->trans_start();
+        
         $this->Subscription_model->log_transaction([
             'transaction_id' => $payment_id,
             'user_id' => $this->admin_data['user_id'],
@@ -105,10 +114,19 @@ class Subscriptions extends Admin_Controller
             'response_json' => json_encode($_POST)
         ]);
 
-        if ($this->Subscription_model->activate_plan($restaurant_id, $plan_id, $payment_id)) {
-            echo json_encode(['success' => true, 'message' => 'Subscription activated successfully!']);
+        $activated = $this->Subscription_model->activate_plan($restaurant_id, $plan_id, $payment_id);
+        
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE || !$activated) {
+            $error = $this->db->error();
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Failed to activate subscription. ' . (isset($error['message']) ? $error['message'] : ''),
+                'db_error' => $error
+            ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to activate subscription.']);
+            echo json_encode(['success' => true, 'message' => 'Subscription activated successfully!']);
         }
     }
 

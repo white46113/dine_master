@@ -176,8 +176,10 @@ function verifyAndActivate(planId, paymentId) {
                 Swal.fire('Error', resp.message, 'error');
             }
         },
-        error: function() {
-            Swal.fire('Error', 'Service unavailable. Please try again later.', 'error');
+        error: function(xhr) {
+            Swal.close();
+            console.error("Payment Verification Error:", xhr.responseText);
+            Swal.fire('Error', 'Service unavailable. Please check console for details.', 'error');
         }
     });
 }
