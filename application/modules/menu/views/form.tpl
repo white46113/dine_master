@@ -13,6 +13,19 @@
         <input type="hidden" name="item_id" value="<%$item.item_id|default:''%>">
         
         <div class="p-8 space-y-8">
+            <%if $admin_user.role_id == 1%>
+            <div class="space-y-2">
+                <label class="text-sm font-bold text-gray-700">Select Restaurant</label>
+                <select name="restaurant_id" id="restaurant_id" required
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    <option value="">Select Restaurant</option>
+                    <%foreach from=$restaurants item=res%>
+                    <option value="<%$res.restaurant_id%>" <%if $item.restaurant_id == $res.restaurant_id%>selected<%/if%>><%$res.name%></option>
+                    <%/foreach%>
+                </select>
+            </div>
+            <%/if%>
+
             <!-- Basic Info Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
@@ -166,6 +179,31 @@ $(document).ready(function() {
             error: function() {
                 Swal.fire('Error', 'Something went wrong!', 'error');
                 btn.prop('disabled', false).html('Save Item');
+            }
+        });
+    });
+
+    // Dynamic Category Loading
+    $('#restaurant_id').on('change', function() {
+        const restaurantId = $(this).val();
+        if (!restaurantId) return;
+
+        const catSelect = $('select[name="category_id"]');
+        catSelect.prop('disabled', true).html('<option value="">Loading Categories...</option>');
+
+        $.ajax({
+            url: '<%base_url("admin/menu/ajax_get_categories")%>',
+            type: 'GET',
+            data: { restaurant_id: restaurantId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    let options = '<option value="">Select Category</option>';
+                    response.data.forEach(function(cat) {
+                        options += `<option value="${cat.category_id}">${cat.name}</option>`;
+                    });
+                    catSelect.html(options).prop('disabled', false);
+                }
             }
         });
     });

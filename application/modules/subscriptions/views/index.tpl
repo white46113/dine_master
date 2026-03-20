@@ -86,7 +86,7 @@
                 ALREADY ACTIVE
             </button>
             <%else%>
-            <button onclick="activateSubscription('<%$plan.id%>', '<%$plan.plan_name%>')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group/btn">
+            <button onclick="activateSubscription('<%$plan.id%>', '<%$plan.plan_name%>', '<%$plan.price%>')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group/btn">
                 ACTIVATE PLAN
                 <i class="fa-solid fa-arrow-right text-xs group-hover/btn:translate-x-1 transition-transform"></i>
             </button>
@@ -107,49 +107,77 @@
     <%/foreach%>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-function activateSubscription(planId, planName) {
+function activateSubscription(planId, planName, price) {
+    const razorpayKey = '<%$razorpay_key_id%>';
+    
+    if (!razorpayKey) {
+        Swal.fire('Error', 'Payment configuration missing.', 'error');
+        return;
+    }
+
     Swal.fire({
         title: 'Activate ' + planName + '?',
-        text: 'Enjoy premium features instantly!',
+        text: 'Price: ₹' + price,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#2563eb',
         cancelButtonColor: '#64748b',
-        confirmButtonText: 'Yes, Activate!',
-        cancelButtonText: 'Thinking...'
+        confirmButtonText: 'Proceed to Payment',
+        cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Activating...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-
-            $.ajax({
-                url: '<%base_url("admin/subscriptions/activate")%>',
-                type: 'POST',
-                data: { plan_id: planId },
-                dataType: 'json',
-                success: function(resp) {
-                    if (resp.success) {
-                        Swal.fire({
-                            title: 'Plan Activated!',
-                            text: resp.message,
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire('Error', resp.message, 'error');
-                    }
+            const options = {
+                "key": razorpayKey,
+                "amount": parseFloat(price) * 100, // in paise
+                "currency": "INR",
+                "name": "Dine Master",
+                "description": "Subscription for " + planName,
+                "handler": function (response) {
+                    verifyAndActivate(planId, response.razorpay_payment_id);
                 },
-                error: function() {
-                    Swal.fire('Error', 'Service unavailable. Please try again later.', 'error');
-                }
-            });
+                "prefill": {
+                    "name": "<%$admin_user.user_name%>",
+                    "email": "<%$admin_user.user_email%>"
+                },
+                "theme": { "color": "#2563eb" }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+    });
+}
+
+function verifyAndActivate(planId, paymentId) {
+    Swal.fire({
+        title: 'Verifying Payment...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    $.ajax({
+        url: '<%base_url("admin/subscriptions/activate")%>',
+        type: 'POST',
+        data: { plan_id: planId, payment_id: paymentId },
+        dataType: 'json',
+        success: function(resp) {
+            if (resp.success) {
+                Swal.fire({
+                    title: 'Subscription Active!',
+                    text: resp.message,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire('Error', resp.message, 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', 'Service unavailable. Please try again later.', 'error');
         }
     });
 }

@@ -21,6 +21,7 @@ class Subscriptions extends Admin_Controller
         $data['plans'] = $this->Subscription_model->get_plans($restaurant_id, $role_id);
         $data['active_sub'] = $this->Subscription_model->get_active_subscription($restaurant_id);
         $data['is_super_admin'] = ($role_id == 1);
+        $data['razorpay_key_id'] = $this->config->item('razorpay_key_id');
 
         $this->render('index.tpl', $data);
     }
@@ -86,8 +87,25 @@ class Subscriptions extends Admin_Controller
     {
         $plan_id = $this->input->post('plan_id');
         $restaurant_id = $this->admin_data['restaurant_id'];
+        $payment_id = $this->input->post('payment_id');
 
-        if ($this->Subscription_model->activate_plan($restaurant_id, $plan_id)) {
+        if (empty($payment_id)) {
+            echo json_encode(['success' => false, 'message' => 'Payment verification failed.']);
+            return;
+        }
+
+        // Log Transaction First
+        $plan = $this->Subscription_model->get_plan($plan_id);
+        $this->Subscription_model->log_transaction([
+            'transaction_id' => $payment_id,
+            'user_id' => $this->admin_data['user_id'],
+            'amount' => $plan['price'],
+            'subscription_id' => $plan_id,
+            'status' => 'success',
+            'response_json' => json_encode($_POST)
+        ]);
+
+        if ($this->Subscription_model->activate_plan($restaurant_id, $plan_id, $payment_id)) {
             echo json_encode(['success' => true, 'message' => 'Subscription activated successfully!']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to activate subscription.']);

@@ -85,12 +85,12 @@ class Subscription_model extends CI_Model
     /**
      * Activate a plan for a restaurant
      */
-    public function activate_plan($restaurant_id, $plan_id)
+    public function activate_plan($restaurant_id, $plan_id, $payment_id = null)
     {
         $plan = $this->get_plan($plan_id);
         if (!$plan) return false;
 
-        $current_user_id = $this->session->userdata('admin_user_id');
+        $current_user_id = isset($this->admin_data['user_id']) ? $this->admin_data['user_id'] : $this->session->userdata('admin_user_id');
 
         // Parse validity (e.g., "30 Days")
         preg_match('/\d+/', $plan['validity'], $matches);
@@ -99,6 +99,7 @@ class Subscription_model extends CI_Model
         $data = [
             'restaurant_id' => $restaurant_id,
             'plan_id' => $plan_id,
+            'payment_id' => $payment_id,
             'activation_date' => date('Y-m-d'),
             'expiry_date' => date('Y-m-d', strtotime("+$days days")),
             'status' => 'ACTIVE',
@@ -115,5 +116,13 @@ class Subscription_model extends CI_Model
         ]);
 
         return $this->db->insert('restaurant_subscriptions', $data);
+    }
+
+    /**
+     * Log a payment transaction
+     */
+    public function log_transaction($data)
+    {
+        return $this->db->insert('payment_transactions', $data);
     }
 }

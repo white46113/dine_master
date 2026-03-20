@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `restaurant_subscriptions` (
     `activation_date` DATE NOT NULL,
     `expiry_date` DATE NOT NULL,
     `status` ENUM('ACTIVE', 'EXPIRED', 'CANCELLED') DEFAULT 'ACTIVE',
+    `payment_id` VARCHAR(255) DEFAULT NULL,
     `added_by` bigint UNSIGNED NOT NULL,
     `updated_by` bigint UNSIGNED DEFAULT NULL,
     `added_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -49,3 +50,17 @@ INSERT INTO `subscription_plans` (`restaurant_id`, `plan_name`, `price`, `validi
 (1, 'Starter Pack', 499.00, '30 Days', 'Basic Table Management\nDigital Menu Access\nDaily Sales Report', 1, 1),
 (1, 'Professional Plan', 999.00, '90 Days', 'Advanced Analytics\nKitchen Display System\nPriority Support\nInventory Tracking', 1, 1),
 (1, 'Enterprise Yearly', 4999.00, '365 Days', 'Multi-restaurant Management\nCustom Branding\nDedicated Manager\nUnlimited Staff Accounts', 1, 1);
+
+CREATE TABLE IF NOT EXISTS `payment_transactions` (
+    `payment_transaction_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `transaction_id` VARCHAR(255) NOT NULL,
+    `order_id` VARCHAR(255) DEFAULT NULL,
+    `user_id` INT NOT NULL,
+    `amount` DECIMAL(10, 2) NOT NULL,
+    `subscription_id` INT DEFAULT NULL,
+    `error_code` VARCHAR(100) DEFAULT NULL,
+    `error_description` TEXT,
+    `status` VARCHAR(50) DEFAULT 'success',
+    `response_json` TEXT,
+    `added_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

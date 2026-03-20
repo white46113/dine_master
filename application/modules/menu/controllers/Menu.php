@@ -109,7 +109,14 @@ class Menu extends Admin_Controller
     {
         $data['title'] = 'Add Menu Item | Dine Master Admin';
         $data['page_title'] = 'Add New Item';
-        $restaurant_id = $this->admin_data['role_id'] == 1 ? null : $this->admin_data['restaurant_id'];
+        if ($this->admin_data['role_id'] == 1) {
+            $this->load->model('restaurant/Restaurant_model');
+            $data['restaurants'] = $this->Restaurant_model->get_all();
+            $restaurant_id = $this->input->get('restaurant_id') ? $this->input->get('restaurant_id') : (isset($data['restaurants'][0]['restaurant_id']) ? $data['restaurants'][0]['restaurant_id'] : null);
+        } else {
+            $restaurant_id = $this->admin_data['restaurant_id'];
+        }
+
         $data['categories'] = $this->Menu_model->get_categories($restaurant_id);
         
         $this->render('form.tpl', $data);
@@ -124,7 +131,14 @@ class Menu extends Admin_Controller
         $data['page_title'] = 'Edit Item';
         $data['item'] = $this->Menu_model->get_item_by_id($id);
         
-        $restaurant_id = $this->admin_data['role_id'] == 1 ? null : $this->admin_data['restaurant_id'];
+        if ($this->admin_data['role_id'] == 1) {
+            $this->load->model('restaurant/Restaurant_model');
+            $data['restaurants'] = $this->Restaurant_model->get_all();
+            $restaurant_id = $data['item']['restaurant_id'];
+        } else {
+            $restaurant_id = $this->admin_data['restaurant_id'];
+        }
+
         $data['categories'] = $this->Menu_model->get_categories($restaurant_id);
         
         if (empty($data['item'])) {
@@ -140,8 +154,10 @@ class Menu extends Admin_Controller
     public function save()
     {
         $id = $this->input->post('item_id');
+        $restaurant_id = ($this->admin_data['role_id'] == 1) ? $this->input->post('restaurant_id') : $this->admin_data['restaurant_id'];
+        
         $data = [
-            'restaurant_id' => $this->admin_data['restaurant_id'] ?? 1, // Fallback if not set
+            'restaurant_id' => $restaurant_id,
             'category_id'   => $this->input->post('category_id'),
             'name'          => $this->input->post('name'),
             'description'   => $this->input->post('description'),
@@ -190,5 +206,15 @@ class Menu extends Admin_Controller
     {
         $this->Menu_model->delete_item($id);
         echo json_encode(['success' => true, 'message' => 'Menu item deleted successfully!']);
+    }
+
+    /**
+     * Get categories by restaurant ID (AJAX)
+     */
+    public function ajax_get_categories()
+    {
+        $restaurant_id = $this->input->get('restaurant_id');
+        $categories = $this->Menu_model->get_categories($restaurant_id);
+        echo json_encode(['success' => true, 'data' => $categories]);
     }
 }
