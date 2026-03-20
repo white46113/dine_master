@@ -163,23 +163,22 @@ function verifyAndActivate(planId, paymentId) {
         dataType: 'json',
         success: function(resp) {
             if (resp.success) {
-                Swal.fire({
-                    title: 'Subscription Active!',
-                    text: resp.message,
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.reload();
+                Swal.fire('Success', resp.message, 'success').then(() => {
+                    location.reload();
                 });
             } else {
-                Swal.fire('Error', resp.message, 'error');
+                let errorMsg = resp.message || JSON.stringify(resp);
+                Swal.fire('Error', errorMsg, 'error');
             }
         },
         error: function(xhr) {
             Swal.close();
             console.error("Payment Verification Error:", xhr.responseText);
-            Swal.fire('Error', 'Service unavailable. Please check console for details.', 'error');
+            let errorMsg = 'Service unavailable. ';
+            if (xhr.responseText) {
+                errorMsg += 'Server Response: ' + xhr.responseText.substring(0, 100);
+            }
+            Swal.fire('Error', errorMsg, 'error');
         }
     });
 }
