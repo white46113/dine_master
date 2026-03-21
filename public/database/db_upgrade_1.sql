@@ -64,3 +64,8 @@ CREATE TABLE IF NOT EXISTS `payment_transactions` (
     `response_json` TEXT,
     `added_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+-- 5. Restaurant GST Configuration
+-- Adds GST fields to the restaurants table with safe defaults for existing records
+ALTER TABLE `restaurants`
+    ADD COLUMN `gst_applicable` ENUM('yes','no') NOT NULL DEFAULT 'no' COMMENT 'Whether GST is applicable for this restaurant',
+    ADD COLUMN `gst_percentage` DECIMAL(5,2) NOT NULL DEFAULT 0.00 COMMENT 'GST percentage (0-100)';

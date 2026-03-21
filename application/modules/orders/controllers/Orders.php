@@ -223,14 +223,17 @@ class Orders extends Admin_Controller
         $data['title'] = 'Generate Bill #' . $data['order']['order_number'] . ' | Dine Master';
         $data['items'] = $this->Order_management_model->get_order_items($order_id);
         
-        // Calculations
+        // Calculations based on restaurant GST settings
         $subtotal = 0;
         foreach ($data['items'] as $item) {
             $subtotal += $item['line_total'];
         }
         
+        $gst_applicable = ($data['restaurant']['gst_applicable'] ?? 'no') === 'yes';
+        $gst_percentage = floatval($data['restaurant']['gst_percentage'] ?? 0);
+        
         $data['subtotal'] = $subtotal;
-        $data['tax_amount'] = $subtotal * 0.05; // 5% GST
+        $data['tax_amount'] = $gst_applicable ? ($subtotal * ($gst_percentage / 100)) : 0;
         $data['total_payable'] = $data['subtotal'] + $data['tax_amount'];
 
         $this->render('bill.tpl', $data);

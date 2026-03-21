@@ -54,6 +54,49 @@ class Restaurant extends Admin_Controller
     }
 
     /**
+     * Create New Restaurant (Super Admin Only)
+     */
+    public function create()
+    {
+        $is_superadmin = ($this->admin_data['user_role'] == 1);
+        if (!$is_superadmin) {
+            show_error('Unauthorized access.', 403);
+            return;
+        }
+
+        if ($this->input->post()) {
+            $data = [
+                'name'           => $this->input->post('name'),
+                'legal_name'     => $this->input->post('legal_name'),
+                'contact_email'  => $this->input->post('contact_email'),
+                'contact_phone'  => $this->input->post('contact_phone'),
+                'address_line1'  => $this->input->post('address_line1'),
+                'address_line2'  => $this->input->post('address_line2'),
+                'city'           => $this->input->post('city'),
+                'state'          => $this->input->post('state'),
+                'postal_code'    => $this->input->post('postal_code'),
+                'gst_applicable' => $this->input->post('gst_applicable') ?: 'no',
+                'gst_percentage' => $this->input->post('gst_applicable') === 'yes' ? floatval($this->input->post('gst_percentage')) : 0,
+                'added_by'       => $this->admin_data['admin_user_id'] ?? 1,
+            ];
+
+            $id = $this->Restaurant_model->create_restaurant($data);
+            if ($id) {
+                echo json_encode(['success' => true, 'message' => 'Restaurant created successfully!', 'restaurant_id' => $id]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to create restaurant.']);
+            }
+            return;
+        }
+
+        $data['title']      = 'Add Restaurant | Dine Master Admin';
+        $data['page_title'] = 'Add New Restaurant';
+        $data['restaurant'] = [];
+        $data['mode']       = 'create';
+        $this->render('index.tpl', $data);
+    }
+
+    /**
      * DataTables Server-side List for Super Admin
      */
     public function ajax_list()
@@ -129,8 +172,10 @@ class Restaurant extends Admin_Controller
             'address_line2' => $this->input->post('address_line2'),
             'city'          => $this->input->post('city'),
             'state'         => $this->input->post('state'),
-            'postal_code'   => $this->input->post('postal_code'),
-            'updated_by'    => $this->admin_data['admin_user_id'] ?? 1
+            'postal_code'    => $this->input->post('postal_code'),
+            'gst_applicable' => $this->input->post('gst_applicable') ?: 'no',
+            'gst_percentage' => $this->input->post('gst_applicable') === 'yes' ? floatval($this->input->post('gst_percentage')) : 0,
+            'updated_by'     => $this->admin_data['admin_user_id'] ?? 1
         ];
 
         // Handle Logo Upload

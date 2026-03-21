@@ -20,9 +20,24 @@ class Categories extends My_Api_Controller
         }
 
         if (!$rid)
-            return $this->response(['success' => false,'status' => false, 'message' => 'restaurant_id required'], REST_Controller::HTTP_BAD_REQUEST);
+            return $this->response(['success' => false, 'status' => false, 'message' => 'restaurant_id required'], REST_Controller::HTTP_BAD_REQUEST);
+
         $data = $this->category->list_by_restaurant($rid);
-        return $this->response(['success' => true,'message' => 'catagories found successfully.','status' => true, 'data' => $data], REST_Controller::HTTP_OK);
+
+        // Prepend "All" category at the first position
+        $all_category = (object) [
+            'category_id'    => "0",
+            'category_name'  => "All",
+            'category_image' => ""
+        ];
+        array_unshift($data, $all_category);
+
+        return $this->response([
+            'success' => true,
+            'message' => 'catagories found successfully.',
+            'status'  => true,
+            'data'    => $data
+        ], REST_Controller::HTTP_OK);
     }
     public function index_post()
     {

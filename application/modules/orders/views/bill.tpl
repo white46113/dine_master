@@ -58,10 +58,12 @@
                                 <span class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Subtotal</span>
                                 <span class="text-gray-700 font-bold">₹<%$subtotal|number_format:2%></span>
                             </div>
+                            <%if $restaurant.gst_applicable == 'yes'%>
                             <div class="flex justify-between text-sm">
-                                <span class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">GST (5%)</span>
+                                <span class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">GST (<%$restaurant.gst_percentage%>%)</span>
                                 <span class="text-gray-700 font-bold">₹<%$tax_amount|number_format:2%></span>
                             </div>
+                            <%/if%>
                             <div class="flex justify-between items-center bg-blue-50/50 p-4 rounded-3xl mt-4">
                                 <span class="text-blue-600 font-black uppercase tracking-widest text-xs">Total Amount</span>
                                 <span class="text-2xl font-black text-blue-600 tracking-tighter">₹<%$total_payable|number_format:2%></span>
@@ -195,10 +197,12 @@
                 <span>Subtotal</span>
                 <span><%$subtotal|number_format:0%></span>
             </div>
+            <%if $restaurant.gst_applicable == 'yes'%>
             <div class="flex justify-between">
-                <span>GST 5%</span>
+                <span>GST <%$restaurant.gst_percentage%>%</span>
                 <span><%$tax_amount|number_format:1%></span>
             </div>
+            <%/if%>
             <div class="flex justify-between font-bold">
                 <span>Total</span>
                 <span><%$total_payable|number_format:1%></span>
@@ -323,7 +327,9 @@ function getRawData() {
 
     data.push('-'.repeat(30) + '\n');
     data.push(pad('Subtotal', subtotal, 30) + '\n');
-    data.push(pad('GST 5%', tax, 30) + '\n');
+    <%if $restaurant.gst_applicable == 'yes'%>
+    data.push(pad('GST <%$restaurant.gst_percentage%>%', tax, 30) + '\n');
+    <%/if%>
     data.push('\x1B\x45\x01'); // Bold on
     data.push(pad('Total', total, 30) + '\n');
     data.push('\x1B\x45\x00'); // Bold off

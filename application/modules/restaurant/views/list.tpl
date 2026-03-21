@@ -3,6 +3,10 @@
         <h2 class="text-2xl font-bold text-gray-800">Restaurant Management</h2>
         <p class="text-gray-500 text-sm">Manage all restaurants and properties directly</p>
     </div>
+    <a href="<%base_url('admin/restaurant/create')%>"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/30 text-sm">
+        <i class="fa-solid fa-plus"></i> Add New Restaurant
+    </a>
 </div>
 
 <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">

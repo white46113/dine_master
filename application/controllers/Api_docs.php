@@ -144,6 +144,22 @@ class Api_docs extends Admin_Controller {
 }'
             ],
             [
+                'category' => 'Orders',
+                'name' => 'Add Items to Order',
+                'url' => '/WS/add_order_items',
+                'method' => 'POST',
+                'params' => [
+                    ['name' => 'order_id', 'type' => 'int', 'description' => 'Required. ID of the existing order'],
+                    ['name' => 'items', 'type' => 'array', 'description' => 'Required. Array of items: { item_id, quantity, price }'],
+                ],
+                'description' => 'Appends new items to an existing order. Validates that order and menu items exist. Auto-recomputes subtotal_amount and total_payable.',
+                'example_response' => '{
+  "status": true,
+  "message": "Items added to order successfully",
+  "order_id": 22
+}'
+            ],
+            [
                 'category' => 'Menu',
                 'name' => 'Get Menu',
                 'url' => '/WS/menu_items/get_menu',
@@ -303,6 +319,26 @@ class Api_docs extends Admin_Controller {
     "data": {
         "order_id": 20
     }
+}'
+            ],
+            [
+                'category' => 'Orders',
+                'name' => 'Update Order Item',
+                'url' => '/WS/update_item',
+                'method' => 'POST',
+                'params' => [
+                    ['name' => 'order_id', 'type' => 'int', 'description' => 'Required. ID of the existing order'],
+                    ['name' => 'items', 'type' => 'array', 'description' => 'Required. Array of items to update: { order_item_id OR menu_id, quantity, price }'],
+                ],
+                'description' => 'Updates quantity or price of existing order items. If quantity is 0, the item is removed. Auto-recomputes order totals.',
+                'example_response' => '{
+  "settings": {
+    "success": true,
+    "message": "Order items updated successfully"
+  },
+  "data": {
+    "order_id": 101
+  }
 }'
             ],
         ];

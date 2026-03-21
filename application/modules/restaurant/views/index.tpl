@@ -96,7 +96,37 @@
                         </div>
                     </div>
 
-                    <div class="mt-12 flex justify-end">
+                    <!-- GST Configuration -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-800 mb-6 text-sm uppercase tracking-wider">GST Configuration</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-gray-500 uppercase">GST Applicable</label>
+                                <div class="flex gap-3 mt-2">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="gst_applicable" id="gst_yes" value="yes" <%if isset($restaurant.gst_applicable) && $restaurant.gst_applicable == 'yes'%>checked<%/if%> class="accent-green-600">
+                                        <span class="text-sm font-semibold text-gray-700">Yes</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="gst_applicable" id="gst_no" value="no" <%if !isset($restaurant.gst_applicable) || $restaurant.gst_applicable != 'yes'%>checked<%/if%> class="accent-red-500">
+                                        <span class="text-sm font-semibold text-gray-700">No</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5" id="gst_percentage_wrapper" <%if !isset($restaurant.gst_applicable) || $restaurant.gst_applicable != 'yes'%>style="display:none"<%/if%>>
+                                <label class="text-xs font-bold text-gray-500 uppercase">GST Percentage (%)</label>
+                                <input type="number" name="gst_percentage" id="gst_percentage"
+                                    value="<%if isset($restaurant.gst_percentage)%><%$restaurant.gst_percentage%><%else%>0<%/if%>"
+                                    min="0" max="100" step="0.01" placeholder="e.g. 18"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                                <p class="text-xs text-gray-400">Enter GST rate between 0–100</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
                         <button type="submit" id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-xl transition-all shadow-lg shadow-blue-500/30">
                             Save Changes
                         </button>
@@ -150,7 +180,7 @@ $(document).ready(function() {
             btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Saving...');
 
             $.ajax({
-                url: '<%base_url("admin/restaurant/save")%>',
+                url: '<%if isset($mode) && $mode == "create"%><%base_url("admin/restaurant/create")%><%else%><%base_url("admin/restaurant/save")%><%/if%>',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -177,6 +207,15 @@ $(document).ready(function() {
                     btn.prop('disabled', false).html('Save Changes');
                 }
             });
+        }
+    });
+
+    // GST toggle show/hide
+    $('input[name="gst_applicable"]').on('change', function() {
+        if ($(this).val() === 'yes') {
+            $('#gst_percentage_wrapper').slideDown(200);
+        } else {
+            $('#gst_percentage_wrapper').slideUp(200);
         }
     });
 

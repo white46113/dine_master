@@ -52,11 +52,119 @@ class Order extends My_Api_Controller
         return $this->response([
             'success' => true, 
             'message' => 'Order created successfully',
-            'status' => true, 
             'data' => [
                 'order_id' => $id
             ]
         ], REST_Controller::HTTP_CREATED);
+    }
+
+    /** POST /WS/add_order_items - Add items to an existing order */
+    public function add_order_items()
+    {
+        if ($this->authenticate() !== true)
+            return;
+
+        $input = $this->post();
+        if (empty($input)) {
+            $input = json_decode($this->input->raw_input_stream, true);
+        }
+
+        $order_id = isset($input['order_id']) ? intval($input['order_id']) : null;
+        $items    = isset($input['items']) && is_array($input['items']) ? $input['items'] : [];
+
+        if (!$order_id) {
+            return $this->response(['status' => false, 'message' => 'order_id is required'], REST_Controller::HTTP_BAD_REQUEST);
+        }
+        if (empty($items)) {
+            return $this->response(['status' => false, 'message' => 'items array is required and cannot be empty'], REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+        // Validate order exists
+        $order = $this->order_model->get_order_row($order_id);
+        if (!$order) {
+            return $this->response(['status' => false, 'message' => 'Order not found'], REST_Controller::HTTP_NOT_FOUND);
+        }
+
+        // Validate each menu item exists
+        foreach ($items as $item) {
+            $menu_id = isset($item['item_id']) ? $item['item_id'] : (isset($item['menu_id']) ? $item['menu_id'] : null);
+            if (!$menu_id || !$this->order_model->menu_item_exists($menu_id)) {
+                return $this->response([
+                    'status'  => false,
+                    'message' => 'Invalid menu_id: ' . $menu_id
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $result = $this->order_model->add_items_to_order($order_id, $items, $this->current_user->user_id);
+        if (!$result) {
+            return $this->response([
+                'success' => false,
+                'message' => 'Failed to add items to order',
+                'data'    => []
+            ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $this->response([
+            'success'  => true,
+            'message'  => 'Items added to order successfully',
+            'data'     => ['order_id' => $order_id]
+        ], REST_Controller::HTTP_OK);
+    }
+
+    /** POST /WS/update_item - Update items in an existing order */
+    public function update_item()
+    {
+        if ($this->authenticate() !== true)
+            return;
+
+        $input = $this->post();
+        if (empty($input)) {
+            $input = json_decode($this->input->raw_input_stream, true);
+        }
+
+        $order_id = isset($input['order_id']) ? intval($input['order_id']) : null;
+        $items    = isset($input['items']) && is_array($input['items']) ? $input['items'] : [];
+
+        if (!$order_id) {
+            return $this->response([
+                'success' => false,
+                'message' => 'order_id is required',
+                'data'    => []
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+        if (empty($items)) {
+            return $this->response([
+                'success' => false,
+                'message' => 'items array is required and cannot be empty',
+                'data'    => []
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+        // Validate order exists
+        $order = $this->order_model->get_order_row($order_id);
+        if (!$order) {
+            return $this->response([
+                'success' => false,
+                'message' => 'Order not found',
+                'data'    => []
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+
+        $result = $this->order_model->update_item_in_order($order_id, $items, $this->current_user->user_id);
+        if (!$result) {
+            return $this->response([
+                'success' => false,
+                'message' => 'Failed to update order items',
+                'data'    => []
+            ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $this->response([
+            'success'  => true,
+            'message'  => 'Order items updated successfully',
+            'data'     => ['order_id' => $order_id]
+        ], REST_Controller::HTTP_OK);
     }
 
     /** GET /WS/get_order_details?id={order_id} - Get single order details */

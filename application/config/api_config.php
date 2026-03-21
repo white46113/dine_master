@@ -52,6 +52,18 @@ $config["get_order_details"] = array(
     "controller" => "order",
     "method" => "GET"
 );
+$config["add_order_items"] = array(
+    "title" => "Add Items to Order",
+    "folder" => "orders",
+    "controller" => "order",
+    "method" => "POST"
+);
+$config["update_item"] = array(
+    "title" => "Update Order Item",
+    "folder" => "orders",
+    "controller" => "order",
+    "method" => "POST"
+);
 
 $config["menu_items"] = array(
     "title" => "Menu",

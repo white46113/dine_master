@@ -11,7 +11,7 @@ class Order_model extends CI_Model
         $this->db->insert($this->orders, $order);
         $order_id = $this->db->insert_id();
         foreach ($payload['items'] as $it) {
-            $addons = $it['addons'] ?? [];
+            $addons = isset($it['addons']) ? $it['addons'] : [];
             $it_insert = [
                 'order_id' => $order_id,
                 'item_id' => $it['item_id'],
@@ -41,7 +41,12 @@ class Order_model extends CI_Model
     public function get($id)
     {
         // Fetch full order record
-        $order = $this->db->get_where($this->orders, ['order_id' => $id])->row_array();
+        // Fetch order with restaurant GST settings
+        $this->db->select('o.*, r.gst_applicable, r.gst_percentage');
+        $this->db->from($this->orders . ' o');
+        $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
+        $this->db->where('o.order_id', $id);
+        $order = $this->db->get()->row_array();
         if (!$order)
             return null;
 
@@ -76,12 +81,23 @@ class Order_model extends CI_Model
         }
         $order['subtotal_amount'] = number_format($subtotal, 2, '.', '');
 
+        // Compute GST if applicable
+        $tax_amount = 0;
+        if (isset($order['gst_applicable']) && $order['gst_applicable'] === 'yes') {
+            $gst_percent = floatval($order['gst_percentage'] ?? 0);
+            $tax_amount = $subtotal * ($gst_percent / 100);
+        }
+        $order['tax_amount'] = number_format($tax_amount, 2, '.', '');
+        
+        // Add restaurant name and address for billing if not present
+        $order['restaurant_name'] = isset($order['name']) ? $order['name'] : 'Dine Master';
+
         // Compute total_payable = subtotal_amount - discount_amount + service_charge_amt + tax_amount + rounding_adjustment
         $total_payable = $subtotal
-            - floatval($order['discount_amount'] ?? 0)
-            + floatval($order['service_charge_amt'] ?? 0)
-            + floatval($order['tax_amount'] ?? 0)
-            + floatval($order['rounding_adjustment'] ?? 0);
+            - floatval(isset($order['discount_amount']) ? $order['discount_amount'] : 0)
+            + floatval(isset($order['service_charge_amt']) ? $order['service_charge_amt'] : 0)
+            + $tax_amount
+            + floatval(isset($order['rounding_adjustment']) ? $order['rounding_adjustment'] : 0);
         $order['total_payable'] = number_format($total_payable, 2, '.', '');
 
         $order['items'] = $items;
@@ -123,5 +139,165 @@ class Order_model extends CI_Model
         }
         return array_values($orders);
          
+    }
+
+    /** Fetch a single order row (without items) to validate it exists */
+    public function get_order_row($order_id)
+    {
+        return $this->db->get_where($this->orders, ['order_id' => $order_id])->row_array();
+    }
+
+    /** Check that a menu item exists */
+    public function menu_item_exists($item_id)
+    {
+        return $this->db->where('item_id', $item_id)->count_all_results('menu_items') > 0;
+    }
+
+    /** Add items to an existing order and recompute totals */
+    public function add_items_to_order($order_id, $items, $added_by)
+    {
+        $this->db->trans_start();
+
+        foreach ($items as $it) {
+            // Accept both item_id and menu_id as field names
+            $item_id   = isset($it['item_id']) ? $it['item_id'] : (isset($it['menu_id']) ? $it['menu_id'] : null);
+            $item_name = isset($it['item_name']) ? $it['item_name'] : null;
+
+            // Fetch item name from menu_items if not provided
+            if (!$item_name && $item_id) {
+                $menu = $this->db->get_where('menu_items', ['item_id' => $item_id])->row();
+                $item_name = $menu ? $menu->name : 'Unknown';
+            }
+
+            $row = [
+                'order_id'  => $order_id,
+                'item_id'   => $item_id,
+                'item_name' => $item_name,
+                'unit_price'=> isset($it['price']) ? $it['price'] : (isset($it['unit_price']) ? $it['unit_price'] : 0),
+                'quantity'  => isset($it['quantity']) ? $it['quantity'] : 1,
+                'status'    => 'PENDING',
+                'added_by'  => $added_by,
+                'added_date'=> date('Y-m-d H:i:s'),
+            ];
+            $this->db->insert($this->order_items, $row);
+
+            // Insert addons if provided
+            $oid = $this->db->insert_id();
+            if (!empty($it['addons']) && is_array($it['addons'])) {
+                foreach ($it['addons'] as $ad) {
+                    $this->db->insert($this->order_item_addons, [
+                        'order_item_id'   => $oid,
+                        'addon_option_id' => $ad['addon_option_id'],
+                        'addon_name'      => $ad['addon_name'],
+                        'price_delta'     => $ad['price_delta'],
+                        'added_by'        => $added_by,
+                    ]);
+                }
+            }
+        }
+
+        // Recompute subtotal and total_payable from all current items
+        $all_items = $this->db->get_where($this->order_items, ['order_id' => $order_id])->result_array();
+        $subtotal  = 0;
+        foreach ($all_items as $item) {
+            $subtotal += floatval($item['unit_price']) * floatval($item['quantity']);
+        }
+        $order = $this->get_order_row($order_id);
+        $total_payable = $subtotal
+            - floatval(isset($order['discount_amount']) ? $order['discount_amount'] : 0)
+            + floatval(isset($order['service_charge_amt']) ? $order['service_charge_amt'] : 0)
+            + floatval(isset($order['tax_amount']) ? $order['tax_amount'] : 0)
+            + floatval(isset($order['rounding_adjustment']) ? $order['rounding_adjustment'] : 0);
+
+        $this->db->where('order_id', $order_id)->update($this->orders, [
+            'subtotal_amount' => number_format($subtotal, 2, '.', ''),
+            'total_payable'   => number_format($total_payable, 2, '.', ''),
+            'updated_date'    => date('Y-m-d H:i:s'),
+        ]);
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    /** Update items in an existing order and recompute totals */
+    public function update_item_in_order($order_id, $items, $user_id)
+    {
+        $this->db->trans_start();
+
+        foreach ($items as $it) {
+            $order_item_id = isset($it['order_item_id']) ? intval($it['order_item_id']) : null;
+            $menu_id       = isset($it['menu_id']) ? intval($it['menu_id']) : null;
+            $quantity      = isset($it['quantity']) ? intval($it['quantity']) : (isset($it['qty']) ? intval($it['qty']) : null);
+            $unit_price    = isset($it['price']) ? floatval($it['price']) : (isset($it['unit_price']) ? floatval($it['unit_price']) : null);
+
+            $where = [];
+            if ($order_item_id) {
+                $where['order_item_id'] = $order_item_id;
+            } elseif ($menu_id && $order_id) {
+                $where['order_id'] = $order_id;
+                $where['item_id']  = $menu_id;
+            }
+
+            if (empty($where)) continue;
+
+            if ($quantity === 0) {
+                // Delete item and its addons
+                // First find the item ID if we only have menu_id
+                if (!$order_item_id) {
+                    $item_row = $this->db->get_where($this->order_items, $where)->row();
+                    $order_item_id = $item_row ? $item_row->order_item_id : null;
+                }
+                
+                if ($order_item_id) {
+                    $this->db->delete($this->order_item_addons, ['order_item_id' => $order_item_id]);
+                    $this->db->delete($this->order_items, ['order_item_id' => $order_item_id]);
+                }
+            } else {
+                // Update item
+                $data = [];
+                if ($quantity !== null) $data['quantity'] = $quantity;
+                if ($unit_price !== null) $data['unit_price'] = $unit_price;
+                
+                if (!empty($data)) {
+                    $this->db->where($where)->update($this->order_items, $data);
+                }
+            }
+        }
+
+        // Recompute subtotal and total_payable
+        $all_items = $this->db->get_where($this->order_items, ['order_id' => $order_id])->result_array();
+        $subtotal  = 0;
+        foreach ($all_items as $item) {
+            $subtotal += floatval($item['unit_price']) * floatval($item['quantity']);
+        }
+        
+        // Fetch order with restaurant GST settings
+        $this->db->select('o.*, r.gst_applicable, r.gst_percentage');
+        $this->db->from($this->orders . ' o');
+        $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
+        $this->db->where('o.order_id', $order_id);
+        $order = $this->db->get()->row_array();
+        
+        $tax_amount = 0;
+        if (isset($order['gst_applicable']) && $order['gst_applicable'] === 'yes') {
+            $gst_percent = floatval($order['gst_percentage'] ?? 0);
+            $tax_amount = $subtotal * ($gst_percent / 100);
+        }
+
+        $total_payable = $subtotal
+            - floatval(isset($order['discount_amount']) ? $order['discount_amount'] : 0)
+            + floatval(isset($order['service_charge_amt']) ? $order['service_charge_amt'] : 0)
+            + $tax_amount
+            + floatval(isset($order['rounding_adjustment']) ? $order['rounding_adjustment'] : 0);
+
+        $this->db->where('order_id', $order_id)->update($this->orders, [
+            'subtotal_amount' => number_format($subtotal, 2, '.', ''),
+            'tax_amount'      => number_format($tax_amount, 2, '.', ''),
+            'total_payable'   => number_format($total_payable, 2, '.', ''),
+            'updated_date'    => date('Y-m-d H:i:s'),
+        ]);
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
     }
 }

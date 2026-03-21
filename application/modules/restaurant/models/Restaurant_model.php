@@ -41,6 +41,18 @@ class Restaurant_model extends CI_Model
         $this->db->where('restaurant_id', $id);
         return $this->db->update($this->table, $data);
     }
+
+    /**
+     * Create a new restaurant
+     */
+    public function create_restaurant($data)
+    {
+        $data['is_active']   = 1;
+        $data['added_date']  = date('Y-m-d H:i:s');
+        $data['updated_date'] = date('Y-m-d H:i:s');
+        $this->db->insert($this->table, $data);
+        return $this->db->insert_id();
+    }
     
     private function _get_datatables_query()
     {
