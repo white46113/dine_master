@@ -26,13 +26,29 @@ class User_login extends My_Api_Controller{
             ], REST_Controller::HTTP_NOT_FOUND);
         }
 
-        unset($u->user_password);
+        // Add order statistics
+        $stats = $this->user_login_model->get_order_stats($id);
+
+        // Build clean, filtered response (only specified fields)
+        $data = [
+            'user_id'            => $u->user_id,
+            'restaurant_id'      => $u->restaurant_id,
+            'user_role'          => $u->user_role,
+            'role_name'          => $u->role_name ?? null,
+            'user_email'         => $u->user_email,
+            'phone'              => $u->phone,
+            'user_name'          => $u->user_name,
+            'status'             => $u->status,
+            'total_orders'       => $stats['total_orders'],
+            'today_orders'       => $stats['today_orders'],
+            'last_7_days_orders' => $stats['last_7_days_orders'],
+        ];
         
         return $this->response([
             'success' => true,
-            'status' => true, 
+            'status'  => true, 
             'message' => 'User details fetched successfully',
-            'data' => $u
+            'data'    => $data
         ], REST_Controller::HTTP_OK);
     }
 

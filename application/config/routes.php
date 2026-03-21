@@ -40,9 +40,12 @@ $route['WS/new_orders'] = "wsengine/api_execute/wscontroller/order/new_orders";
 $route['WS/gets_orders'] = "wsengine/api_execute/wscontroller/order/gets_orders";
 $route['WS/get_order_details'] = "wsengine/api_execute/wscontroller/order/get_order_details";
 
+#------------ Tables API Alias -----------------
+$route['WS/tables'] = "wsengine/api_execute/wscontroller/tables/index";
+
 $route['WS/(.*)'] = "wsengine/api_execute/wscontroller/$1";
 
 $GLOBALS['is_ws'] = false;
-if (isset($this->uri->segments[1]) && ($this->uri->segments[1] == "WS" || $this->uri->segments[1] == "api_docs")) {
+if (isset($this->uri->segments[1]) && ($this->uri->segments[1] == "WS")) {
     $GLOBALS['is_ws'] = true;
 }

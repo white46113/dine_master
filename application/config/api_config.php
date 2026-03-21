@@ -70,6 +70,16 @@ $config['categories'] = array(
     )
 );
 
+$config["tables"] = array(
+    "title" => "Tables",
+    "folder" => "tables",
+    "controller" => "table",
+    "method" => "GET_POST",
+    "params" => array(
+        "restaurant_id"
+    )
+);
+
 
 #####GENERATED_CONFIG_SETTINGS_END#####
 

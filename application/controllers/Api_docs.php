@@ -1,18 +1,15 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Api_docs extends CI_Controller {
+class Api_docs extends Admin_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->library('session');
-        $this->load->helper('url');
     }
 
     public function index() {
-        // Enforce Super Admin only
-        $admin_data = $this->session->userdata('admin_user');
-        if (!$admin_data || ($admin_data['role_id'] != 1 && $admin_data['user_role'] != 1)) {
+        // Enforce Super Admin only (Role ID 1)
+        if (!$this->admin_data || ($this->admin_data['role_id'] != 1 && $this->admin_data['user_role'] != 1)) {
             show_404();
         }
 
@@ -91,6 +88,9 @@ class Api_docs extends CI_Controller {
         "user_name": "odell44",
         "user_email": "adrienne.schaden@gmail.com",
         "status": "Active",
+        "total_orders": 150,
+        "today_orders": 5,
+        "last_7_days_orders": 25,
         ...
     }
 }'
@@ -115,6 +115,32 @@ class Api_docs extends CI_Controller {
         "city": "Lisandrobury",
         ...
     }
+}'
+            ],
+            [
+                'category' => 'Tables',
+                'name' => 'Table Listing',
+                'url' => '/WS/tables',
+                'method' => 'GET',
+                'params' => [
+                    ['name' => 'restaurant_id', 'type' => 'int', 'description' => 'Restaurant ID to fetch tables for'],
+                    ['name' => 'search', 'type' => 'string', 'description' => 'Search by table name or code (Optional)'],
+                    ['name' => 'status', 'type' => 'string', 'description' => 'Filter by status: FREE, OCCUPIED, etc. (Optional, only for Super Admin)']
+                ],
+                'description' => 'Returns a list of tables for a specific restaurant. Regular users only see available (FREE) tables.',
+                'example_response' => '{
+  "status": true,
+  "message": "Table list fetched successfully",
+  "data": [
+    {
+      "table_id": 1,
+      "table_code": "T1",
+      "table_name": "Table 1",
+      "capacity": 4,
+      "status": "FREE",
+      "restaurant_id": 1
+    }
+  ]
 }'
             ],
             [

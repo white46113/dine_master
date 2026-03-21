@@ -40,16 +40,51 @@ class Order_model extends CI_Model
     }
     public function get($id)
     {
-        
-        $order = $this->db->get_where($this->orders, ['order_id' => $id])->row();
+        // Fetch full order record
+        $order = $this->db->get_where($this->orders, ['order_id' => $id])->row_array();
         if (!$order)
             return null;
-        $items = $this->db->get_where($this->order_items, ['order_id' => $id])->result();
-        foreach ($items as &$it) {
-            $it->addons = $this->db->get_where($this->order_item_addons, ['order_item_id' => $it->id])->result();
+
+        // Fetch full item records, joining menu_items for veg_type
+        $this->db->select('oi.*, mi.veg_type');
+        $this->db->from($this->order_items . ' oi');
+        $this->db->join('menu_items mi', 'mi.item_id = oi.item_id', 'left');
+        $this->db->where('oi.order_id', $id);
+        $items = $this->db->get()->result_array();
+
+        foreach ($items as &$item) {
+            // Fetch addons for this item
+            $item['addons'] = $this->db
+                ->get_where($this->order_item_addons, ['order_item_id' => $item['order_item_id']])
+                ->result_array();
         }
-        $order->items = $items;
-       
+
+        // Compute order-level status based on item statuses
+        if (!empty($items)) {
+            $item_statuses = array_column($items, 'status');
+            if (in_array('PENDING', $item_statuses)) {
+                $order['status'] = 'PENDING';
+            } elseif (count(array_unique($item_statuses)) === 1 && $item_statuses[0] === 'COMPLETED') {
+                $order['status'] = 'COMPLETED';
+            }
+        }
+
+        // Compute subtotal_amount = SUM(unit_price * quantity) for all items
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += floatval($item['unit_price']) * floatval($item['quantity']);
+        }
+        $order['subtotal_amount'] = number_format($subtotal, 2, '.', '');
+
+        // Compute total_payable = subtotal_amount - discount_amount + service_charge_amt + tax_amount + rounding_adjustment
+        $total_payable = $subtotal
+            - floatval($order['discount_amount'] ?? 0)
+            + floatval($order['service_charge_amt'] ?? 0)
+            + floatval($order['tax_amount'] ?? 0)
+            + floatval($order['rounding_adjustment'] ?? 0);
+        $order['total_payable'] = number_format($total_payable, 2, '.', '');
+
+        $order['items'] = $items;
         return $order;
     }
     public function list($filters = [])

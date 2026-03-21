@@ -27,7 +27,11 @@ class User_login_model extends CI_Model{
     }
 
     public function get_by_id($id) {
-        return $this->db->get_where($this->table, ['user_id'=>$id])->row();
+        $this->db->select('u.user_id, u.restaurant_id, u.user_role, u.user_email, u.phone, u.user_name, u.status, u.user_password, r.name as role_name');
+        $this->db->from($this->table . ' u');
+        $this->db->join('roles r', 'r.role_id = u.user_role', 'left');
+        $this->db->where('u.user_id', $id);
+        return $this->db->get()->row();
     }
 
     public function update_user($id, $data) {
@@ -63,6 +67,26 @@ class User_login_model extends CI_Model{
         $this->db->where('u.user_id', $user_id);
         $this->db->where('r.is_active', 1);
         return $this->db->get()->row();
+    }
+
+    public function get_order_stats($user_id) {
+        $stats = [];
+
+        // Total orders
+        $this->db->where('added_by', $user_id);
+        $stats['total_orders'] = $this->db->count_all_results('orders');
+
+        // Today's orders
+        $this->db->where('added_by', $user_id);
+        $this->db->where('DATE(placed_at)', date('Y-m-d'));
+        $stats['today_orders'] = $this->db->count_all_results('orders');
+
+        // Last 7 days orders
+        $this->db->where('added_by', $user_id);
+        $this->db->where('placed_at >=', date('Y-m-d H:i:s', strtotime('-7 days')));
+        $stats['last_7_days_orders'] = $this->db->count_all_results('orders');
+
+        return $stats;
     }
 
 }
