@@ -28,8 +28,9 @@ class Table extends My_Api_Controller
                 $restaurant_id = $this->current_user->restaurant_id;
             } else {
                 return $this->response([
-                    'status' => false,
-                    'message' => 'Unauthorized: No restaurant associated with this user.'
+                    'success' => false,
+                    'message' => 'Unauthorized: No restaurant associated with this user.',
+                    'data'    => []
                 ], REST_Controller::HTTP_FORBIDDEN);
             }
         }
@@ -43,7 +44,7 @@ class Table extends My_Api_Controller
         }
 
         return $this->response([
-            'status' => true,
+            'success' => true,
             'message' => 'Table list fetched successfully',
             'data' => $tables
         ], REST_Controller::HTTP_OK);

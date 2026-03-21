@@ -68,8 +68,10 @@ class User_login extends My_Api_Controller{
         $id = $this->user_login_model->register($input);
 
         return $this->response([
+            'success' => true,
             'status' => true,
-            'user_id' => $id
+            'user_id' => $id,
+            'data'    => ['user_id' => $id]
         ], REST_Controller::HTTP_CREATED);
     }
 
@@ -78,15 +80,19 @@ class User_login extends My_Api_Controller{
         if ($this->authenticate() !== true) return;
         if (!$id) {
             return $this->response([
+                'success' => false,
                 'status' => false,
-                'message' => 'Missing id'
+                'message' => 'Missing id',
+                'data'    => []
             ], REST_Controller::HTTP_BAD_REQUEST);
         }
 
         if ($this->current_user->id != $id ) {
             return $this->response([
+                'success' => false,
                 'status' => false,
-                'message' => 'Forbidden'
+                'message' => 'Forbidden',
+                'data'    => []
             ], REST_Controller::HTTP_FORBIDDEN);
         }
 
@@ -95,8 +101,10 @@ class User_login extends My_Api_Controller{
         $ok = $this->user_login_model->update_user($id, $this->put());
 
         return $this->response([
+            'success' => true,
             'status' => true,
-            'updated' => $ok
+            'updated' => $ok,
+            'data'    => ['updated' => $ok]
         ], REST_Controller::HTTP_OK);
     }
 

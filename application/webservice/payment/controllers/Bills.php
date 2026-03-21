@@ -13,9 +13,9 @@ class Bills extends My_Api_Controller
         $this->require_role(['admin']);
         $input = $this->post();
         if (empty($input['bill']) || empty($input['items']))
-            return $this->response(['status' => false, 'message' => 'bill and items required'], REST_Controller::HTTP_BAD_REQUEST);
+            return $this->response(['success' => false, 'status' => false, 'message' => 'bill and items required', 'data' => []], REST_Controller::HTTP_BAD_REQUEST);
         $input['bill']['added_by'] = $this->current_user->id;
         $id = $this->bill->create($input['bill'], $input['items']);
-        return $this->response(['status' => true, 'bill_id' => $id], REST_Controller::HTTP_CREATED);
+        return $this->response(['success' => true, 'status' => true, 'message' => 'Bill created successfully', 'bill_id' => $id, 'data' => ['bill_id' => $id]], REST_Controller::HTTP_CREATED);
     }
 }

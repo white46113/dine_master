@@ -12,17 +12,17 @@ class Addons extends My_Api_Controller
     {
         $rid = $this->get('restaurant_id');
         if (!$rid)
-            return $this->response(['status' => false, 'message' => 'restaurant_id required'], REST_Controller::HTTP_BAD_REQUEST);
+            return $this->response(['success' => false, 'status' => false, 'message' => 'restaurant_id required', 'data' => []], REST_Controller::HTTP_BAD_REQUEST);
         $data = $this->group->list_by_restaurant($rid);
-        return $this->response(['status' => true, 'data' => $data], REST_Controller::HTTP_OK);
+        return $this->response(['success' => true, 'status' => true, 'message' => 'Addon groups fetched successfully', 'data' => $data], REST_Controller::HTTP_OK);
     }
     public function options_get()
     {
         $gid = $this->get('group_id');
         if (!$gid)
-            return $this->response(['status' => false, 'message' => 'group_id required'], REST_Controller::HTTP_BAD_REQUEST);
+            return $this->response(['success' => false, 'status' => false, 'message' => 'group_id required', 'data' => []], REST_Controller::HTTP_BAD_REQUEST);
         $data = $this->option->list_by_group($gid);
-        return $this->response(['status' => true, 'data' => $data], REST_Controller::HTTP_OK);
+        return $this->response(['success' => true, 'status' => true, 'message' => 'Addon options fetched successfully', 'data' => $data], REST_Controller::HTTP_OK);
     }
     public function item_groups_post()
     {
@@ -31,8 +31,8 @@ class Addons extends My_Api_Controller
         $this->require_role(['admin']);
         $input = $this->post();
         if (empty($input['item_id']) || !isset($input['group_ids']))
-            return $this->response(['status' => false, 'message' => 'item_id & group_ids required'], REST_Controller::HTTP_BAD_REQUEST);
+            return $this->response(['success' => false, 'status' => false, 'message' => 'item_id & group_ids required', 'data' => []], REST_Controller::HTTP_BAD_REQUEST);
         $ok = $this->itemaddon->set_for_item($input['item_id'], (array) $input['group_ids']);
-        return $this->response(['status' => true, 'updated' => $ok], REST_Controller::HTTP_OK);
+        return $this->response(['success' => true, 'status' => true, 'message' => 'Item addon groups updated successfully', 'updated' => $ok, 'data' => ['updated' => $ok]], REST_Controller::HTTP_OK);
     }
 }

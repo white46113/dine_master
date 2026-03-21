@@ -13,6 +13,6 @@ class Payments extends My_Api_Controller
         $input = $this->post();
         $input['added_by'] = $this->current_user->id;
         $id = $this->payment->create($input);
-        return $this->response(['status' => true, 'payment_id' => $id], REST_Controller::HTTP_CREATED);
+        return $this->response(['success' => true, 'status' => true, 'message' => 'Payment created successfully', 'payment_id' => $id, 'data' => ['payment_id' => $id]], REST_Controller::HTTP_CREATED);
     }
 }
