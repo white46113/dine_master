@@ -33,6 +33,14 @@ class Order_model extends CI_Model
                 $this->db->insert($this->order_item_addons, $ad_insert);
             }
         }
+        // Update Table Status to OCCUPIED and link this Order
+        if (isset($order['table_id']) && !empty($order['table_id'])) {
+            $this->db->where('table_id', $order['table_id'])->update('dining_tables', [
+                'status'           => 'OCCUPIED',
+                'current_order_id' => $order_id
+            ]);
+        }
+
         $this->db->trans_complete();
         if ($this->db->trans_status() === FALSE)
             return false;
