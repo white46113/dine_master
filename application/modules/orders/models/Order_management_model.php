@@ -155,8 +155,27 @@ class Order_management_model extends CI_Model
         $this->db->from('order_items oi');
         $this->db->join('menu_items mi', 'mi.item_id = oi.item_id', 'left');
         $this->db->where('oi.order_id', $order_id);
-        $query = $this->db->get();
-        return $query->result_array();
+        $items = $this->db->get()->result_array();
+
+        if (empty($items)) return [];
+
+        // Merge identical items (same item_id and unit_price)
+        $merged = [];
+        foreach ($items as $item) {
+            $key = $item['item_id'] . '_' . number_format($item['unit_price'], 2, '.', '');
+            if (!isset($merged[$key])) {
+                $merged[$key] = $item;
+                $merged[$key]['quantity'] = floatval($item['quantity']);
+            } else {
+                $merged[$key]['quantity'] += floatval($item['quantity']);
+            }
+        }
+
+        // Format and return
+        foreach ($merged as &$m) {
+            $m['quantity'] = number_format($m['quantity'], 2, '.', '');
+        }
+        return array_values($merged);
     }
 
     /**

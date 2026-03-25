@@ -40,7 +40,7 @@
                     <div class="py-4 flex items-center">
                         <div class="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden mr-4 flex-shrink-0">
                             <%if $item.image_url%>
-                            <img src="<%$item.image_url%>" class="w-full h-full object-cover">
+                            <img src="<%$item.image_url%>" onerror="this.src='https://placehold.co/200x200?text=No+Image'" class="w-full h-full object-cover">
                             <%else%>
                             <div class="w-full h-full flex items-center justify-center text-gray-300">
                                 <i class="fa-solid fa-image text-xl"></i>
