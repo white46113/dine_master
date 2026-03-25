@@ -7,6 +7,10 @@ class Menu_item_model extends CI_Model
         $this->db->where('restaurant_id', $restaurant_id);
         $this->db->where('is_active', 1);
 
+        if ($category_id > 0) {
+            $this->db->where('category_id', $category_id);
+        }
+
         if (!empty($veg_type)) {
             $this->db->where('veg_type', $veg_type);
         }
