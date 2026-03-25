@@ -50,7 +50,7 @@ class Reports_model extends CI_Model
      */
     public function get_table_wise_sales($start_date = null, $end_date = null)
     {
-        $this->db->select('t.table_no, COUNT(o.order_id) as total_orders, SUM(o.total_payable) as revenue');
+        $this->db->select('t.code as table_no, COUNT(o.order_id) as total_orders, SUM(o.total_payable) as revenue');
         $this->db->from('orders o');
         $this->db->join('dining_tables t', 't.table_id = o.table_id');
         $this->db->where('o.status', 'COMPLETED');

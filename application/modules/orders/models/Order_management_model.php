@@ -21,7 +21,7 @@ class Order_management_model extends CI_Model
      */
     public function get_all_orders($status = null)
     {
-        $this->db->select('o.*, c.name as customer_name, t.table_no, r.name as restaurant_name');
+        $this->db->select('o.*, c.name as customer_name, t.code as table_no, r.name as restaurant_name');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');
@@ -48,7 +48,7 @@ class Order_management_model extends CI_Model
      */
     private function _get_datatables_query()
     {
-        $this->db->select('o.*, c.name as customer_name, t.table_no, r.name as restaurant_name');
+        $this->db->select('o.*, c.name as customer_name, t.code as table_no, r.name as restaurant_name');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');
@@ -66,11 +66,11 @@ class Order_management_model extends CI_Model
         }
 
         if ($this->_is_superadmin()) {
-            $column_order = [null, 'o.order_id', 'r.name', 't.table_no', 'o.total_payable', 'o.status', 'o.placed_at'];
-            $column_search = ['o.order_id', 'c.name', 't.table_no', 'r.name'];
+            $column_order = [null, 'o.order_id', 'r.name', 't.code', 'o.total_payable', 'o.status', 'o.placed_at'];
+            $column_search = ['o.order_id', 'c.name', 't.code', 'r.name'];
         } else {
-            $column_order = [null, 'o.order_id', 'c.name', 't.table_no', 'o.total_payable', 'o.status', 'o.placed_at'];
-            $column_search = ['o.order_id', 'c.name', 't.table_no'];
+            $column_order = [null, 'o.order_id', 'c.name', 't.code', 'o.total_payable', 'o.status', 'o.placed_at'];
+            $column_search = ['o.order_id', 'c.name', 't.code'];
         }
 
         $i = 0;
@@ -128,7 +128,7 @@ class Order_management_model extends CI_Model
      */
     public function get_order_by_id($id)
     {
-        $this->db->select('o.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, t.table_no, r.name as restaurant_name, r.address_line1 as restaurant_address');
+        $this->db->select('o.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, t.code as table_no, r.name as restaurant_name, r.address_line1 as restaurant_address');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');

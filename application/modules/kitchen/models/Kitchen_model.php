@@ -13,7 +13,7 @@ class Kitchen_model extends CI_Model
      */
     public function get_active_kots()
     {
-        $this->db->select('k.*, o.order_number, t.table_no');
+        $this->db->select('k.*, o.order_number, t.code as table_no');
         $this->db->from('kot_tickets k');
         $this->db->join('orders o', 'o.order_id = k.order_id');
         $this->db->join('dining_tables t', 't.table_id = o.table_id');
