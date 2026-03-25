@@ -73,6 +73,38 @@ class Order_model extends CI_Model
         }
         unset($item); // Important: Fix PHP reference bug to avoid duplicate items in later loops
 
+        // Merge duplicate items (same item_id, unit_price, and addons)
+        $merged_items = [];
+        foreach ($items as $item) {
+            // Create a unique key for grouping: item_id + unit_price + serialized addons
+            $addon_keys = [];
+            if (!empty($item['addons'])) {
+                foreach ($item['addons'] as $ad) {
+                    $addon_keys[] = $ad['addon_option_id'] . ':' . $ad['price'];
+                }
+                sort($addon_keys); // Ensure consistent key regardless of DB order
+            }
+            $merge_key = $item['item_id'] . '_' . number_format($item['unit_price'], 2, '.', '') . '_' . implode('|', $addon_keys);
+
+            if (!isset($merged_items[$merge_key])) {
+                // Initialize merged item with first instance's data
+                $merged_items[$merge_key] = $item;
+                $merged_items[$merge_key]['quantity'] = floatval($item['quantity']);
+            } else {
+                // Add quantity to existing merged item
+                $merged_items[$merge_key]['quantity'] += floatval($item['quantity']);
+            }
+        }
+
+        // Finalize merged items: format quantity and compute line_total
+        foreach ($merged_items as &$m_item) {
+            $m_item['quantity'] = number_format($m_item['quantity'], 2, '.', '');
+            $m_item['line_subtotal'] = number_format(floatval($m_item['unit_price']) * floatval($m_item['quantity']), 2, '.', '');
+            $m_item['line_total'] = $m_item['line_subtotal']; // For now, line_total = line_subtotal
+        }
+        unset($m_item);
+        $items = array_values($merged_items); // Replace original items with merged ones
+
         // Compute order-level status based on item statuses
         if (!empty($items)) {
             $item_statuses = array_column($items, 'status');
