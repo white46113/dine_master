@@ -50,6 +50,13 @@ class Order_model extends CI_Model
         if (!$order)
             return null;
 
+        // Populate order_number if missing for existing orders
+        if (empty($order['order_number'])) {
+            $order_number = 'ODN' . date('YmdHis', strtotime($order['placed_at']));
+            $this->db->where('order_id', $id)->update($this->orders, ['order_number' => $order_number]);
+            $order['order_number'] = $order_number;
+        }
+
         // Fetch full item records, joining menu_items for veg_type
         $this->db->select('oi.*, mi.veg_type');
         $this->db->from($this->order_items . ' oi');
@@ -64,6 +71,7 @@ class Order_model extends CI_Model
                 ->get_where($this->order_item_addons, ['order_item_id' => $item['order_item_id']])
                 ->result_array();
         }
+        unset($item); // Important: Fix PHP reference bug to avoid duplicate items in later loops
 
         // Compute order-level status based on item statuses
         if (!empty($items)) {
@@ -90,8 +98,10 @@ class Order_model extends CI_Model
         }
         $order['tax_amount'] = number_format($tax_amount, 2, '.', '');
         
-        // Add restaurant name and address for billing if not present
-        $order['restaurant_name'] = isset($order['name']) ? $order['name'] : 'Dine Master';
+        // Use restaurant_name selected from the join
+        if (!isset($order['restaurant_name']) || empty($order['restaurant_name'])) {
+            $order['restaurant_name'] = 'Dine Master';
+        }
 
         // Compute total_payable = subtotal_amount - discount_amount + service_charge_amt + tax_amount + rounding_adjustment
         $total_payable = $subtotal
