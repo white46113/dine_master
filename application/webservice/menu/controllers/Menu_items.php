@@ -12,6 +12,7 @@ class Menu_items extends My_Api_Controller
         $restaurant_id = $this->get('restaurant_id') ? $this->get('restaurant_id') : $this->post('restaurant_id');
         $category_id = $this->get('category_id') ? $this->get('category_id') : ($this->post('category_id') ? $this->post('category_id') : 0);
         $veg_type = $this->get('veg_type') ? $this->get('veg_type') : ($this->post('veg_type') ? $this->post('veg_type') : null);
+        $search_param = $this->get('search_param') ? $this->get('search_param') : ($this->post('search_param') ? $this->post('search_param') : null);
 
         if (empty($restaurant_id)) {
             return $this->response([
@@ -22,7 +23,7 @@ class Menu_items extends My_Api_Controller
             ], REST_Controller::HTTP_BAD_REQUEST);
         }
 
-        $data = $this->item->list_by_category($restaurant_id, $category_id, $veg_type);
+        $data = $this->item->list_by_category($restaurant_id, $category_id, $veg_type, $search_param);
         
         if ($data) {
             return $this->response([

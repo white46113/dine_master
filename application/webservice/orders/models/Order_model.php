@@ -315,7 +315,16 @@ class Order_model extends CI_Model
             }
         }
 
-        // Recompute subtotal and total_payable
+        $this->recompute_order_totals($order_id);
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    /** Recompute subtotal and total_payable for an order */
+    public function recompute_order_totals($order_id)
+    {
+        // Recompute subtotal from all current items
         $all_items = $this->db->get_where($this->order_items, ['order_id' => $order_id])->result_array();
         $subtotal  = 0;
         foreach ($all_items as $item) {
@@ -329,6 +338,8 @@ class Order_model extends CI_Model
         $this->db->where('o.order_id', $order_id);
         $order = $this->db->get()->row_array();
         
+        if (!$order) return false;
+
         $tax_amount = 0;
         if (isset($order['gst_applicable']) && $order['gst_applicable'] === 'yes') {
             $gst_percent = floatval($order['gst_percentage'] ?? 0);
@@ -341,12 +352,39 @@ class Order_model extends CI_Model
             + $tax_amount
             + floatval(isset($order['rounding_adjustment']) ? $order['rounding_adjustment'] : 0);
 
-        $this->db->where('order_id', $order_id)->update($this->orders, [
+        return $this->db->where('order_id', $order_id)->update($this->orders, [
             'subtotal_amount' => number_format($subtotal, 2, '.', ''),
             'tax_amount'      => number_format($tax_amount, 2, '.', ''),
             'total_payable'   => number_format($total_payable, 2, '.', ''),
             'updated_date'    => date('Y-m-d H:i:s'),
         ]);
+    }
+
+    /** Delete an item from an order */
+    public function delete_order_item($order_id, $item_id = null, $order_item_id = null)
+    {
+        $this->db->trans_start();
+
+        $where = ['order_id' => $order_id];
+        if ($order_item_id) {
+            $where['order_item_id'] = $order_item_id;
+        } elseif ($item_id) {
+            $where['item_id'] = $item_id;
+        } else {
+            return false;
+        }
+
+        // Get affected item ids for addon cleanup
+        $this->db->select('order_item_id');
+        $affected = $this->db->get_where($this->order_items, $where)->result_array();
+        
+        foreach ($affected as $it) {
+            $this->db->delete($this->order_item_addons, ['order_item_id' => $it['order_item_id']]);
+        }
+
+        $this->db->delete($this->order_items, $where);
+
+        $this->recompute_order_totals($order_id);
 
         $this->db->trans_complete();
         return $this->db->trans_status();

@@ -167,7 +167,8 @@ class Api_docs extends Admin_Controller {
                 'params' => [
                     ['name' => 'restaurant_id', 'type' => 'int', 'description' => 'Required. ID of the restaurant'],
                     ['name' => 'category_id', 'type' => 'int', 'description' => 'Optional. Filter by category'],
-                    ['name' => 'veg_type', 'type' => 'string', 'description' => 'Optional. Filter by VEG/NON_VEG/EGG']
+                    ['name' => 'veg_type', 'type' => 'string', 'description' => 'Optional. Filter by VEG/NON_VEG/EGG'],
+                    ['name' => 'search_param', 'type' => 'string', 'description' => 'Optional. Search by item name (LIKE search)']
                 ],
                 'description' => 'Retrieves the menu items for a restaurant.',
                 'example_response' => '{
@@ -382,6 +383,27 @@ class Api_docs extends Admin_Controller {
   "settings": {
     "success": true,
     "message": "Order items updated successfully"
+  },
+  "data": {
+    "order_id": 101
+  }
+}'
+            ],
+            [
+                'category' => 'Orders',
+                'name' => 'Delete Order Item',
+                'url' => '/WS/delete_item',
+                'method' => 'POST',
+                'params' => [
+                    ['name' => 'order_id', 'type' => 'int', 'description' => 'Required. ID of the existing order'],
+                    ['name' => 'item_id', 'type' => 'int', 'description' => 'ID of the menu item to remove'],
+                    ['name' => 'order_item_id', 'type' => 'int', 'description' => 'Specific ID of the order item to remove (alternative to item_id)'],
+                ],
+                'description' => 'Removes an item and its associated addons from an order. Auto-recomputes order totals.',
+                'example_response' => '{
+  "settings": {
+    "success": true,
+    "message": "Item deleted successfully"
   },
   "data": {
     "order_id": 101

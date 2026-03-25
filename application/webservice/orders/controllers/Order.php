@@ -176,6 +176,44 @@ class Order extends My_Api_Controller
         ], REST_Controller::HTTP_OK);
     }
 
+    /** POST /WS/delete_item - Delete an item from an order */
+    public function delete_item()
+    {
+        if ($this->authenticate() !== true)
+            return;
+
+        $input = $this->post();
+        if (empty($input)) {
+            $input = json_decode($this->input->raw_input_stream, true);
+        }
+
+        $order_id = isset($input['order_id']) ? intval($input['order_id']) : null;
+        $item_id  = isset($input['item_id']) ? intval($input['item_id']) : null;
+        $order_item_id = isset($input['order_item_id']) ? intval($input['order_item_id']) : null;
+
+        if (!$order_id) {
+            return $this->response(['status' => false, 'message' => 'order_id is required'], REST_Controller::HTTP_BAD_REQUEST);
+        }
+        if (!$item_id && !$order_item_id) {
+            return $this->response(['status' => false, 'message' => 'item_id or order_item_id is required'], REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+        $result = $this->order_model->delete_order_item($order_id, $item_id, $order_item_id);
+        if (!$result) {
+            return $this->response([
+                'success' => false,
+                'message' => 'Failed to delete item',
+                'data'    => []
+            ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $this->response([
+            'success'  => true,
+            'message'  => 'Item deleted successfully',
+            'data'     => ['order_id' => $order_id]
+        ], REST_Controller::HTTP_OK);
+    }
+
     /** GET /WS/get_order_details?id={order_id} - Get single order details */
     public function get_order_details($id = null)
     {

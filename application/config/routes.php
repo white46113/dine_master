@@ -41,6 +41,7 @@ $route['WS/gets_orders'] = "wsengine/api_execute/wscontroller/order/gets_orders"
 $route['WS/get_order_details'] = "wsengine/api_execute/wscontroller/order/get_order_details";
 $route['WS/add_order_items'] = "wsengine/api_execute/wscontroller/order/add_order_items";
 $route['WS/update_item'] = "wsengine/api_execute/wscontroller/order/update_item";
+$route['WS/delete_item'] = "wsengine/api_execute/wscontroller/order/delete_item";
 
 #------------ Tables API Alias -----------------
 $route['WS/tables'] = "wsengine/api_execute/wscontroller/tables/index";

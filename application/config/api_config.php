@@ -64,6 +64,12 @@ $config["update_item"] = array(
     "controller" => "order",
     "method" => "POST"
 );
+$config["delete_item"] = array(
+    "title" => "Delete Order Item",
+    "folder" => "orders",
+    "controller" => "order",
+    "method" => "POST"
+);
 
 $config["menu_items"] = array(
     "title" => "Menu",
