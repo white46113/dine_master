@@ -223,12 +223,12 @@ class Api_docs extends Admin_Controller {
     "data": [
         {
             "category_id": "1",
-            "category_name": "Starters",
+            "name": "Starters",
             "category_image": "starters.jpg"
         },
         {
             "category_id": "2",
-            "category_name": "Main Course",
+            "name": "Main Course",
             "category_image": "main.jpg"
         }
     ]
@@ -285,16 +285,63 @@ class Api_docs extends Admin_Controller {
         "message": "Order details fetched successfully"
     },
     "data": {
-        "order_id": "19",
-        "restaurant_id": "4",
-        "table_id": "60",
+        "order_id": "32",
+        "order_number": "ODN20260325132431",
+        "restaurant_id": "1",
+        "table_id": "1",
+        "customer_id": null,
+        "waiter_id": null,
+        "order_type": "DINE_IN",
+        "status": "PENDING",
+        "placed_at": "2026-03-25 13:24:31",
+        "completed_at": null,
+        "subtotal_amount": "580.00",
+        "discount_amount": "0.00",
+        "service_charge_pct": "0.00",
+        "service_charge_amt": "0.00",
+        "tax_amount": "0.00",
+        "rounding_adjustment": "0.00",
+        "total_payable": "580.00",
+        "tax_breakdown": null,
+        "notes": null,
+        "payment_status": "UNPAID",
+        "is_active": "1",
+        "added_by": "1",
+        "updated_by": null,
+        "added_date": "2026-03-25 13:24:31",
+        "updated_date": "2026-03-25 13:24:31",
+        "restaurant_name": "Dine Master",
         "items": [
             {
-                "id": "25",
+                "order_item_id": "41",
+                "order_id": "32",
+                "item_id": "1",
                 "item_name": "Paneer Tikka",
+                "veg_type": "VEG",
                 "unit_price": "250.00",
-                "quantity": "2",
-                "addons": []
+                "quantity": "1.00",
+                "notes": null,
+                "status": "PENDING",
+                "tax_rate": "0.00",
+                "tax_breakdown": null,
+                "tax_amount": "0.00",
+                "line_subtotal": "250.00",
+                "line_discount": "0.00",
+                "line_total": "250.00",
+                "added_by": "1",
+                "updated_by": null,
+                "added_date": "2026-03-25 13:24:31",
+                "updated_date": "2026-03-25 13:24:31",
+                "addons": [
+                    {
+                        "order_item_addon_id": "1",
+                        "order_item_id": "41",
+                        "addon_option_id": "1",
+                        "addon_name": "Extra Cheese",
+                        "price": "50.00",
+                        "added_date": "2025-09-06 16:46:40"
+                    }
+                ]
             }
         ]
     }

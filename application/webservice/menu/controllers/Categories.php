@@ -27,7 +27,7 @@ class Categories extends My_Api_Controller
         // Prepend "All" category at the first position
         $all_category = (object) [
             'category_id'    => "0",
-            'category_name'  => "All",
+            'name'           => "All",
             'category_image' => ""
         ];
         array_unshift($data, $all_category);

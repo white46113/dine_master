@@ -42,7 +42,7 @@ class Order_model extends CI_Model
     {
         // Fetch full order record
         // Fetch order with restaurant GST settings
-        $this->db->select('o.*, r.gst_applicable, r.gst_percentage');
+        $this->db->select('o.*, r.name as restaurant_name, r.gst_applicable, r.gst_percentage');
         $this->db->from($this->orders . ' o');
         $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
         $this->db->where('o.order_id', $id);
@@ -59,6 +59,7 @@ class Order_model extends CI_Model
 
         foreach ($items as &$item) {
             // Fetch addons for this item
+            $this->db->select('*, price_delta as price');
             $item['addons'] = $this->db
                 ->get_where($this->order_item_addons, ['order_item_id' => $item['order_item_id']])
                 ->result_array();
