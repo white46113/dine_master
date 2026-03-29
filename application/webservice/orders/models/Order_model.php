@@ -171,6 +171,10 @@ class Order_model extends CI_Model
             $oid = $row->order_id;
             if (!isset($orders[$oid])) {
                 $order = clone $row;
+                // Status mapping: consolidate active statuses to RUNNING
+                if (in_array($order->status, ['PLACED', 'RUNNING', 'PREPARING', 'READY', 'SERVED'])) {
+                    $order->status = 'RUNNING';
+                }
                 $order->items = [];
                 unset($order->item_id, $order->item_name, $order->unit_price, $order->quantity, $order->item_added_by);
                 $orders[$oid] = $order;

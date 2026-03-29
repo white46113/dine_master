@@ -1,3 +1,7 @@
+<!-- Select2 Library -->
+<link rel="stylesheet" href="<%base_url('public/plugin/select2/select2.min.css')%>">
+<script src="<%base_url('public/plugin/select2/select2.min.js')%>"></script>
+
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
         <h2 class="text-2xl font-bold text-gray-800">Order Management</h2>
