@@ -125,7 +125,7 @@
                     <span>₹<%$order.subtotal_amount|default:0|number_format:2%></span>
                 </div>
                 <div class="flex justify-between text-sm text-gray-600">
-                    <span>Tax (GST - <%$order.gst_percentage|default:0%>%)</span>
+                    <span>Tax/GST (<%$order.gst_percentage|default:0|number_format:2%>%)</span>
                     <span>₹<%$order.tax_amount|default:0|number_format:2%></span>
                 </div>
                 <div class="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200">
