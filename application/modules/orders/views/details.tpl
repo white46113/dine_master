@@ -1,3 +1,67 @@
+<!-- Select2 Library -->
+<link rel="stylesheet" href="<%base_url('public/plugin/select2/select2.min.css')%>">
+<script src="<%base_url('public/plugin/select2/select2.min.js')%>"></script>
+
+<style>
+/* Premium Select2 Styling */
+.select2-container--default .select2-selection--single {
+    background-color: #2563eb !important; /* blue-600 */
+    border: none !important;
+    border-radius: 0.75rem !important; /* rounded-xl */
+    height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: white !important;
+    font-weight: 700 !important;
+    padding-left: 1.5rem !important;
+    font-size: 0.875rem !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 48px !important;
+    right: 12px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: white transparent transparent transparent !important;
+}
+
+.select2-container--default.select2-container--open .select2-selection__arrow b {
+    border-color: transparent transparent white transparent !important;
+}
+
+.select2-dropdown {
+    border-radius: 1rem !important;
+    border: 1px solid #f3f4f6 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    padding: 0.5rem !important;
+    overflow: hidden !important;
+    margin-top: 5px !important;
+}
+
+.select2-results__option {
+    border-radius: 0.5rem !important;
+    padding: 8px 12px !important;
+    margin: 2px 0 !important;
+    font-size: 0.875rem !important;
+}
+
+.select2-results__option--highlighted[aria-selected] {
+    background-color: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.select2-results__option[aria-selected=true] {
+    background-color: #2563eb !important;
+    color: white !important;
+}
+</style>
+
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div class="flex items-center">
         <a href="<%base_url('admin/orders')%>" class="mr-4 text-gray-500 hover:text-gray-900 transition-colors">
@@ -13,9 +77,9 @@
         <button onclick="window.print()" class="bg-white border border-gray-200 text-gray-700 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-50 transition-all flex items-center shadow-sm">
             <i class="fa-solid fa-print mr-2 text-sm"></i> Print Receipt
         </button>
-        <div class="relative">
-             <select onchange="updateStatus(<%$order.order_id%>, this.value)" 
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/30 outline-none cursor-pointer border-none">
+        <div class="w-48">
+             <select id="statusPicker" onchange="updateStatus(<%$order.order_id%>, this.value)" 
+                class="w-full">
                 <option value="RUNNING" <%if $order.status != 'COMPLETED' && $order.status != 'CANCELLED'%>selected<%/if%>>Mark RUNNING</option>
                 <option value="COMPLETED" <%if $order.status == 'COMPLETED'%>selected<%/if%>>Mark COMPLETED</option>
                 <option value="CANCELLED" <%if $order.status == 'CANCELLED'%>selected<%/if%>>Mark CANCELLED</option>
@@ -61,12 +125,8 @@
                     <span>₹<%$order.subtotal_amount|default:0|number_format:2%></span>
                 </div>
                 <div class="flex justify-between text-sm text-gray-600">
-                    <span>Tax (GST)</span>
+                    <span>Tax (GST - <%$order.gst_percentage|default:0%>%)</span>
                     <span>₹<%$order.tax_amount|default:0|number_format:2%></span>
-                </div>
-                <div class="flex justify-between text-sm text-gray-600">
-                    <span>Service Charge</span>
-                    <span>₹<%$order.service_charge_amt|default:0|number_format:2%></span>
                 </div>
                 <div class="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-200">
                     <span>Total Payable</span>
@@ -143,6 +203,13 @@
 </div>
 
 <script>
+$(document).ready(function() {
+    $('#statusPicker').select2({
+        minimumResultsForSearch: Infinity,
+        width: '100%'
+    });
+});
+
 function updateStatus(orderId, newStatus) {
     $.ajax({
         url: '<%base_url("admin/orders/update_status")%>',

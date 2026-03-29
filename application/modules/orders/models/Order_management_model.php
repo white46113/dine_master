@@ -150,17 +150,20 @@ class Order_management_model extends CI_Model
         $query = $this->db->get();
         $order = $query->row_array();
 
-        // If subtotal is zero (often for API orders), calculate on the fly for display
-        if ($order && floatval($order['subtotal_amount']) == 0) {
+        // If subtotal is zero (often for API orders) OR tax is zero but GST is applicable
+        $gst_applicable = ($order['gst_applicable'] ?? 'no') === 'yes';
+        $should_recalculate = $order && (floatval($order['subtotal_amount']) == 0 || (floatval($order['tax_amount']) == 0 && $gst_applicable));
+
+        if ($should_recalculate) {
             $items = $this->get_order_items($id);
             $subtotal = 0;
             foreach ($items as $item) {
                 $subtotal += floatval($item['unit_price']) * floatval($item['quantity']);
             }
             
-            $gst_applicable = ($order['gst_applicable'] ?? 'no') === 'yes';
             $gst_percent = floatval($order['gst_percentage'] ?? 0);
             $tax_amount = $gst_applicable ? ($subtotal * ($gst_percent / 100)) : 0;
+            // Maintain service charge if it exists, otherwise 0
             $service_charge = floatval($order['service_charge_amt'] ?? 0);
 
             $order['subtotal_amount'] = number_format($subtotal, 2, '.', '');
