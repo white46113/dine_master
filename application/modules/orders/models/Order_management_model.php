@@ -55,7 +55,12 @@ class Order_management_model extends CI_Model
         $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
 
         if ($this->input->post('status')) {
-            $this->db->where('o.status', $this->input->post('status'));
+            $status = $this->input->post('status');
+            if ($status == 'RUNNING') {
+                $this->db->where_in('o.status', ['PLACED', 'RUNNING', 'PREPARING', 'READY', 'SERVED']);
+            } else {
+                $this->db->where('o.status', $status);
+            }
         }
         
         if (!$this->_is_superadmin()) {
