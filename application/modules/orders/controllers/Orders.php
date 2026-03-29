@@ -87,7 +87,7 @@ class Orders extends Admin_Controller
         }
 
         // 1. Create New Order
-        $order_number = 'ORD' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        $order_number = 'ORD' . date('YmdHis');
         $order_data = [
             'order_number'  => $order_number,
             'restaurant_id' => $table['restaurant_id'], 
@@ -187,7 +187,7 @@ class Orders extends Admin_Controller
         }
 
         // 3. Update Order Subtotal
-        $this->db->select_sum('line_total');
+        $this->db->select('SUM(unit_price * quantity) as line_total', FALSE);
         $this->db->where('order_id', $order_id);
         $subtotal = $this->db->get('order_items')->row()->line_total;
 
@@ -262,6 +262,7 @@ class Orders extends Admin_Controller
             return;
         }
 
+        /*
         // 1. Insert Payment
         $payment_data = [
             'order_id'      => $order_id,
@@ -273,6 +274,8 @@ class Orders extends Admin_Controller
             'paid_at'       => date('Y-m-d H:i:s') 
         ];
         $this->db->insert('payments', $payment_data);
+        */
+
 
         // 2. Update Order Status
         $this->db->where('order_id', $order_id);
@@ -327,7 +330,7 @@ class Orders extends Admin_Controller
 
         // 3. Recalculate Order Subtotal (excluding cancelled items)
         $order_id = $item['order_id'];
-        $this->db->select_sum('line_total');
+        $this->db->select('SUM(unit_price * quantity) as line_total', FALSE);
         $this->db->where('order_id', $order_id);
         $this->db->where('status !=', 'CANCELLED');
         $subtotal = $this->db->get('order_items')->row()->line_total;

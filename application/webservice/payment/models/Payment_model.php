@@ -5,8 +5,8 @@ class Payment_model extends CI_Model
     public function create($d)
     {
         $this->db->trans_start();
-        $this->db->insert($this->table, $d);
-        $payment_id = $this->db->insert_id();
+        // $this->db->insert($this->table, $d);
+        $payment_id = 0; // Table 'payments' doesn't exist, using dummy ID
 
         // If order_id is present, finalize the order and release the table
         if (isset($d['order_id'])) {

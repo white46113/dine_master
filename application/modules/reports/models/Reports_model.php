@@ -30,7 +30,7 @@ class Reports_model extends CI_Model
      */
     public function get_item_wise_sales($start_date = null, $end_date = null)
     {
-        $this->db->select('mi.name as item_name, mi.image_url, SUM(oi.quantity) as total_qty, SUM(oi.line_total) as revenue');
+        $this->db->select('mi.name as item_name, mi.image_url, SUM(oi.quantity) as total_qty, SUM(oi.unit_price * oi.quantity) as revenue');
         $this->db->from('order_items oi');
         $this->db->join('menu_items mi', 'mi.item_id = oi.item_id');
         $this->db->join('orders o', 'o.order_id = oi.order_id');

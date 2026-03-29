@@ -174,6 +174,10 @@ class Order_management_model extends CI_Model
         // Format and return
         foreach ($merged as &$m) {
             $m['quantity'] = number_format($m['quantity'], 2, '.', '');
+            // Calculate line_total if missing or zero (common for API-created orders)
+            if (!isset($m['line_total']) || floatval($m['line_total']) == 0) {
+                $m['line_total'] = number_format(floatval($m['unit_price']) * floatval($m['quantity']), 2, '.', '');
+            }
         }
         return array_values($merged);
     }
@@ -219,7 +223,7 @@ class Order_management_model extends CI_Model
      */
     public function get_tables($floor_id = null)
     {
-        $this->db->select('t.*, o.order_number, o.status as order_status, r.name as restaurant_name');
+        $this->db->select('t.*, t.code as table_no, o.order_number, o.status as order_status, r.name as restaurant_name');
         $this->db->from('dining_tables t');
         $this->db->join('orders o', 'o.order_id = t.current_order_id', 'left');
         $this->db->join('restaurants r', 'r.restaurant_id = t.restaurant_id', 'left');

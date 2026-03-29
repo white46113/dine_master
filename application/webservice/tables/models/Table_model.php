@@ -6,16 +6,17 @@ class Table_model extends CI_Model
 
     public function get_available_tables($restaurant_id, $search = null)
     {
-        $this->db->select('table_id, code as table_code, name as table_name, capacity, status, restaurant_id');
-        $this->db->from($this->table);
-        $this->db->where('restaurant_id', $restaurant_id);
-        $this->db->where('status', 'FREE');
-        $this->db->where('is_active', 1);
+        $this->db->select("t.table_id, t.code as table_code, CONCAT(t.name, ' | ', f.name) as table_name, t.capacity, t.status, t.restaurant_id", FALSE);
+        $this->db->from($this->table . ' t');
+        $this->db->join('floors f', 'f.floor_id = t.floor_id', 'left');
+        $this->db->where('t.restaurant_id', $restaurant_id);
+        $this->db->where('t.status', 'FREE');
+        $this->db->where('t.is_active', 1);
 
         if ($search) {
             $this->db->group_start();
-            $this->db->like('name', $search);
-            $this->db->or_like('code', $search);
+            $this->db->like('t.name', $search);
+            $this->db->or_like('t.code', $search);
             $this->db->group_end();
         }
 
@@ -25,9 +26,10 @@ class Table_model extends CI_Model
 
     public function get_all_tables_for_superadmin($restaurant_id = null, $search = null, $status = null)
     {
-        $this->db->select('t.table_id, t.code as table_code, t.name as table_name, t.capacity, t.status, t.restaurant_id, r.name as restaurant_name');
+        $this->db->select("t.table_id, t.code as table_code, CONCAT(t.name, ' | ', f.name) as table_name, t.capacity, t.status, t.restaurant_id, r.name as restaurant_name", FALSE);
         $this->db->from($this->table . ' t');
         $this->db->join('restaurants r', 'r.restaurant_id = t.restaurant_id', 'left');
+        $this->db->join('floors f', 'f.floor_id = t.floor_id', 'left');
 
         if ($restaurant_id) {
             $this->db->where('t.restaurant_id', $restaurant_id);

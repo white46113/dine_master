@@ -60,7 +60,7 @@ class Order_model extends CI_Model
 
         // Populate order_number if missing for existing orders
         if (empty($order['order_number'])) {
-            $order_number = 'ODN' . date('YmdHis', strtotime($order['placed_at']));
+            $order_number = 'ORD' . date('YmdHis', strtotime($order['placed_at']));
             $this->db->where('order_id', $id)->update($this->orders, ['order_number' => $order_number]);
             $order['order_number'] = $order_number;
         }

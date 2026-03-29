@@ -21,7 +21,7 @@ class Order extends My_Api_Controller
         // Support top-level params by wrapping them into the 'order' object if missing
         if (!isset($input['order']) || !is_array($input['order'])) {
             $input['order'] = [
-                'order_number'  => 'ODN' . date('YmdHis'),
+                'order_number'  => 'ORD' . date('YmdHis'),
                 'restaurant_id' => isset($input['restaurant_id']) ? $input['restaurant_id'] : null,
                 'table_id'      => isset($input['table_no']) ? $input['table_no'] : (isset($input['table_id']) ? $input['table_id'] : null),
                 'customer_id'   => isset($input['customer_id']) ? $input['customer_id'] : null,
@@ -32,7 +32,7 @@ class Order extends My_Api_Controller
         } else {
             // Ensure order_number is set if the 'order' object is already provided
             if (!isset($input['order']['order_number'])) {
-                $input['order']['order_number'] = 'ODN' . date('YmdHis');
+                $input['order']['order_number'] = 'ORD' . date('YmdHis');
             }
             if (!isset($input['order']['placed_at'])) {
                 $input['order']['placed_at'] = date('Y-m-d H:i:s');
