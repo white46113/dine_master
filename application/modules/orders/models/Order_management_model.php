@@ -133,7 +133,7 @@ class Order_management_model extends CI_Model
      */
     public function get_order_by_id($id)
     {
-        $this->db->select('o.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, t.code as table_no, r.name as restaurant_name, r.address_line1 as restaurant_address');
+        $this->db->select('o.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, t.code as table_no, r.name as restaurant_name, r.address_line1 as restaurant_address, r.gst_applicable, r.gst_percentage');
         $this->db->from($this->table . ' o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('dining_tables t', 't.table_id = o.table_id', 'left');
@@ -148,7 +148,27 @@ class Order_management_model extends CI_Model
         }
         
         $query = $this->db->get();
-        return $query->row_array();
+        $order = $query->row_array();
+
+        // If subtotal is zero (often for API orders), calculate on the fly for display
+        if ($order && floatval($order['subtotal_amount']) == 0) {
+            $items = $this->get_order_items($id);
+            $subtotal = 0;
+            foreach ($items as $item) {
+                $subtotal += floatval($item['unit_price']) * floatval($item['quantity']);
+            }
+            
+            $gst_applicable = ($order['gst_applicable'] ?? 'no') === 'yes';
+            $gst_percent = floatval($order['gst_percentage'] ?? 0);
+            $tax_amount = $gst_applicable ? ($subtotal * ($gst_percent / 100)) : 0;
+            $service_charge = floatval($order['service_charge_amt'] ?? 0);
+
+            $order['subtotal_amount'] = number_format($subtotal, 2, '.', '');
+            $order['tax_amount'] = number_format($tax_amount, 2, '.', '');
+            $order['total_payable'] = number_format($subtotal + $tax_amount + $service_charge, 2, '.', '');
+        }
+
+        return $order;
     }
 
     /**

@@ -16,10 +16,7 @@
         <div class="relative">
              <select onchange="updateStatus(<%$order.order_id%>, this.value)" 
                 class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/30 outline-none cursor-pointer border-none">
-                <option value="PLACED" <%if $order.status == 'PLACED'%>selected<%/if%>>Mark PLACED</option>
-                <option value="PREPARING" <%if $order.status == 'PREPARING'%>selected<%/if%>>Mark PREPARING</option>
-                <option value="READY" <%if $order.status == 'READY'%>selected<%/if%>>Mark READY</option>
-                <option value="SERVED" <%if $order.status == 'SERVED'%>selected<%/if%>>Mark SERVED</option>
+                <option value="RUNNING" <%if $order.status != 'COMPLETED' && $order.status != 'CANCELLED'%>selected<%/if%>>Mark RUNNING</option>
                 <option value="COMPLETED" <%if $order.status == 'COMPLETED'%>selected<%/if%>>Mark COMPLETED</option>
                 <option value="CANCELLED" <%if $order.status == 'CANCELLED'%>selected<%/if%>>Mark CANCELLED</option>
             </select>
@@ -88,7 +85,12 @@
                 <div class="w-2 h-10 bg-blue-600 rounded-full mr-4"></div>
                 <div>
                     <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Current State</p>
-                    <p class="text-lg font-bold text-blue-600"><%$order.status%></p>
+                    <p class="text-lg font-bold text-blue-600">
+                        <%if $order.status == 'COMPLETED'%>COMPLETED
+                        <%else if $order.status == 'CANCELLED'%>CANCELLED
+                        <%else%>RUNNING
+                        <%/if%>
+                    </p>
                 </div>
             </div>
             <div class="space-y-4">
