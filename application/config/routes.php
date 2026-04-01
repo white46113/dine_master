@@ -21,6 +21,7 @@ $route['admin/tables(.*)'] = 'tables$1';
 $route['admin/waiter(.*)'] = 'waiter$1';
 $route['admin/subscriptions(.*)'] = 'subscriptions$1';
 $route['admin/reports(.*)'] = 'reports/reports$1';
+$route['admin/documentation(.*)'] = 'documentation$1';
 
 
 $route['user_list'] = 'user1/user_login/start';

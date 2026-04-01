@@ -75,6 +75,11 @@
         </a>
 
         <%if isset($admin_user) && ($admin_user.role_id == 1 || $admin_user.user_role == 1)%>
+        <a href="<%base_url('admin/documentation')%>" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 <%if $current_module == 'documentation'%>sidebar-active<%/if%>" title="Manual">
+            <i class="fa-solid fa-book w-6 text-center text-teal-400"></i>
+            <span class="sidebar-label ml-3 transition-opacity duration-300">Manual</span>
+        </a>
+
         <a href="<%base_url('api_docs')%>" target="_blank" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-300" title="API Documentation">
             <i class="fa-solid fa-code w-6 text-center"></i>
             <span class="sidebar-label ml-3 transition-opacity duration-300">API Documentation</span>
