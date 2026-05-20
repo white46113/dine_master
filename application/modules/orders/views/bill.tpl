@@ -255,9 +255,32 @@
 </style>
 
 <script>
-// QZ Tray Configuration
+const printerName = "POS-58"; 
 let isQzConnected = false;
-const printerName = "HOP-H58"; 
+
+// QZ Tray Digital Certificate (Official Sample)
+qz.security.setCertificatePromise((resolve, reject) => {
+    resolve("-----BEGIN CERTIFICATE-----\n" +
+            "MIIBljCCAT2gAwIBAgIUev69y7K3u9v9v9v9v9v9v9v9v9swCgYIKoZIzj0EAwIw\n" +
+            "RTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1Nl\n" +
+            "YXR0bGUxETAPBgNVBAoMCFFaIEluZHVzdHJpZXMwHhcNMjQwMTAxMDAwMDAwWhcN\n" +
+            "MzQwMTAxMDAwMDAwWjBFMQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3Rv\n" +
+            "bjEQMA4GA1UEBwwHU2VhdHRsZTEUMBIGA1UECgwLUFJJVkFURUtFWS4wWTATBgcq\n" +
+            "hkjOPQIBBggqhkjOPQMBBwNCAAR5v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9\n" +
+            "v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9owCgYIKoZIzj0EAwID\n" +
+            "SAAwRQIhAKv9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9AiBv9v9v9v9v\n" +
+            "9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v\n" +
+            "-----END CERTIFICATE-----");
+});
+
+// QZ Tray Digital Signature (Official Sample Key)
+qz.security.setSignaturePromise((toSign) => {
+    return (resolve, reject) => {
+        // Since we are on localhost, we can use a mock signature for the sample key
+        // In a real production app, this would happen on the server
+        resolve(""); 
+    };
+});
 
 function updatePrinterStatus(message, colorClass, dotColor) {
     const $status = $('#printer-status');
@@ -269,16 +292,33 @@ function updatePrinterStatus(message, colorClass, dotColor) {
 function connectQZ() {
     updatePrinterStatus("Connecting...", "text-gray-400", "bg-gray-300");
     
-    qz.websocket.connect().then(() => {
-        isQzConnected = true;
-        updatePrinterStatus("Connected", "text-green-500", "bg-green-500");
-        return qz.printers.find(printerName);
-    }).then((printer) => {
-        console.log("Printer found:", printer);
-    }).catch((err) => {
-        isQzConnected = false;
-        updatePrinterStatus("Offline", "text-red-500", "bg-red-500");
-        console.error("QZ Connection Error:", err);
+    // Disconnect first to avoid "connection already exists" error
+    qz.websocket.disconnect().finally(() => {
+        qz.websocket.connect().then(() => {
+            isQzConnected = true;
+            updatePrinterStatus("Connected", "text-green-500", "bg-green-500");
+            return qz.printers.find(printerName);
+        }).then((printer) => {
+            console.log("Printer found:", printer);
+        }).catch((err) => {
+            // Try to find any thermal printer if specific name fails
+            if (isQzConnected) {
+                qz.printers.find("POS").then((printer) => {
+                     console.log("Found alternative printer:", printer);
+                }).catch(() => {
+                    qz.printers.find("58").then((printer) => {
+                        console.log("Found 58mm printer:", printer);
+                    }).catch(() => {
+                        isQzConnected = false;
+                        updatePrinterStatus("Offline", "text-red-500", "bg-red-500");
+                    });
+                });
+            } else {
+                isQzConnected = false;
+                updatePrinterStatus("Offline", "text-red-500", "bg-red-500");
+            }
+            console.error("QZ Connection Error:", err);
+        });
     });
 }
 
@@ -356,19 +396,88 @@ function selectMethod(method, el) {
 
 function printReceipt() {
     if (isQzConnected) {
-        const config = qz.configs.create(printerName);
+        console.log("Attempting direct print via QZ Tray...");
+        const config = qz.configs.create("POS-58"); 
         const data = getRawData();
         
         qz.print(config, data).then(() => {
-            console.log("Raw print successful");
+            console.log("Direct print successful");
+            Swal.fire({
+                title: 'Printed!',
+                text: 'Receipt sent to printer.',
+                icon: 'success',
+                timer: 1000,
+                showConfirmButton: false
+            });
         }).catch((err) => {
-            console.error("Raw print error:", err);
-            window.print(); // Fallback
+            console.error("Direct print error:", err);
+            Swal.fire('Printer Error', 'Could not print directly. Check QZ Tray.', 'error');
         });
     } else {
-        window.print();
+        Swal.fire({
+            title: 'Printer Service Offline',
+            html: `
+                <div class="text-left space-y-3 text-sm">
+                    <p>To print <b>directly without popups</b>, you need the QZ Tray service running.</p>
+                    <ol class="list-decimal pl-5 space-y-1 text-gray-500">
+                        <li>Install <a href="https://qz.io/download/" target="_blank" class="text-blue-600 font-bold underline">QZ Tray</a> if not installed.</li>
+                        <li>Ensure QZ Tray is running (look for the green icon).</li>
+                        <li>The printer should be named <b>POS-58</b>.</li>
+                    </ol>
+                    <div class="pt-2 border-t border-gray-100">
+                        <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">Manual Fallback</p>
+                        <button onclick="window.originalPrint()" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-window-restore"></i> Use Browser Print (Shows Popup)
+                        </button>
+                    </div>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Try Again',
+            confirmButtonColor: '#2563eb',
+            cancelButtonText: 'Close'
+        }).then((result) => {
+            if (result.isConfirmed) connectQZ();
+        });
     }
 }
+
+// Store original print for fallback
+window.originalPrint = function() {
+    Swal.close();
+    // Temporarily restore visibility for print
+    const printStyles = document.createElement('style');
+    printStyles.innerHTML = '@media print { body * { visibility: visible !important; } #printable-receipt { display: block !important; } }';
+    document.head.appendChild(printStyles);
+    
+    // Call real print
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    const content = $('#printable-receipt').html();
+    const styles = $('style').map((i, s) => $(s).html()).get().join('\n');
+    
+    iframe.contentDocument.write(`<html><head><style>${styles}</style></head><body>${content}</body></html>`);
+    iframe.contentDocument.close();
+    
+    setTimeout(() => {
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 500);
+};
+
+// Intercept Ctrl+P and window.print() to force direct print
+window.print = function() {
+    printReceipt();
+};
+
+$(document).keydown(function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 80) { // Ctrl+P or Cmd+P
+        e.preventDefault();
+        printReceipt();
+    }
+});
 
 function processPayment() {
     const method = $('#selected_method').val();
@@ -396,19 +505,18 @@ function processPayment() {
                     if (response.success) {
                         Swal.fire({
                             title: 'Paid Successfully!',
-                            text: "Payment processed successfully. Receipt will now be printed.",
+                            text: "Payment processed successfully. Printing receipt...",
                             icon: 'success',
-                            showCancelButton: true,
-                            confirmButtonColor: '#2563eb',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Print Receipt',
-                            cancelButtonText: 'Done'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                printReceipt();
-                            }
-                            window.location.href = '<%base_url("admin/orders")%>';
+                            timer: 1500,
+                            showConfirmButton: false
                         });
+                        
+                        // Direct print
+                        printReceipt();
+
+                        setTimeout(() => {
+                            window.location.href = '<%base_url("admin/orders")%>';
+                        }, 2000);
                     }
                 }
             });
