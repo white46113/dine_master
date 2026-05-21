@@ -96,6 +96,23 @@
                         </div>
                     </div>
 
+                    <!-- Operating Hours -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-6 mt-6">
+                        <h3 class="font-bold text-gray-800 mb-6 text-sm uppercase tracking-wider">Operating Hours</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-gray-500 uppercase">Start Time</label>
+                                <input type="time" name="start_time" value="<%$restaurant.start_time|default:''%>"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-gray-500 uppercase">End Time</label>
+                                <input type="time" name="end_time" value="<%$restaurant.end_time|default:''%>"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- GST Configuration -->
                     <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                         <h3 class="font-bold text-gray-800 mb-6 text-sm uppercase tracking-wider">GST Configuration</h3>
@@ -114,8 +131,16 @@
                                     </label>
                                 </div>
                             </div>
-
-                            <div class="space-y-1.5" id="gst_percentage_wrapper" <%if !isset($restaurant.gst_applicable) || $restaurant.gst_applicable != 'yes'%>style="display:none"<%/if%>>
+                        </div>
+                        
+                        <div id="gst_details_wrapper" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6" <%if !isset($restaurant.gst_applicable) || $restaurant.gst_applicable != 'yes'%>style="display:none"<%/if%>>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-gray-500 uppercase">GST Number</label>
+                                <input type="text" name="gstin" id="gstin"
+                                    value="<%$restaurant.gstin|default:''%>" placeholder="e.g. 22AAAAA0000A1Z5"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase">
+                            </div>
+                            <div class="space-y-1.5">
                                 <label class="text-xs font-bold text-gray-500 uppercase">GST Percentage (%)</label>
                                 <input type="number" name="gst_percentage" id="gst_percentage"
                                     value="<%if isset($restaurant.gst_percentage)%><%$restaurant.gst_percentage%><%else%>0<%/if%>"
@@ -213,9 +238,9 @@ $(document).ready(function() {
     // GST toggle show/hide
     $('input[name="gst_applicable"]').on('change', function() {
         if ($(this).val() === 'yes') {
-            $('#gst_percentage_wrapper').slideDown(200);
+            $('#gst_details_wrapper').slideDown(200);
         } else {
-            $('#gst_percentage_wrapper').slideUp(200);
+            $('#gst_details_wrapper').slideUp(200);
         }
     });
 

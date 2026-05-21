@@ -4,8 +4,8 @@
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">Edit Waiter</h2>
-            <p class="text-gray-500 text-sm">Update waiter account details</p>
+            <h2 class="text-2xl font-bold text-gray-800">Edit Customer</h2>
+            <p class="text-gray-500 text-sm">Update customer or staff account details</p>
         </div>
     </div>
 
@@ -59,6 +59,25 @@
                 </div>
             </div>
 
+            <!-- Role Type -->
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Role Type</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                        <i class="fa-solid fa-user-shield text-xs"></i>
+                    </span>
+                    <select name="user_role" required 
+                            class="w-full pl-10 pr-10 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700 appearance-none">
+                        <%foreach $roles as $role%>
+                        <option value="<%$role.role_id%>" <%if $waiter->user_role == $role.role_id%>selected<%/if%>><%$role.name%></option>
+                        <%/foreach%>
+                    </select>
+                    <span class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </span>
+                </div>
+            </div>
+
             <!-- Restaurant Selection (Super Admin only) -->
             <%if $is_superadmin%>
             <div class="space-y-2">
@@ -90,7 +109,7 @@
         <div class="pt-6">
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 tracking-widest uppercase text-sm">
                 <i class="fa-solid fa-circle-check"></i>
-                UPDATE WAITER ACCOUNT
+                UPDATE CUSTOMER ACCOUNT
             </button>
         </div>
     </form>

@@ -9,7 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .gradient-bg { 
+            background: linear-gradient(135deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.95) 100%), 
+                        url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop') center/cover no-repeat fixed; 
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen flex items-center justify-center p-4">
@@ -79,8 +82,11 @@
             </div>
         </div>
         
-        <p class="text-center text-gray-400 text-xs mt-8 uppercase tracking-widest">
+        <p class="text-center text-gray-400 text-xs mt-8 uppercase tracking-widest drop-shadow-md">
             Authorized Personnel Only
+        </p>
+        <p class="text-center text-gray-400/60 text-[10px] mt-2 uppercase tracking-widest font-semibold drop-shadow-md">
+            All copyrights reserved by Code Crafter Infotech
         </p>
     </div>
 

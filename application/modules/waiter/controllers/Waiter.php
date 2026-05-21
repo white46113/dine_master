@@ -17,8 +17,8 @@ class Waiter extends Admin_Controller
 
     public function index()
     {
-        $data['title'] = 'Waiters | Dine Master Admin';
-        $data['page_title'] = 'Waiter Management';
+        $data['title'] = 'Customer Management | Dine Master Admin';
+        $data['page_title'] = 'Customer Management';
         $data['is_superadmin'] = $this->_is_superadmin();
         
         $this->render('index.tpl', $data);
@@ -31,18 +31,37 @@ class Waiter extends Admin_Controller
         $no = $_POST['start'];
         $is_superadmin = $this->_is_superadmin();
         
+        $role_names = [
+            '1' => 'Super Admin',
+            '2' => 'Admin',
+            '3' => 'Manager',
+            '4' => 'Waiter'
+        ];
+        $role_colors = [
+            '1' => 'bg-red-50 text-red-600 border border-red-100',
+            '2' => 'bg-blue-50 text-blue-600 border border-blue-100',
+            '3' => 'bg-green-50 text-green-600 border border-green-100',
+            '4' => 'bg-purple-50 text-purple-600 border border-purple-100'
+        ];
+        
         foreach ($list as $waiter) {
             $no++;
             $row = [];
             
-            // Waiter Info
+            $role_name = $role_names[$waiter->user_role] ?? 'Unknown';
+            $role_color = $role_colors[$waiter->user_role] ?? 'bg-gray-50 text-gray-600 border border-gray-100';
+            
+            // User/Customer Info
             $row[] = '
                 <div class="flex items-center">
                     <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mr-4">
-                        <i class="fa-solid fa-user-tie"></i>
+                        <i class="fa-solid fa-user"></i>
                     </div>
                     <div>
-                        <div class="font-bold text-gray-800">' . $waiter->user_name . '</div>
+                        <div class="font-bold text-gray-800 flex items-center gap-2">
+                            ' . $waiter->user_name . '
+                            <span class="px-2 py-0.5 text-[9px] font-bold rounded-md uppercase tracking-wider ' . $role_color . '">' . $role_name . '</span>
+                        </div>
                         <div class="text-[10px] text-gray-400 font-bold tracking-widest">' . $waiter->user_email . '</div>
                     </div>
                 </div>';
@@ -92,9 +111,15 @@ class Waiter extends Admin_Controller
         $admin_data = $this->session->userdata('admin_user');
         
         if ($this->input->post()) {
+            $role_id = $this->input->post('user_role');
+            if (!$is_superadmin) {
+                if (!in_array($role_id, ['3', '4'])) {
+                    $role_id = '4';
+                }
+            }
             $data = [
                 'restaurant_id' => $is_superadmin ? $this->input->post('restaurant_id') : $admin_data['restaurant_id'],
-                'user_role'     => '4', // Waiter role
+                'user_role'     => $role_id,
                 'user_name'     => $this->input->post('user_name'),
                 'user_email'    => $this->input->post('user_email'),
                 'phone'         => $this->input->post('phone'),
@@ -104,13 +129,27 @@ class Waiter extends Admin_Controller
             ];
             
             $this->Waiter_model->save($data);
-            $this->session->set_flashdata('success', 'Waiter added successfully');
+            $this->session->set_flashdata('success', 'User added successfully');
             redirect('admin/waiter');
         }
 
-        $data['title'] = 'Add New Waiter | Dine Master Admin';
-        $data['page_title'] = 'Add Waiter';
+        $roles = [
+            ['role_id' => '1', 'name' => 'Super Admin'],
+            ['role_id' => '2', 'name' => 'Admin'],
+            ['role_id' => '3', 'name' => 'Manager'],
+            ['role_id' => '4', 'name' => 'Waiter']
+        ];
+        if (!$is_superadmin) {
+            $roles = [
+                ['role_id' => '3', 'name' => 'Manager'],
+                ['role_id' => '4', 'name' => 'Waiter']
+            ];
+        }
+
+        $data['title'] = 'Add New Customer | Dine Master Admin';
+        $data['page_title'] = 'Add Customer';
         $data['is_superadmin'] = $is_superadmin;
+        $data['roles'] = $roles;
         if ($is_superadmin) {
             $data['restaurants'] = $this->Waiter_model->get_restaurants();
         }
@@ -128,10 +167,17 @@ class Waiter extends Admin_Controller
         }
 
         if ($this->input->post()) {
+            $role_id = $this->input->post('user_role');
+            if (!$is_superadmin) {
+                if (!in_array($role_id, ['3', '4'])) {
+                    $role_id = '4';
+                }
+            }
             $data = [
                 'user_name'     => $this->input->post('user_name'),
                 'user_email'    => $this->input->post('user_email'),
                 'phone'         => $this->input->post('phone'),
+                'user_role'     => $role_id,
                 'status'        => $this->input->post('status') ? 'Active' : 'Inactive',
                 'updated_by'    => $admin_data['admin_user_id'] ?? 1
             ];
@@ -145,14 +191,28 @@ class Waiter extends Admin_Controller
             }
             
             $this->Waiter_model->update(['user_id' => $id], $data);
-            $this->session->set_flashdata('success', 'Waiter updated successfully');
+            $this->session->set_flashdata('success', 'User updated successfully');
             redirect('admin/waiter');
         }
 
-        $data['title'] = 'Edit Waiter | Dine Master Admin';
-        $data['page_title'] = 'Edit Waiter';
+        $roles = [
+            ['role_id' => '1', 'name' => 'Super Admin'],
+            ['role_id' => '2', 'name' => 'Admin'],
+            ['role_id' => '3', 'name' => 'Manager'],
+            ['role_id' => '4', 'name' => 'Waiter']
+        ];
+        if (!$is_superadmin) {
+            $roles = [
+                ['role_id' => '3', 'name' => 'Manager'],
+                ['role_id' => '4', 'name' => 'Waiter']
+            ];
+        }
+
+        $data['title'] = 'Edit Customer | Dine Master Admin';
+        $data['page_title'] = 'Edit Customer';
         $data['waiter'] = $waiter;
         $data['is_superadmin'] = $is_superadmin;
+        $data['roles'] = $roles;
         if ($is_superadmin) {
             $data['restaurants'] = $this->Waiter_model->get_restaurants();
         }

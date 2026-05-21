@@ -1,11 +1,11 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">Waiter Management</h2>
-        <p class="text-gray-500 text-sm">Manage restaurant service staff</p>
+        <h2 class="text-2xl font-bold text-gray-800">Customer Management</h2>
+        <p class="text-gray-500 text-sm">Manage customer and staff accounts</p>
     </div>
     <a href="<%base_url('admin/waiter/add')%>" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
         <i class="fa-solid fa-plus text-xs"></i>
-        ADD NEW WAITER
+        ADD NEW CUSTOMER
     </a>
 </div>
 
@@ -14,7 +14,7 @@
         <table id="waitersTable" class="w-full border-collapse">
             <thead class="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
                 <tr>
-                    <th class="px-6 py-5 text-left">Waiter Info</th>
+                    <th class="px-6 py-5 text-left">Customer Info</th>
                     <th class="px-6 py-5 text-left">Phone</th>
                     <%if $is_superadmin%>
                     <th class="px-6 py-5 text-left">Restaurant</th>
@@ -70,7 +70,7 @@ function reloadTable() {
 
 function deleteWaiter(id) {
     Swal.fire({
-        title: 'Delete this waiter?',
+        title: 'Delete this customer/user?',
         text: "This action cannot be undone.",
         icon: 'warning',
         showCancelButton: true,

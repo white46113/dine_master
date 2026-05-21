@@ -202,6 +202,14 @@
     </script>
 <body class="bg-gray-50 text-gray-900">
 
+    <!-- Global AJAX Loader -->
+    <div id="global-ajax-loader" class="fixed inset-0 bg-black/40 z-[9999] hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-600 mb-4"></i>
+            <span class="text-gray-700 font-bold tracking-wide">Processing...</span>
+        </div>
+    </div>
+
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
         <div id="main-sidebar" class="h-full flex flex-col flex-shrink-0">
@@ -223,7 +231,6 @@
     </div>
 
     <!-- Custom Scripts -->
-
     <script>
         $(document).ready(function() {
             // Sidebar Toggle Logic
@@ -248,7 +255,61 @@
                     search: ""
                 }
             });
+
+            // Global AJAX Loader Logic
+            let activeImportantAjax = 0;
+            $(document).ajaxSend(function(event, jqxhr, settings) {
+                // Ignore background requests (like DataTables or category fetching)
+                if (settings.url && (settings.url.includes('ajax_list') || settings.url.includes('ajax_get_categories'))) {
+                    return;
+                }
+                activeImportantAjax++;
+                if (activeImportantAjax === 1) {
+                    $('#global-ajax-loader').removeClass('hidden').hide().fadeIn(200);
+                }
+            }).ajaxComplete(function(event, jqxhr, settings) {
+                if (settings.url && (settings.url.includes('ajax_list') || settings.url.includes('ajax_get_categories'))) {
+                    return;
+                }
+                activeImportantAjax--;
+                if (activeImportantAjax <= 0) {
+                    activeImportantAjax = 0;
+                    $('#global-ajax-loader').fadeOut(200, function() {
+                        $(this).addClass('hidden');
+                    });
+                }
+            });
         });
     </script>
+
+    <%assign var="CI" value=get_instance()%>
+    <%assign var="success_msg" value=$CI->session->flashdata('success')%>
+    <%assign var="error_msg" value=$CI->session->flashdata('error')%>
+    
+    <%if $success_msg%>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: "<%$success_msg|escape:'javascript'%>"
+                });
+            });
+        </script>
+        <%assign var="dummy" value=$CI->session->unset_userdata('success')%>
+    <%/if%>
+    
+    <%if $error_msg%>
+        <script>
+            $(document).ready(function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: "<%$error_msg|escape:'javascript'%>"
+                });
+            });
+        </script>
+        <%assign var="dummy" value=$CI->session->unset_userdata('error')%>
+    <%/if%>
 </body>
 </html>

@@ -76,7 +76,10 @@ class Restaurant extends Admin_Controller
                 'state'          => $this->input->post('state'),
                 'postal_code'    => $this->input->post('postal_code'),
                 'gst_applicable' => $this->input->post('gst_applicable') ?: 'no',
+                'gstin'          => $this->input->post('gst_applicable') === 'yes' ? $this->input->post('gstin') : null,
                 'gst_percentage' => $this->input->post('gst_applicable') === 'yes' ? floatval($this->input->post('gst_percentage')) : 0,
+                'start_time'     => $this->input->post('start_time') ?: null,
+                'end_time'       => $this->input->post('end_time') ?: null,
                 'added_by'       => $this->admin_data['admin_user_id'] ?? 1,
             ];
 
@@ -174,7 +177,10 @@ class Restaurant extends Admin_Controller
             'state'         => $this->input->post('state'),
             'postal_code'    => $this->input->post('postal_code'),
             'gst_applicable' => $this->input->post('gst_applicable') ?: 'no',
+            'gstin'          => $this->input->post('gst_applicable') === 'yes' ? $this->input->post('gstin') : null,
             'gst_percentage' => $this->input->post('gst_applicable') === 'yes' ? floatval($this->input->post('gst_percentage')) : 0,
+            'start_time'     => $this->input->post('start_time') ?: null,
+            'end_time'       => $this->input->post('end_time') ?: null,
             'updated_by'     => $this->admin_data['admin_user_id'] ?? 1
         ];
 

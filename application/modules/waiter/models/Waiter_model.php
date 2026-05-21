@@ -31,11 +31,11 @@ class Waiter_model extends CI_Model
         $this->db->select('u.*, r.name as restaurant_name');
         $this->db->from($this->table . ' u');
         $this->db->join('restaurants r', 'r.restaurant_id = u.restaurant_id', 'left');
-        $this->db->where('u.user_role', '4');
 
         if (!$this->_is_superadmin()) {
             $admin_data = $this->session->userdata('admin_user');
             $this->db->where('u.restaurant_id', $admin_data['restaurant_id']);
+            $this->db->where_in('u.user_role', ['3', '4']);
         }
 
         $i = 0;
@@ -80,11 +80,11 @@ class Waiter_model extends CI_Model
     public function count_all()
     {
         $this->db->from($this->table . ' u');
-        $this->db->where('u.user_role', '4');
         
         if (!$this->_is_superadmin()) {
             $admin_data = $this->session->userdata('admin_user');
             $this->db->where('u.restaurant_id', $admin_data['restaurant_id']);
+            $this->db->where_in('u.user_role', ['3', '4']);
         }
         return $this->db->count_all_results();
     }
@@ -93,11 +93,11 @@ class Waiter_model extends CI_Model
     {
         $this->db->from($this->table);
         $this->db->where('user_id', $id);
-        $this->db->where('user_role', '4');
         
         if (!$this->_is_superadmin()) {
             $admin_data = $this->session->userdata('admin_user');
             $this->db->where('restaurant_id', $admin_data['restaurant_id']);
+            $this->db->where_in('user_role', ['3', '4']);
         }
         
         $query = $this->db->get();
@@ -119,11 +119,11 @@ class Waiter_model extends CI_Model
     public function delete_by_id($id)
     {
         $this->db->where('user_id', $id);
-        $this->db->where('user_role', '4');
         
         if (!$this->_is_superadmin()) {
             $admin_data = $this->session->userdata('admin_user');
             $this->db->where('restaurant_id', $admin_data['restaurant_id']);
+            $this->db->where_in('user_role', ['3', '4']);
         }
         
         $this->db->delete($this->table);
