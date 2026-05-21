@@ -9,11 +9,11 @@
         </div>
     </div>
 
-    <form action="<%base_url('admin/tables/edit/`$table->table_id`')%>" method="POST" class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl space-y-8">
+    <form id="tableForm" action="<%base_url('admin/tables/edit/')%><%$table->table_id%>" method="POST" class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl space-y-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Table Code -->
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Table Code</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Table Code <span class="text-red-500">*</span></label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-hashtag text-xs"></i>
@@ -25,7 +25,7 @@
 
             <!-- Table Name -->
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Display Name</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Display Name <span class="text-red-500">*</span></label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-signature text-xs"></i>
@@ -37,7 +37,7 @@
 
             <!-- Floor Selection -->
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Location (Floor)</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Location (Floor) <span class="text-red-500">*</span></label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-layer-group text-xs"></i>
@@ -53,7 +53,7 @@
 
             <!-- Seating Capacity -->
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Seating Capacity</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Seating Capacity <span class="text-red-500">*</span></label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-users text-xs"></i>
@@ -65,7 +65,7 @@
 
             <!-- Status -->
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current Status</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current Status <span class="text-red-500">*</span></label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 z-10 pointer-events-none">
                         <i class="fa-solid fa-circle-dot text-xs"></i>
@@ -99,8 +99,45 @@ $(document).ready(function() {
         width: '100%',
         minimumResultsForSearch: 5
     });
+
+    $('select').on('change', function() {
+        $(this).valid();
+    });
+
+    $('#tableForm').validate({
+        rules: {
+            code: "required",
+            name: "required",
+            floor_id: "required",
+            capacity: "required",
+            status: "required"
+        },
+        messages: {
+            code: "Please enter Table Code",
+            name: "Please enter Display Name",
+            floor_id: "Please select Location",
+            capacity: "Please enter Seating Capacity",
+            status: "Please select Status"
+        },
+        errorElement: 'span',
+        errorPlacement: function(error, element) {
+            error.addClass('text-red-500 text-xs font-bold mt-1 block');
+            if(element.hasClass('select2-hidden-accessible')) {
+                error.insertAfter(element.next('.select2-container'));
+            } else {
+                error.insertAfter(element.parent());
+            }
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).parent().addClass('border-red-500').removeClass('border-gray-200');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).parent().removeClass('border-red-500').addClass('border-gray-200');
+        }
+    });
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <style>
 /* Select2 Tailwind Integration */
 .select2-container--default .select2-selection--single {

@@ -15,9 +15,9 @@
         <div class="p-8 space-y-8">
             <%if $admin_user.role_id == 1%>
             <div class="space-y-2">
-                <label class="text-sm font-bold text-gray-700">Select Restaurant</label>
+                <label class="text-sm font-bold text-gray-700">Select Restaurant <span class="text-red-500">*</span></label>
                 <select name="restaurant_id" id="restaurant_id" required
-                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    class="w-full select2-restaurant px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                     <option value="">Select Restaurant</option>
                     <%foreach from=$restaurants item=res%>
                     <option value="<%$res.restaurant_id%>" <%if $item.restaurant_id == $res.restaurant_id%>selected<%/if%>><%$res.name%></option>
@@ -29,16 +29,16 @@
             <!-- Basic Info Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="text-sm font-bold text-gray-700">Item Name</label>
+                    <label class="text-sm font-bold text-gray-700">Item Name <span class="text-red-500">*</span></label>
                     <input type="text" name="name" value="<%$item.name|default:''%>" required
                         class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                         placeholder="e.g. Paneer Tikka">
                 </div>
                 
                 <div class="space-y-2">
-                    <label class="text-sm font-bold text-gray-700">Category</label>
+                    <label class="text-sm font-bold text-gray-700">Category <span class="text-red-500">*</span></label>
                     <select name="category_id" required
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                        class="w-full select2-category px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                         <option value="">Select Category</option>
                         <%foreach from=$categories item=cat%>
                         <option value="<%$cat.category_id%>" <%if $item.category_id == $cat.category_id%>selected<%/if%>><%$cat.name%></option>
@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-bold text-gray-700">Base Price (₹)</label>
+                    <label class="text-sm font-bold text-gray-700">Base Price (₹) <span class="text-red-500">*</span></label>
                     <input type="number" step="0.01" name="base_price" value="<%$item.base_price|default:''%>" required
                         class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                         placeholder="0.00">
@@ -130,8 +130,44 @@
     </form>
 </div>
 
+<!-- Load jQuery Validate Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<!-- Load Select2 Plugin -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+/* Custom styling for Select2 to match the theme */
+.select2-container .select2-selection--single {
+    height: 48px; /* matching py-3 padding */
+    border-radius: 0.75rem; /* rounded-xl */
+    border-color: #e5e7eb; /* border-gray-200 */
+    display: flex;
+    align-items: center;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px;
+    right: 12px;
+}
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 0 0 2px #bfdbfe; /* blue-200 */
+}
+</style>
+
 <script>
 $(document).ready(function() {
+    // Initialize Select2 for Category and Restaurant
+    $('.select2-category').select2({
+        placeholder: "Search for a category...",
+        allowClear: true,
+        width: '100%'
+    });
+    $('.select2-restaurant').select2({
+        placeholder: "Search for a restaurant...",
+        allowClear: true,
+        width: '100%'
+    });
     // Image Preview
     $('#imageInput').on('change', function() {
         const file = this.files[0];
@@ -142,45 +178,6 @@ $(document).ready(function() {
             }
             reader.readAsDataURL(file);
         }
-    });
-
-    // Form Submission
-    $('#menuForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        const btn = $('#saveBtn');
-        const formData = new FormData(this);
-        
-        btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Saving...');
-
-        $.ajax({
-            url: '<%base_url("admin/menu/save")%>',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: response.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        window.location.href = response.redirect;
-                    });
-                } else {
-                    Swal.fire('Error', response.message, 'error');
-                    btn.prop('disabled', false).html('Save Item');
-                }
-            },
-            error: function() {
-                Swal.fire('Error', 'Something went wrong!', 'error');
-                btn.prop('disabled', false).html('Save Item');
-            }
-        });
     });
 
     // Dynamic Category Loading
@@ -202,10 +199,102 @@ $(document).ready(function() {
                     response.data.forEach(function(cat) {
                         options += `<option value="${cat.category_id}">${cat.name}</option>`;
                     });
-                    catSelect.html(options).prop('disabled', false);
+                    catSelect.html(options).prop('disabled', false).trigger('change.select2');
                 }
             }
         });
+    });
+
+    // Custom styling for jQuery validation errors
+    $.validator.setDefaults({
+        errorElement: 'p',
+        errorClass: 'text-sm text-red-500 mt-1',
+        highlight: function(element) {
+            $(element).addClass('border-red-500 focus:ring-red-100 focus:border-red-500');
+            $(element).removeClass('border-gray-200 focus:ring-blue-100 focus:border-blue-400');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('border-red-500 focus:ring-red-100 focus:border-red-500');
+            $(element).addClass('border-gray-200 focus:ring-blue-100 focus:border-blue-400');
+        }
+    });
+
+    // Initialize Form Validation
+    $('#menuForm').validate({
+        rules: {
+            restaurant_id: {
+                required: true
+            },
+            name: {
+                required: true,
+                minlength: 2,
+                maxlength: 150
+            },
+            category_id: {
+                required: true
+            },
+            base_price: {
+                required: true,
+                number: true,
+                min: 0
+            }
+        },
+        messages: {
+            restaurant_id: {
+                required: "Please select a restaurant"
+            },
+            name: {
+                required: "Please enter the item name",
+                minlength: "Item name must be at least 2 characters",
+                maxlength: "Item name cannot exceed 150 characters"
+            },
+            category_id: {
+                required: "Please select a category"
+            },
+            base_price: {
+                required: "Please enter a base price",
+                number: "Please enter a valid number",
+                min: "Price cannot be negative"
+            }
+        },
+        submitHandler: function(form, e) {
+            e.preventDefault();
+            
+            const btn = $('#saveBtn');
+            const formData = new FormData(form);
+            const originalText = btn.html();
+            
+            btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Saving...');
+
+            $.ajax({
+                url: '<%base_url("admin/menu/save")%>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = response.redirect;
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Something went wrong!', 'error');
+                    btn.prop('disabled', false).html(originalText);
+                }
+            });
+        }
     });
 });
 </script>

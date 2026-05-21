@@ -156,10 +156,25 @@ class Menu extends Admin_Controller
         $id = $this->input->post('item_id');
         $restaurant_id = ($this->admin_data['role_id'] == 1) ? $this->input->post('restaurant_id') : $this->admin_data['restaurant_id'];
         
+        $name = trim($this->input->post('name'));
+
+        // Check for duplicate name
+        $this->db->where('name', $name);
+        $this->db->where('restaurant_id', $restaurant_id);
+        if ($id) {
+            $this->db->where('item_id !=', $id);
+        }
+        $duplicate = $this->db->get('menu_items')->row();
+
+        if ($duplicate) {
+            echo json_encode(['success' => false, 'message' => 'Same Item Name cannot be added.']);
+            return;
+        }
+
         $data = [
             'restaurant_id' => $restaurant_id,
             'category_id'   => $this->input->post('category_id'),
-            'name'          => $this->input->post('name'),
+            'name'          => $name,
             'description'   => $this->input->post('description'),
             'base_price'    => $this->input->post('base_price'),
             'veg_type'      => $this->input->post('veg_type'),

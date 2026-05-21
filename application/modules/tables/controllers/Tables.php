@@ -129,7 +129,7 @@ class Tables extends Admin_Controller
                 'status'        => 'FREE',
                 'qr_token'      => bin2hex(random_bytes(16)),
                 'is_active'     => 1,
-                'added_by'      => $this->admin_data['admin_user_id']
+                'added_by'      => $this->admin_data['user_id']
             ];
             
             $this->Tables_model->save($data);
@@ -166,7 +166,7 @@ class Tables extends Admin_Controller
                 'name'     => $this->input->post('name'),
                 'capacity' => $this->input->post('capacity'),
                 'status'   => $this->input->post('status'),
-                'updated_by' => $this->admin_data['admin_user_id']
+                'updated_by' => $this->admin_data['user_id']
             ];
             
             $this->Tables_model->update(['table_id' => $id], $data);
