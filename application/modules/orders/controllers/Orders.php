@@ -123,10 +123,9 @@ class Orders extends Admin_Controller
         }
 
         $data['title'] = 'Manage Order #' . $data['order']['order_number'] . ' | Dine Master';
-        $data['categories'] = $this->Menu_model->get_categories();
-        
-        // Ideally we fetch items only for this restaurant, but Menu_model might handle that or it's a future step
-        $data['items'] = $this->Menu_model->get_all_items();
+        $restaurant_id = $data['order']['restaurant_id'];
+        $data['categories'] = $this->Menu_model->get_categories($restaurant_id);
+        $data['items'] = $this->Menu_model->get_all_items($restaurant_id);
         
         // Fetch existing items already in this order
         $data['order_items'] = $this->Order_management_model->get_order_items($order_id);
