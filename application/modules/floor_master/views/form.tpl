@@ -21,10 +21,7 @@
             <label class="block text-sm font-semibold text-gray-700">Floor Name <span class="text-red-500">*</span></label>
             <input type="text" name="name" value="<%$item.name|default:''%>" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" placeholder="e.g. Ground Floor" />
         </div>
-        <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">Description</label>
-            <textarea name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" placeholder="Optional description"><%$item.description|default:''%></textarea>
-        </div>
+
         <div class="flex justify-end">
             <a href="<%base_url('admin/floor_master')%>" class="mr-4 text-gray-600 hover:text-gray-900 mt-2">Cancel</a>
             <button type="submit" id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all">

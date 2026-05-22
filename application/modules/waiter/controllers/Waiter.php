@@ -130,7 +130,8 @@ class Waiter extends Admin_Controller
             
             $this->Waiter_model->save($data);
             $this->session->set_flashdata('success', 'User added successfully');
-            redirect('admin/waiter');
+            echo json_encode(['success' => true, 'message' => 'User added successfully', 'redirect' => base_url('admin/waiter')]);
+            return;
         }
 
         $roles = [
@@ -192,7 +193,8 @@ class Waiter extends Admin_Controller
             
             $this->Waiter_model->update(['user_id' => $id], $data);
             $this->session->set_flashdata('success', 'User updated successfully');
-            redirect('admin/waiter');
+            echo json_encode(['success' => true, 'message' => 'User updated successfully', 'redirect' => base_url('admin/waiter')]);
+            return;
         }
 
         $roles = [

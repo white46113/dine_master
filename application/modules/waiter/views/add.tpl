@@ -55,7 +55,10 @@
                         <i class="fa-solid fa-lock text-xs"></i>
                     </span>
                     <input type="password" name="password" required placeholder="Enter password"
-                           class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
+                           class="w-full pl-10 pr-12 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
+                    <button type="button" class="pwd-toggle absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors" onclick="togglePassword(this)">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -153,5 +156,21 @@
             submitHandler:function(form,e){e.preventDefault(); var btn=$(form).find('button[type=submit]'); var orig=btn.html(); btn.prop('disabled',true).html('<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving...'); $.ajax({url:$(form).attr('action'), type:'POST', data:$(form).serialize(), dataType:'json', success:function(res){if(res.success){Swal.fire({icon:"success",title:"Success!",text:res.message,showConfirmButton:false,timer:1500}).then(()=>{window.location.href=res.redirect;});}else{Swal.fire('Error',res.message,'error'); btn.prop('disabled',false).html(orig);} }, error:function(){Swal.fire('Error','Server error','error'); btn.prop('disabled',false).html(orig);} }); }
         });
     });
+
+    function togglePassword(btn) {
+        const input = btn.parentElement.querySelector('input');
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            btn.classList.add('text-blue-500');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            btn.classList.remove('text-blue-500');
+        }
+    }
     </script>
 </div>

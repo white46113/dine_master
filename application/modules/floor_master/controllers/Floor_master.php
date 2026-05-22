@@ -76,18 +76,14 @@ class Floor_master extends Admin_Controller {
         $restaurant_id = ($role_id == 1) ? $this->input->post('restaurant_id') : $this->admin_data['restaurant_id'];
         $name = trim($this->input->post('name'));
         // Duplicate check
-        $this->db->where('name', $name);
-        $this->db->where('restaurant_id', $restaurant_id);
-        if ($id) $this->db->where('floor_id !=', $id);
-        if ($this->db->get('floor_master')->row()) {
+        if ($this->Floor_master_model->duplicate_name($name, $restaurant_id, $id)) {
             echo json_encode(['success' => false, 'message' => 'Same Floor Name cannot be added.']);
             return;
         }
         $data = [
             'restaurant_id' => $restaurant_id,
             'name' => $name,
-            'description' => $this->input->post('description'),
-            'sort_order' => $this->input->post('sort_order'),
+            'sort_order' => $this->input->post('sort_order') ? $this->input->post('sort_order') : 0,
             'added_by' => $this->admin_data['user_id'],
         ];
         if ($id) {

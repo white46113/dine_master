@@ -23,20 +23,35 @@
                     <form id="password-form" class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Current Password</label>
-                            <input type="password" name="current_password" required
-                                class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                            <div class="relative">
+                                <input type="password" name="current_password" required
+                                    class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                <button type="button" class="pwd-toggle" onclick="togglePassword(this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">New Password</label>
-                                <input type="password" name="new_password" id="new_password" required
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                <div class="relative">
+                                    <input type="password" name="new_password" id="new_password" required
+                                        class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                    <button type="button" class="pwd-toggle" onclick="togglePassword(this)">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Confirm New Password</label>
-                                <input type="password" name="confirm_password" required
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                <div class="relative">
+                                    <input type="password" name="confirm_password" required
+                                        class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                                    <button type="button" class="pwd-toggle" onclick="togglePassword(this)">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -56,7 +71,40 @@
 <style>
     .error { color: #ef4444; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; margin-top: 0.25rem; display: block; }
     input.error { border-color: #ef4444; background-color: #fef2f2; }
+    .pwd-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: #9ca3af;
+        font-size: 16px;
+        transition: color 0.2s;
+    }
+    .pwd-toggle:hover { color: #3b82f6; }
+    .pwd-toggle.active { color: #3b82f6; }
 </style>
+
+<script>
+function togglePassword(btn) {
+    const input = btn.parentElement.querySelector('input');
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        btn.classList.add('active');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        btn.classList.remove('active');
+    }
+}
+</script>
 
 <script>
 $(document).ready(function() {

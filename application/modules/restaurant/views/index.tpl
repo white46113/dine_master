@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <form id="restaurantForm" class="space-y-8" enctype="multipart/form-data">
+    <form id="restaurantForm" class="space-y-8" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="restaurant_id" value="<%$restaurant.restaurant_id%>">
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -37,12 +37,12 @@
 
                     <div class="mt-8 space-y-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-500 uppercase">Display Name</label>
-                            <input type="text" name="name" value="<%$restaurant.name%>" required
+                            <label class="text-xs font-bold text-gray-500 uppercase">Display Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" value="<%$restaurant.name%>"
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-semibold">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-500 uppercase">Legal Entity Name</label>
+                            <label class="text-xs font-bold text-gray-500 uppercase">Legal Entity Name <span class="text-red-500">*</span></label>
                             <input type="text" name="legal_name" value="<%$restaurant.legal_name%>"
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm">
                         </div>
@@ -57,14 +57,14 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-500 uppercase">Support Email</label>
-                            <input type="email" name="contact_email" value="<%$restaurant.contact_email%>" required
+                            <label class="text-xs font-bold text-gray-500 uppercase">Support Email <span class="text-red-500">*</span></label>
+                            <input type="email" name="contact_email" value="<%$restaurant.contact_email%>"
                                 class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-500 uppercase">Support Phone</label>
-                            <input type="text" name="contact_phone" value="<%$restaurant.contact_phone%>" required
-                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                            <label class="text-xs font-bold text-gray-500 uppercase">Support Phone <span class="text-red-500">*</span></label>
+                            <input type="tel" name="contact_phone" value="<%$restaurant.contact_phone%>"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all no-arrow" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                         </div>
                     </div>
 
@@ -162,6 +162,7 @@
     </form>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script>
 $(document).ready(function() {
     // Logo Preview
@@ -176,27 +177,64 @@ $(document).ready(function() {
         }
     });
 
+    // Custom validator: digits only
+    $.validator.addMethod('phoneDigits', function(value, element) {
+        return this.optional(element) || /^[0-9]+$/.test(value);
+    }, 'Please enter only digits');
+
     // jQuery Validation
     $("#restaurantForm").validate({
         rules: {
             name: { required: true, minlength: 2 },
+            legal_name: { required: true, minlength: 2 },
             contact_email: { required: true, email: true },
-            contact_phone: { required: true, minlength: 10 },
+            contact_phone: { required: true, phoneDigits: true, minlength: 10, maxlength: 15 },
             address_line1: { required: true }
         },
         messages: {
-            name: { required: "Please enter restaurant name" },
-            contact_email: { required: "Email is required", email: "Enter a valid email" },
-            contact_phone: { required: "Phone number is required" },
-            address_line1: { required: "Street address is required" }
+            name: {
+                required: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Restaurant name is required',
+                minlength: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Must be at least 2 characters'
+            },
+            legal_name: {
+                required: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Legal entity name is required',
+                minlength: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Must be at least 2 characters'
+            },
+            contact_email: {
+                required: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Email address is required',
+                email: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Please enter a valid email address'
+            },
+            contact_phone: {
+                required: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Phone number is required',
+                phoneDigits: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Only numeric digits are allowed',
+                minlength: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Phone must be at least 10 digits',
+                maxlength: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Phone cannot exceed 15 digits'
+            },
+            address_line1: {
+                required: '<i class="fa-solid fa-circle-exclamation mr-1"></i> Street address is required'
+            }
         },
         errorElement: 'span',
-        errorClass: 'text-red-500 text-xs mt-1 block',
+        errorClass: 'validation-error',
+        errorPlacement: function(error, element) {
+            error.hide();
+            // Place error after the closest parent .space-y-1.5 div's input
+            error.insertAfter(element);
+            error.fadeIn(200);
+        },
         highlight: function(element) {
-            $(element).addClass('border-red-500').removeClass('border-gray-200');
+            $(element).addClass('!border-red-500 !ring-red-100').removeClass('border-gray-200');
         },
         unhighlight: function(element) {
-            $(element).removeClass('border-red-500').addClass('border-gray-200');
+            $(element).removeClass('!border-red-500 !ring-red-100').addClass('border-gray-200');
+        },
+        invalidHandler: function(event, validator) {
+            // Scroll to first error
+            if (validator.numberOfInvalids()) {
+                $('html, body').animate({
+                    scrollTop: $(validator.errorList[0].element).offset().top - 120
+                }, 400);
+            }
         },
         submitHandler: function(form) {
             const btn = $('#saveBtn');
@@ -251,4 +289,35 @@ $(document).ready(function() {
     $('.group-hover\\:opacity-100').removeClass('group-hover:opacity-100').addClass('hidden'); // Hide logo upload overlay capability
     <%/if%>
 });
+</script>
+
+<style>
+/* Hide number input arrows */
+.no-arrow::-webkit-outer-spin-button,
+.no-arrow::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-arrow {
+  -moz-appearance: textfield;
+}
+
+/* jQuery Validation error styling */
+.validation-error {
+  display: block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ef4444;
+  background: #fef2f2;
+  border-left: 3px solid #ef4444;
+  border-radius: 0 6px 6px 0;
+  animation: errorSlideIn 0.25s ease-out;
+}
+@keyframes errorSlideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
 </script>
