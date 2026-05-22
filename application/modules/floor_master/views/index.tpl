@@ -3,12 +3,10 @@
         <h2 class="text-2xl font-bold text-gray-800">Floor Master</h2>
         <p class="text-gray-500 text-sm">Manage restaurant floors and seating areas</p>
     </div>
-    <%if isset($admin_user.role_id) && $admin_user.role_id == 1%>
     <a href="<%base_url('admin/floor_master/add')%>" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
         <i class="fa-solid fa-plus text-xs"></i>
         ADD NEW FLOOR
     </a>
-    <%/if%>
 </div>
 
 <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -17,7 +15,6 @@
             <thead class="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
                 <tr>
                     <th class="px-6 py-5 text-left">Name</th>
-                    <th class="px-6 py-5 text-left">Sort Order</th>
                     <th class="px-6 py-5 text-left">Added Date</th>
                     <th class="px-6 py-5 text-center">Action</th>
                 </tr>

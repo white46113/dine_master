@@ -38,9 +38,9 @@
             <i class="fa-solid fa-table w-6 text-center"></i>
             <span class="sidebar-label ml-3 transition-opacity duration-300">Tables</span>
         </a>
-        <a href="<%base_url('admin/waiter')%>" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 <%if $current_module == 'waiter'%>sidebar-active<%/if%>" title="Customer">
+        <a href="<%base_url('admin/waiter')%>" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-300 <%if $current_module == 'waiter'%>sidebar-active<%/if%>" title="Restaurant Members">
             <i class="fa-solid fa-users w-6 text-center"></i>
-            <span class="sidebar-label ml-3 transition-opacity duration-300">Customer</span>
+            <span class="sidebar-label ml-3 transition-opacity duration-300">Restaurant Members</span>
         </a>
 
         <!-- Reports -->

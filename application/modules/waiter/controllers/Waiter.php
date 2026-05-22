@@ -17,8 +17,8 @@ class Waiter extends Admin_Controller
 
     public function index()
     {
-        $data['title'] = 'Customer Management | Dine Master Admin';
-        $data['page_title'] = 'Customer Management';
+        $data['title'] = 'Restaurant Members | Dine Master Admin';
+        $data['page_title'] = 'Restaurant Members';
         $data['is_superadmin'] = $this->_is_superadmin();
         
         $this->render('index.tpl', $data);

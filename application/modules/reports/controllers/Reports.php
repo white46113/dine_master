@@ -20,6 +20,12 @@ class Reports extends Admin_Controller
         $data['end_date'] = $end_date;
         $data['reports'] = $this->Reports_model->get_daily_sales($start_date, $end_date);
         
+        if ($this->input->is_ajax_request()) {
+            $html = $this->smarty->fetch('daily_sales_partial.tpl', $data);
+            echo json_encode(['success' => true, 'html' => $html]);
+            return;
+        }
+
         $this->render('daily_sales.tpl', $data);
     }
 
@@ -34,6 +40,12 @@ class Reports extends Admin_Controller
         $data['end_date'] = $end_date;
         $data['reports'] = $this->Reports_model->get_item_wise_sales($start_date, $end_date);
         
+        if ($this->input->is_ajax_request()) {
+            $html = $this->smarty->fetch('item_wise_partial.tpl', $data);
+            echo json_encode(['success' => true, 'html' => $html]);
+            return;
+        }
+
         $this->render('item_wise.tpl', $data);
     }
 
@@ -48,6 +60,12 @@ class Reports extends Admin_Controller
         $data['end_date'] = $end_date;
         $data['reports'] = $this->Reports_model->get_table_wise_sales($start_date, $end_date);
         
+        if ($this->input->is_ajax_request()) {
+            $html = $this->smarty->fetch('table_wise_partial.tpl', $data);
+            echo json_encode(['success' => true, 'html' => $html]);
+            return;
+        }
+
         $this->render('table_wise.tpl', $data);
     }
 
@@ -62,6 +80,12 @@ class Reports extends Admin_Controller
         $data['end_date'] = $end_date;
         $data['reports'] = $this->Reports_model->get_waiter_performance($start_date, $end_date);
         
+        if ($this->input->is_ajax_request()) {
+            $html = $this->smarty->fetch('waiter_performance_partial.tpl', $data);
+            echo json_encode(['success' => true, 'html' => $html]);
+            return;
+        }
+
         $this->render('waiter_performance.tpl', $data);
     }
 }

@@ -86,7 +86,6 @@
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-3">Order ID</th>
-                        <th class="px-6 py-3">Customer</th>
                         <th class="px-6 py-3">Amount</th>
                         <th class="px-6 py-3">Status</th>
                         <th class="px-6 py-3">Time</th>
@@ -96,7 +95,6 @@
                     <%foreach from=$recent_orders item=order%>
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 font-semibold text-gray-700">#<%$order.order_id%></td>
-                        <td class="px-6 py-4 text-gray-600"><%$order.customer_name%></td>
                         <td class="px-6 py-4 text-gray-900 font-medium">₹<%$order.total_payable|default:0|number_format:2%></td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs font-bold rounded-full 

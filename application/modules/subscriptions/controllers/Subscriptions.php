@@ -15,11 +15,12 @@ class Subscriptions extends Admin_Controller
      */
     public function index()
     {
-        $restaurant_id = $this->admin_data['restaurant_id'];
         $role_id = $this->admin_data['role_id'];
 
-        $data['plans'] = $this->Subscription_model->get_plans($restaurant_id, $role_id);
-        $data['active_sub'] = $this->Subscription_model->get_active_subscription($restaurant_id);
+        // Removed restaurant-specific filtering to show subscriptions for all restaurants
+        $data['plans'] = $this->Subscription_model->get_plans(null, $role_id);
+        // Optionally fetch active subscriptions globally if needed; currently omitted to avoid restaurant filter
+        // $data['active_sub'] = $this->Subscription_model->get_active_subscription(null);
         $data['is_super_admin'] = ($role_id == 1);
         $data['razorpay_key_id'] = $this->config->item('razorpay_key_id');
 

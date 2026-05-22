@@ -1,11 +1,11 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">Customer Management</h2>
-        <p class="text-gray-500 text-sm">Manage customer and staff accounts</p>
+        <h2 class="text-2xl font-bold text-gray-800">Restaurant Members</h2>
+        <p class="text-gray-500 text-sm">Manage restaurant members</p>
     </div>
     <a href="<%base_url('admin/waiter/add')%>" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
         <i class="fa-solid fa-plus text-xs"></i>
-        ADD NEW CUSTOMER
+        Add New Restaurant Members
     </a>
 </div>
 

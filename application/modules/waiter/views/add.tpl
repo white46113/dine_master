@@ -4,8 +4,8 @@
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">Add New Customer</h2>
-            <p class="text-gray-500 text-sm">Create a new customer or staff account</p>
+            <h2 class="text-2xl font-bold text-gray-800">Add New Restaurant Members</h2>
+            <p class="text-gray-500 text-sm">Create a new restaurant member</p>
         </div>
     </div>
 
