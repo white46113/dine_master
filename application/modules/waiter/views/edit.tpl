@@ -37,12 +37,12 @@
 
             <!-- Phone -->
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number<span class="text-red-500">*</span></label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
                         <i class="fa-solid fa-phone text-xs"></i>
                     </span>
-                    <input type="text" name="phone" value="<%$waiter->phone%>" placeholder="e.g. 555-1234"
+                    <input type="text" name="phone" required value="<%$waiter->phone%>" placeholder="e.g. 555-1234"
                            class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
                 </div>
             </div>
@@ -146,12 +146,14 @@
             rules:{
                 user_name:{required:true, minlength:2, maxlength:100},
                 user_email:{required:true, email:true},
+                phone:{required:true},
                 user_role:{required:true},
                 restaurant_id:{required:true}
             },
             messages:{
                 user_name:{required:'Please enter full name', minlength:'Name must be at least 2 chars', maxlength:'Name too long'},
                 user_email:{required:'Please enter email', email:'Enter a valid email'},
+                phone:{required:'Please enter phone number'},
                 user_role:{required:'Select a role'},
                 restaurant_id:{required:'Select a restaurant'}
             },
