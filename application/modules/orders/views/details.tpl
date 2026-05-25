@@ -74,6 +74,9 @@
     </div>
     
     <div class="flex space-x-3">
+        <button onclick="printToken()" class="bg-blue-50 text-blue-600 border border-blue-100 font-bold py-2.5 px-6 rounded-xl hover:bg-blue-100 transition-all flex items-center shadow-sm">
+            <i class="fa-solid fa-receipt mr-2 text-sm"></i> Print Token
+        </button>
         <button onclick="window.print()" class="bg-white border border-gray-200 text-gray-700 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-50 transition-all flex items-center shadow-sm">
             <i class="fa-solid fa-print mr-2 text-sm"></i> Print Receipt
         </button>
@@ -232,4 +235,121 @@ function updateStatus(orderId, newStatus) {
         }
     });
 }
+</script>
+
+<!-- QZ Tray for Raw Printing -->
+<script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.3/qz-tray.js"></script>
+<script>
+const printerName = "POS-58"; 
+let isQzConnected = false;
+
+qz.security.setCertificatePromise((resolve, reject) => {
+    resolve("-----BEGIN CERTIFICATE-----\n" +
+            "MIIBljCCAT2gAwIBAgIUev69y7K3u9v9v9v9v9v9v9v9v9swCgYIKoZIzj0EAwIw\n" +
+            "RTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1Nl\n" +
+            "YXR0bGUxETAPBgNVBAoMCFFaIEluZHVzdHJpZXMwHhcNMjQwMTAxMDAwMDAwWhcN\n" +
+            "MzQwMTAxMDAwMDAwWjBFMQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3Rv\n" +
+            "bjEQMA4GA1UEBwwHU2VhdHRsZTEUMBIGA1UECgwLUFJJVkFURUtFWS4wWTATBgcq\n" +
+            "hkjOPQIBBggqhkjOPQMBBwNCAAR5v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9\n" +
+            "v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9owCgYIKoZIzj0EAwID\n" +
+            "SAAwRQIhAKv9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9AiBv9v9v9v9v\n" +
+            "9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v9v\n" +
+            "-----END CERTIFICATE-----");
+});
+
+qz.security.setSignaturePromise((toSign) => {
+    return (resolve, reject) => {
+        resolve(""); 
+    };
+});
+
+function connectQZ() {
+    qz.websocket.disconnect().finally(() => {
+        qz.websocket.connect().then(() => {
+            isQzConnected = true;
+            return qz.printers.find(printerName);
+        }).catch((err) => {
+            if (isQzConnected) {
+                qz.printers.find("POS").catch(() => {
+                    qz.printers.find("58").catch(() => {
+                        isQzConnected = false;
+                    });
+                });
+            } else {
+                isQzConnected = false;
+            }
+        });
+    });
+}
+
+function pad(left, right, width = 32) {
+    const spaceCount = width - (left.length + right.length);
+    return left + " ".repeat(Math.max(0, spaceCount)) + right;
+}
+
+function getRawTokenData() {
+    const orderNo = '<%$order.order_number%>';
+    const tableNo = '<%$order.table_no|default:"N/A"%>';
+    const placedAt = new Date('<%$order.placed_at%>');
+    
+    const formattedDate = placedAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const formattedTime = placedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
+
+    let data = [
+        '\x1B\x61\x01', // Center align
+        '\x1B\x45\x01', // Bold on
+        'KITCHEN ORDER TOKEN\n',
+        '\x1B\x45\x00', // Bold off
+        '\x1B\x61\x00', // Left align
+        '-'.repeat(32) + '\n',
+        'Order ID : ' + orderNo + '\n',
+        'Table    : ' + tableNo + '\n',
+        'Date     : ' + formattedDate + '\n',
+        'Time     : ' + formattedTime + '\n',
+        '-'.repeat(32) + '\n',
+        '\x1B\x45\x01', // Bold on
+        pad('Item', 'Qty', 32) + '\n',
+        '\x1B\x45\x00', // Bold off
+    ];
+
+    <%foreach $items as $item%>
+    data.push(pad('<%$item.item_name|replace:"'":"\\'"%>'.substring(0, 26), '<%$item.quantity%>', 32) + '\n');
+    <%/foreach%>
+
+    data.push('-'.repeat(32) + '\n');
+    data.push('\n\n\n\n'); // Carriage returns
+    data.push('\x1B\x69'); // Cut paper
+    
+    return data;
+}
+
+function printToken() {
+    if (isQzConnected) {
+        const config = qz.configs.create(printerName); 
+        const data = getRawTokenData();
+        
+        qz.print(config, data).then(() => {
+            Swal.fire({
+                title: 'Printed!',
+                text: 'Token sent to kitchen printer.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }).catch((err) => {
+            Swal.fire('Printer Error', 'Could not print directly. Check QZ Tray.', 'error');
+        });
+    } else {
+        Swal.fire({
+            title: 'Printer Service Offline',
+            text: 'Please start QZ Tray and make sure a POS-58 printer is connected.',
+            icon: 'warning',
+            confirmButtonColor: '#2563eb'
+        });
+    }
+}
+
+$(document).ready(() => {
+    connectQZ();
+});
 </script>

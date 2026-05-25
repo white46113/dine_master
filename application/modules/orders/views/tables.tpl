@@ -145,8 +145,13 @@
                                                 <span class="block text-[9px] font-bold text-red-400 uppercase tracking-wider mb-0.5">Active Order</span>
                                                 <span class="block text-sm font-black text-red-600"><%$table.order_number|default:"#`$table.current_order_id`"%></span>
                                             </div>
-                                            <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors shadow-sm">
-                                                <i class="fa-solid fa-arrow-right text-sm"></i>
+                                            <div class="flex gap-2 relative z-10">
+                                                <button onclick="event.preventDefault(); event.stopPropagation(); window.location.href='<%base_url("admin/orders/bill/`$table.current_order_id`")%>'" class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors shadow-sm" title="Print Bill">
+                                                    <i class="fa-solid fa-print text-sm"></i>
+                                                </button>
+                                                <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors shadow-sm">
+                                                    <i class="fa-solid fa-arrow-right text-sm"></i>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

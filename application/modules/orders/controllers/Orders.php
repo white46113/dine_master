@@ -70,7 +70,7 @@ class Orders extends Admin_Controller
     }
 
     /**
-     * Start a new order from a table
+     * Start a new order from a table (Deferred creation)
      */
     public function create()
     {
@@ -86,49 +86,54 @@ class Orders extends Admin_Controller
             redirect('admin/orders');
         }
 
-        // 1. Create New Order
-        $order_number = 'ORD' . date('YmdHis');
-        $order_data = [
-            'order_number'  => $order_number,
-            'restaurant_id' => $table['restaurant_id'], 
-            'table_id'      => $table_id,
-            'status'        => 'RUNNING',
-            'order_type'    => 'DINE_IN',
-            'waiter_id'     => $this->session->userdata('admin_user_id'),
-            'placed_at'     => date('Y-m-d H:i:s'),
-            'added_by'      => $this->session->userdata('admin_user_id')
-        ];
-
-        $this->db->insert('orders', $order_data);
-        $order_id = $this->db->insert_id();
-
-        // 2. Update Table Status
-        $this->db->where('table_id', $table_id);
-        $this->db->update('dining_tables', [
-            'status'           => 'OCCUPIED',
-            'current_order_id' => $order_id
-        ]);
-
-        redirect('admin/orders/manage/' . $order_id);
+        // Redirect to manage without creating the order yet
+        redirect('admin/orders/manage/new?table_id=' . $table_id);
     }
 
     /**
      * POS Style Order Management View
      */
-    public function manage($order_id)
+    public function manage($order_id = 'new')
     {
-        $data['order'] = $this->Order_management_model->get_order_by_id($order_id);
-        if (empty($data['order'])) {
-            show_404();
+        $data['order_items'] = [];
+        
+        if ($order_id === 'new') {
+            $table_id = $this->input->get('table_id');
+            if (!$table_id) {
+                redirect('admin/orders');
+            }
+            
+            // Get table details
+            $this->db->where('table_id', $table_id);
+            $table = $this->db->get('dining_tables')->row_array();
+            
+            if (!$table) {
+                redirect('admin/orders');
+            }
+
+            // Construct dummy order
+            $data['order'] = [
+                'order_id' => '',
+                'order_number' => 'NEW',
+                'table_id' => $table_id,
+                'table_no' => $table['code'],
+                'restaurant_id' => $table['restaurant_id'],
+                'status' => 'NEW'
+            ];
+            
+        } else {
+            $data['order'] = $this->Order_management_model->get_order_by_id($order_id);
+            if (empty($data['order'])) {
+                show_404();
+            }
+            // Fetch existing items already in this order
+            $data['order_items'] = $this->Order_management_model->get_order_items($order_id);
         }
 
-        $data['title'] = 'Manage Order #' . $data['order']['order_number'] . ' | Dine Master';
+        $data['title'] = 'Manage Order ' . ($order_id === 'new' ? 'New' : '#' . $data['order']['order_number']) . ' | Dine Master';
         $restaurant_id = $data['order']['restaurant_id'];
         $data['categories'] = $this->Menu_model->get_categories($restaurant_id);
         $data['items'] = $this->Menu_model->get_all_items($restaurant_id);
-        
-        // Fetch existing items already in this order
-        $data['order_items'] = $this->Order_management_model->get_order_items($order_id);
         
         $this->render('manage.tpl', $data);
     }
@@ -139,14 +144,53 @@ class Orders extends Admin_Controller
     public function send_to_kitchen()
     {
         $order_id = $this->input->post('order_id');
+        $table_id = $this->input->post('table_id');
         $items = $this->input->post('items');
 
-        if (!$order_id || empty($items)) {
-            echo json_encode(['success' => false, 'message' => 'No items or order ID provided']);
+        if (empty($items)) {
+            echo json_encode(['success' => false, 'message' => 'No items provided']);
             return;
         }
 
         $this->db->trans_start();
+
+        // 0. Create Order if it doesn't exist
+        if (empty($order_id)) {
+            if (!$table_id) {
+                echo json_encode(['success' => false, 'message' => 'Table ID is required to start a new order']);
+                return;
+            }
+
+            $this->db->where('table_id', $table_id);
+            $table = $this->db->get('dining_tables')->row_array();
+
+            if (!$table) {
+                echo json_encode(['success' => false, 'message' => 'Invalid Table ID']);
+                return;
+            }
+
+            $order_number = 'ORD' . date('YmdHis');
+            $order_data = [
+                'order_number'  => $order_number,
+                'restaurant_id' => $table['restaurant_id'], 
+                'table_id'      => $table_id,
+                'status'        => 'RUNNING',
+                'order_type'    => 'DINE_IN',
+                'waiter_id'     => $this->session->userdata('admin_user_id'),
+                'placed_at'     => date('Y-m-d H:i:s'),
+                'added_by'      => $this->session->userdata('admin_user_id')
+            ];
+
+            $this->db->insert('orders', $order_data);
+            $order_id = $this->db->insert_id();
+
+            // Update Table Status
+            $this->db->where('table_id', $table_id);
+            $this->db->update('dining_tables', [
+                'status'           => 'OCCUPIED',
+                'current_order_id' => $order_id
+            ]);
+        }
 
         // 1. Create KOT Ticket
         $kot_data = [
@@ -201,7 +245,7 @@ class Orders extends Admin_Controller
         if ($this->db->trans_status() === FALSE) {
             echo json_encode(['success' => false, 'message' => 'Database error']);
         } else {
-            echo json_encode(['success' => true, 'message' => 'KOT generated successfully']);
+            echo json_encode(['success' => true, 'message' => 'KOT generated successfully', 'order_id' => $order_id]);
         }
     }
 
@@ -395,14 +439,14 @@ class Orders extends Admin_Controller
             $no++;
             $row = [];
             
-            // Order ID & Customer
+            // Order ID & Date
             $row[] = '
                 <div class="flex items-center">
                     <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3">
-                        #' . $order->order_id . '
+                        <i class="fa-solid fa-receipt"></i>
                     </div>
                     <div>
-                        <div class="font-bold text-gray-800">' . ($order->customer_name ?: "Guest") . '</div>
+                        <div class="font-bold text-gray-800">' . ($order->order_number ?: "#".$order->order_id) . '</div>
                         <div class="text-xs text-gray-400">' . date('h:i A, d M', strtotime($order->placed_at)) . '</div>
                     </div>
                 </div>';

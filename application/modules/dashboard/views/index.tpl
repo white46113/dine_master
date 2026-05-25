@@ -78,14 +78,14 @@
     <!-- Recent Orders -->
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="font-bold text-gray-800">Recent Orders</h3>
+            <h3 class="font-bold text-gray-800">Today's Recent Orders</h3>
             <a href="<%base_url('admin/orders')%>" class="text-blue-600 text-sm font-semibold hover:underline">View All</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="px-6 py-3">Order ID</th>
+                        <th class="px-6 py-3">Order Number</th>
                         <th class="px-6 py-3">Amount</th>
                         <th class="px-6 py-3">Status</th>
                         <th class="px-6 py-3">Time</th>
@@ -94,7 +94,7 @@
                 <tbody class="divide-y divide-gray-100">
                     <%foreach from=$recent_orders item=order%>
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-semibold text-gray-700">#<%$order.order_id%></td>
+                        <td class="px-6 py-4 font-semibold text-gray-700">#<%$order.order_number%></td>
                         <td class="px-6 py-4 text-gray-900 font-medium">₹<%$order.total_payable|default:0|number_format:2%></td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 text-xs font-bold rounded-full 
@@ -106,6 +106,15 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500"><%$order.placed_at%></td>
+                    </tr>
+                    <%foreachelse%>
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 font-medium">
+                            <div class="flex flex-col items-center justify-center opacity-60">
+                                <i class="fa-solid fa-receipt text-3xl mb-2 text-gray-300"></i>
+                                <span>No orders today</span>
+                            </div>
+                        </td>
                     </tr>
                     <%/foreach%>
                 </tbody>

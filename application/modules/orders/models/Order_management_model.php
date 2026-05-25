@@ -210,15 +210,24 @@ class Order_management_model extends CI_Model
         return array_values($merged);
     }
 
-    /**
-     * Update order status
-     */
     public function update_status($id, $status)
     {
         $data = ['status' => $status];
         if ($status == 'COMPLETED') {
             $data['completed_at'] = date('Y-m-d H:i:s');
             $data['payment_status'] = 'PAID';
+            
+            // Fetch order to get table_id
+            $this->db->select('table_id');
+            $this->db->where('order_id', $id);
+            $order = $this->db->get($this->table)->row_array();
+            
+            if ($order && !empty($order['table_id'])) {
+                $this->db->where('table_id', $order['table_id']);
+                $this->db->set('status', 'FREE');
+                $this->db->set('current_order_id', NULL);
+                $this->db->update('dining_tables');
+            }
         }
         
         $this->db->where('order_id', $id);

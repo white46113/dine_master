@@ -108,6 +108,7 @@ class Dashboard_model extends CI_Model
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
         $this->_apply_restaurant_filter('o');
+        $this->db->where('DATE(o.placed_at)', date('Y-m-d'));
         $this->db->order_by('o.placed_at', 'DESC');
         $this->db->limit($limit);
         $orders = $this->db->get()->result_array();

@@ -175,9 +175,11 @@
                          KITCHEN (KOT)
                          <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                     </button>
+                    <%if $order.order_id%>
                     <button onclick="generateBill()" class="w-full bg-white hover:bg-gray-100 text-gray-800 font-bold py-3.5 rounded-2xl border border-gray-200 transition-all text-sm">
                         Preview Bill
                     </button>
+                    <%/if%>
                 </div>
             </div>
         </div>
@@ -390,6 +392,7 @@ function sendToKitchen() {
         type: 'POST',
         data: { 
             order_id: '<%$order.order_id%>',
+            table_id: '<%$order.table_id%>',
             items: cart
         },
         dataType: 'json',
@@ -402,7 +405,11 @@ function sendToKitchen() {
                     timer: 1000,
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.reload();
+                    if ('<%$order.order_id%>' === '') {
+                        window.location.href = '<%base_url("admin/orders/manage/")%>' + response.order_id;
+                    } else {
+                        window.location.reload();
+                    }
                 });
             } else {
                 Swal.fire('Error', response.message || 'Failed to send to kitchen', 'error');
