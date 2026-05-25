@@ -48,12 +48,11 @@ class Menu extends Admin_Controller
                     </div>
                     <div>
                         <div class="font-bold text-gray-800">' . $item->name . '</div>
-                        <div class="text-xs text-gray-400">#' . $item->item_id . '</div>
                     </div>
                 </div>';
             
             // Category
-            $row[] = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">' . ($item->category_name ?: "Uncategorized") . '</span>';
+            $row[] = '<span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full whitespace-nowrap">' . ($item->category_name ?: "Uncategorized") . '</span>';
             
             // Restaurant (Only for Super Admin)
             if ($role_id == 1) {

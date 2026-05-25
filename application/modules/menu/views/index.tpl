@@ -15,7 +15,7 @@
             <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                 <tr>
                     <th class="px-6 py-4 text-left">Item</th>
-                    <th class="px-6 py-4 text-left">Category</th>
+                    <th class="px-6 py-4 text-left w-40 whitespace-nowrap">Category</th>
                     <%if $role_id == 1%>
                     <th class="px-6 py-4 text-left">Restaurant</th>
                     <%/if%>
