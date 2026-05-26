@@ -1,103 +1,80 @@
 <div class="max-w-4xl mx-auto">
-    <div class="flex items-center gap-4 mb-8">
-        <a href="<%base_url('admin/waiter')%>" class="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
+    <div class="flex justify-between items-center mb-8">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">Add New Restaurant Members</h2>
             <p class="text-gray-500 text-sm">Create a new restaurant member</p>
         </div>
+        <a href="<%base_url('admin/waiter')%>" class="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
     </div>
 
-    <form id="waiterForm" action="<%base_url('admin/waiter/add')%>" method="POST" class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl space-y-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Name -->
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name<span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <i class="fa-solid fa-user text-xs"></i>
-                    </span>
+    <form id="waiterForm" action="<%base_url('admin/waiter/add')%>" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-8 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Name -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Full Name <span class="text-red-500">*</span></label>
                     <input type="text" name="user_name" required placeholder="John Doe"
-                           class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 </div>
-            </div>
 
-            <!-- Email -->
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address<span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <i class="fa-solid fa-envelope text-xs"></i>
-                    </span>
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Email Address <span class="text-red-500">*</span></label>
                     <input type="email" name="user_email" required placeholder="john@example.com"
-                           class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 </div>
-            </div>
 
-            <!-- Phone -->
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number<span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <i class="fa-solid fa-phone text-xs"></i>
-                    </span>
+                <!-- Phone -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Phone Number <span class="text-red-500">*</span></label>
                     <input type="text" name="phone" required placeholder="e.g. 555-1234"
-                           class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                 </div>
-            </div>
 
-            <!-- Password -->
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <i class="fa-solid fa-lock text-xs"></i>
-                    </span>
-                    <input type="password" name="password" required placeholder="Enter password"
-                           class="w-full pl-10 pr-12 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700">
-                    <button type="button" class="pwd-toggle absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors" onclick="togglePassword(this)">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
+                <!-- Password -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Password <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" name="password" required placeholder="Enter password"
+                               class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                        <button type="button" class="pwd-toggle absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors" onclick="togglePassword(this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Role Type -->
-            <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Role Type<span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <i class="fa-solid fa-user-shield text-xs"></i>
-                    </span>
-                    <select name="user_role" required class="w-full pl-10 pr-10 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700 appearance-none select2-role" style="width:100%" ><%foreach $roles as $role%>
-                        <option value="<%$role.role_id%>"><%$role.name%></option>
-                        <%/foreach%>
-                    </select>
-                    <span class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
-                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                    </span>
-                </div>
             </div>
 
             <!-- Restaurant Selection (Super Admin only) -->
             <%if $is_superadmin%>
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Assign to Restaurant<span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-                        <i class="fa-solid fa-shop text-xs"></i>
-                    </span>
-                    <select name="restaurant_id" required class="w-full pl-10 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-gray-700 appearance-none select2-restaurant" style="width:100%" ><%foreach $restaurants as $res%>
-                        <option value="<%$res.restaurant_id%>"><%$res.name%></option>
-                        <%/foreach%>
-                    </select>
-                </div>
+                <label class="text-sm font-bold text-gray-700">Assign to Restaurant <span class="text-red-500">*</span></label>
+                <select name="restaurant_id" required class="w-full select2-restaurant px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" style="width:100%"><%foreach $restaurants as $res%>
+                    <option value="<%$res.restaurant_id%>"><%$res.name%></option>
+                    <%/foreach%>
+                </select>
             </div>
             <%/if%>
 
+            <!-- Role Type -->
+            <div class="space-y-2">
+                <label class="text-sm font-bold text-gray-700">Role Type <span class="text-red-500">*</span></label>
+                <select name="user_role" required class="w-full select2-role px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" style="width:100%"><%foreach $roles as $role%>
+                    <%if $role.role_id != 1%>
+                    <option value="<%$role.role_id%>"><%$role.name%></option>
+                    <%/if%>
+                    <%/foreach%>
+                </select>
+            </div>
+
             <!-- Active Status -->
-            <div class="space-y-2 flex items-center pt-8">
-                <label class="text-sm font-bold text-gray-700 mr-4">Active Account</label>
+            <div class="flex items-center p-4 bg-gray-50 rounded-2xl">
+                <div class="flex-1">
+                    <h4 class="font-bold text-gray-800 text-sm">Active Account</h4>
+                    <p class="text-xs text-gray-500">Toggling this will grant or revoke access.</p>
+                </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" name="status" value="1" class="sr-only peer" checked>
                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -105,10 +82,12 @@
             </div>
         </div>
 
-        <div class="pt-6">
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 tracking-widest uppercase text-sm">
-                <i class="fa-solid fa-circle-check"></i>
-                SAVE CUSTOMER ACCOUNT
+        <div class="bg-gray-50 px-8 py-5 flex justify-end space-x-3">
+            <a href="<%base_url('admin/waiter')%>"
+                class="bg-white hover:bg-gray-100 text-gray-700 font-bold py-2.5 px-6 rounded-xl transition-all border border-gray-200 ml-auto">Cancel</a>
+            <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-xl transition-all shadow-lg shadow-blue-500/30">
+                Save Account
             </button>
         </div>
     </form>
@@ -117,34 +96,90 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <style>
+
 .select2-container .select2-selection--single {
-    height: 3.5rem !important;
-    padding-left: 2.5rem !important;
-    border-radius: 0.75rem !important;
-    border: 1px solid #d1d5db !important;
-    background-color: #f9fafb !important;
-    font-weight: 700;
-    color: #374151 !important;
+    background-color: #f9fafb !important; /* gray-50 */
+    border: 1px solid #e5e7eb !important; /* gray-200 */
+    border-radius: 0.75rem !important; /* rounded-2xl */
+    height: 48px !important;
+    padding-left: 0.75rem !important;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
 }
 .select2-container .select2-selection--single .select2-selection__rendered {
-    line-height: 3.5rem !important;
-    padding: 0 0.75rem;
+    line-height: 48px !important;
+    padding: 0 0.5rem;
+    color: #374151 !important;
+    font-weight: 400;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 3.5rem !important;
-    right: 0.75rem;
+    height: 48px !important;
+    right: 8px !important;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.2) !important;
+}
+.select2-dropdown {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1) !important;
+    margin-top: 4px;
+    overflow: hidden;
+}
+.select2-results__option {
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 400;
+    color: #374151;
+    transition: all 0.15s;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #eff6ff !important;
+    color: #3b82f6 !important;
 }
 </style>
     <script>
     $(document).ready(function(){
-        $('.select2-role').select2({placeholder:'Select Role', allowClear:true, width:'100%'});
-        $('.select2-restaurant').select2({placeholder:'Select Restaurant', allowClear:true, width:'100%'});
-        $.validator.setDefaults({errorElement:'p', errorClass:'text-sm text-red-500 mt-1'});
+        $('.select2-role').select2({placeholder:'Select Role', allowClear:true, width:'100%'}).on('change', function() {
+            $(this).valid();
+        });
+        $('.select2-restaurant').select2({placeholder:'Select Restaurant', allowClear:true, width:'100%'}).on('change', function() {
+            $(this).valid();
+        });
+        
+        $.validator.setDefaults({
+            errorElement: 'p',
+            errorClass: 'text-sm text-red-500 mt-1',
+            errorPlacement: function(error, element) {
+                if (element.hasClass('select2-hidden-accessible') || element.prop('tagName') === 'SELECT') {
+                    error.insertAfter(element.next('.select2-container'));
+                } else if (element.parent().hasClass('relative')) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).addClass('border-red-500 focus:ring-red-100 focus:border-red-500');
+                $(element).removeClass('border-gray-200 focus:ring-blue-100 focus:border-blue-400');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('border-red-500 focus:ring-red-100 focus:border-red-500');
+                $(element).addClass('border-gray-200 focus:ring-blue-100 focus:border-blue-400');
+            }
+        });
         $('#waiterForm').validate({
             rules:{
                 user_name:{required:true, minlength:2, maxlength:100},
                 user_email:{required:true, email:true},
                 phone:{required:true},
+                password:{required:true},
                 user_role:{required:true},
                 restaurant_id:{required:true}
             },
@@ -152,6 +187,7 @@
                 user_name:{required:'Please enter full name', minlength:'Name must be at least 2 chars', maxlength:'Name too long'},
                 user_email:{required:'Please enter email', email:'Enter a valid email'},
                 phone:{required:'Please enter phone number'},
+                password:{required:'Please enter password'},
                 user_role:{required:'Select a role'},
                 restaurant_id:{required:'Select a restaurant'}
             },

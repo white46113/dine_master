@@ -1,13 +1,29 @@
-<div class="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6"><%if isset($item)%>Edit Floor<%else%>Add New Floor<%/if%></h2>
-    <form id="floorForm" enctype="multipart/form-data" class="space-y-6">
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">
+                <%if isset($page_title)%><%$page_title%><%else%>Add New Floor<%/if%>
+            </h2>
+            <p class="text-gray-500 text-sm">
+                <%if isset($item)%>Modify existing floor details<%else%>Create a new floor<%/if%>
+            </p>
+        </div>
+        <a href="<%base_url('admin/floor_master')%>"
+            class="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <form id="floorForm" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <%if isset($item)%>
             <input type="hidden" name="floor_id" value="<%$item.floor_id%>" />
         <%/if%>
+        
+        <div class="p-8 space-y-8">
         <%if isset($admin_user.role_id) && $admin_user.role_id == 1%>
             <div class="space-y-2">
                 <label class="block text-sm font-semibold text-gray-700">Restaurant <span class="text-red-500">*</span></label>
-                <select name="restaurant_id" id="restaurant_id" required class="w-full select2-restaurant border border-gray-300 rounded-lg px-4 py-2.5 outline-none transition-all bg-gray-50 hover:bg-white">
+                <select name="restaurant_id" id="restaurant_id" required class="w-full select2-restaurant px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                     <option value="">Select Restaurant</option>
                     <%foreach from=$restaurants item=res%>
                         <option value="<%$res.restaurant_id%>" <%if isset($item) && $item.restaurant_id == $res.restaurant_id%>selected<%/if%>>
@@ -19,12 +35,15 @@
         <%/if%>
         <div class="space-y-2">
             <label class="block text-sm font-semibold text-gray-700">Floor Name <span class="text-red-500">*</span></label>
-            <input type="text" name="name" value="<%$item.name|default:''%>" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all" placeholder="e.g. Ground Floor" />
+            <input type="text" name="name" value="<%$item.name|default:''%>" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="e.g. Ground Floor" />
+        </div>
         </div>
 
-        <div class="flex justify-end">
-            <a href="<%base_url('admin/floor_master')%>" class="mr-4 text-gray-600 hover:text-gray-900 mt-2">Cancel</a>
-            <button type="submit" id="saveBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all">
+        <div class="bg-gray-50 px-8 py-5 flex justify-end space-x-3">
+            <a href="<%base_url('admin/floor_master')%>"
+                class="bg-white hover:bg-gray-100 text-gray-700 font-bold py-2.5 px-6 rounded-xl transition-all border border-gray-200 ml-auto">Cancel</a>
+            <button type="submit" id="saveBtn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-xl transition-all shadow-lg shadow-blue-500/30">
                 <%if isset($item)%>Update Floor<%else%>Save Floor<%/if%>
             </button>
         </div>
@@ -38,9 +57,29 @@
 <script>
 $(document).ready(function(){
     // Initialize Select2 for restaurant
-    $('.select2-restaurant').select2({placeholder: 'Select a restaurant...', allowClear: true, width: '100%'});
+    $('.select2-restaurant').select2({placeholder: 'Select a restaurant...', allowClear: true, width: '100%'}).on('change', function() {
+        $(this).valid();
+    });
     // Validation
-    $.validator.setDefaults({errorElement: 'p', errorClass: 'text-sm text-red-500 mt-1'});
+    $.validator.setDefaults({
+        errorElement: 'p', 
+        errorClass: 'text-sm text-red-500 mt-1',
+        errorPlacement: function (error, element) {
+            if (element.hasClass('select2-hidden-accessible') || element.prop('tagName') === 'SELECT') {
+                error.insertAfter(element.next('.select2-container'));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).addClass('border-red-500 focus:ring-red-100 focus:border-red-500');
+            $(element).removeClass('border-gray-200 focus:ring-blue-100 focus:border-blue-400');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('border-red-500 focus:ring-red-100 focus:border-red-500');
+            $(element).addClass('border-gray-200 focus:ring-blue-100 focus:border-blue-400');
+        }
+    });
     $('#floorForm').validate({
         rules: {
             <%if isset($admin_user.role_id) && $admin_user.role_id == 1%>restaurant_id: {required: true},<%/if%>
@@ -78,45 +117,51 @@ $(document).ready(function(){
 });
 </script>
 <style>
-/* Custom Select2 Styling to match Tailwind inputs */
-.select2-container--default .select2-selection--single {
-    border: 1px solid #d1d5db; /* border-gray-300 */
-    border-radius: 0.5rem; /* rounded-lg */
-    height: 46px; /* Match standard input height */
-    background-color: #f9fafb; /* bg-gray-50 */
-    transition: all 0.2s ease-in-out;
+/* Select2 styled to match input fields */
+.select2-container .select2-selection--single {
+    background-color: #f9fafb !important; /* gray-50 */
+    border: 1px solid #e5e7eb !important; /* gray-200 */
+    border-radius: 0.75rem !important; /* rounded-2xl */
+    height: 48px !important;
+    padding-left: 0.75rem !important;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
 }
-.select2-container--default .select2-selection--single:hover {
-    background-color: #ffffff; /* hover:bg-white */
-}
-.select2-container--default.select2-container--open .select2-selection--single,
-.select2-container--default.select2-container--focus .select2-selection--single {
-    border-color: #60a5fa; /* focus:border-blue-400 */
-    box-shadow: 0 0 0 2px #dbeafe; /* focus:ring-2 focus:ring-blue-100 */
-    background-color: #ffffff;
-}
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 44px; /* Center text vertically */
-    padding-left: 1rem; /* px-4 */
-    color: #374151; /* text-gray-700 */
+.select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 48px !important;
+    padding: 0 0.5rem;
+    color: #374151 !important;
+    font-weight: 400;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 44px;
-    right: 12px;
+    height: 48px !important;
+    right: 8px !important;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.2) !important;
 }
 .select2-dropdown {
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1) !important;
+    margin-top: 4px;
+    overflow: hidden;
 }
-.select2-search--dropdown .select2-search__field {
-    border-radius: 0.375rem;
-    border: 1px solid #d1d5db;
-    padding: 0.375rem 0.75rem;
+.select2-results__option {
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 400;
+    color: #374151;
+    transition: all 0.15s;
 }
-.select2-search--dropdown .select2-search__field:focus {
-    border-color: #60a5fa;
-    outline: none;
-    box-shadow: 0 0 0 2px #dbeafe;
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #eff6ff !important;
+    color: #3b82f6 !important;
 }
 </style>

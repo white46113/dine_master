@@ -1,18 +1,23 @@
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-3xl mx-auto">
-    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
         <div>
-            <h2 class="text-lg font-bold text-gray-800"><%$page_title%></h2>
-            <p class="text-sm text-gray-500 mt-1">Fill in the details below</p>
+            <h2 class="text-2xl font-bold text-gray-800">
+                <%$page_title%>
+            </h2>
+            <p class="text-gray-500 text-sm">
+                <%if isset($item)%>Modify existing category details<%else%>Create a new category<%/if%>
+            </p>
         </div>
-        <a href="<%base_url('admin/category_master')%>" class="text-gray-500 hover:text-gray-700 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200">
-            <i class="fa-solid fa-xmark text-lg"></i>
+        <a href="<%base_url('admin/category_master')%>"
+            class="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+            <i class="fa-solid fa-arrow-left"></i>
         </a>
     </div>
 
-    <form id="categoryForm" class="p-6">
+    <form id="categoryForm" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <input type="hidden" name="category_id" value="<%if isset($item)%><%$item.category_id%><%/if%>">
         
-        <div class="space-y-6">
+        <div class="p-8 space-y-8">
             <%if isset($restaurants) && $role_id == 1%>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Restaurant <span class="text-red-500">*</span></label>
@@ -53,13 +58,12 @@
             </div>
         </div>
 
-        <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
-            <a href="<%base_url('admin/category_master')%>" class="px-6 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
-                Cancel
-            </a>
-            <button type="submit" id="submitBtn" class="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-                <i class="fa-solid fa-floppy-disk mr-2"></i>
-                Save Category
+        <div class="bg-gray-50 px-8 py-5 flex justify-end space-x-3">
+            <a href="<%base_url('admin/category_master')%>"
+                class="bg-white hover:bg-gray-100 text-gray-700 font-bold py-2.5 px-6 rounded-xl transition-all border border-gray-200 ml-auto">Cancel</a>
+            <button type="submit" id="submitBtn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-xl transition-all shadow-lg shadow-blue-500/30">
+                <%if isset($item)%>Update Category<%else%>Save Category<%/if%>
             </button>
         </div>
     </form>
@@ -72,26 +76,52 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <style>
-/* Custom styling for Select2 to match the theme */
+/* Select2 styled to match input fields */
 .select2-container .select2-selection--single {
-    height: 46px;
-    border-radius: 0.5rem;
-    border-color: #d1d5db;
-    background-color: #f9fafb;
+    background-color: #f9fafb !important; /* gray-50 */
+    border: 1px solid #e5e7eb !important; /* gray-200 */
+    border-radius: 0.75rem !important; /* rounded-2xl */
+    height: 48px !important;
+    padding-left: 0.75rem !important;
     display: flex;
     align-items: center;
+    transition: all 0.2s;
+}
+.select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 48px !important;
+    padding: 0 0.5rem;
+    color: #374151 !important;
+    font-weight: 400;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 44px;
-    right: 10px;
+    height: 48px !important;
+    right: 8px !important;
 }
-.select2-container--default .select2-selection--single:hover {
-    background-color: #ffffff;
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.2) !important;
 }
-.select2-container--default.select2-container--focus .select2-selection--single {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 2px #dbeafe;
-    background-color: #ffffff;
+.select2-dropdown {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1) !important;
+    margin-top: 4px;
+    overflow: hidden;
+}
+.select2-results__option {
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 400;
+    color: #374151;
+    transition: all 0.15s;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #eff6ff !important;
+    color: #3b82f6 !important;
 }
 </style>
 
@@ -102,11 +132,20 @@ $(document).ready(function() {
         placeholder: "Search for a restaurant...",
         allowClear: true,
         width: '100%'
+    }).on('change', function() {
+        $(this).valid();
     });
     // Custom styling for jQuery validation errors
     $.validator.setDefaults({
         errorElement: 'p',
         errorClass: 'text-sm text-red-500 mt-1',
+        errorPlacement: function (error, element) {
+            if (element.hasClass('select2-hidden-accessible') || element.prop('tagName') === 'SELECT') {
+                error.insertAfter(element.next('.select2-container'));
+            } else {
+                error.insertAfter(element);
+            }
+        },
         highlight: function(element) {
             $(element).addClass('border-red-500 focus:ring-red-100 focus:border-red-500');
             $(element).removeClass('border-gray-300 focus:ring-blue-100 focus:border-blue-400');

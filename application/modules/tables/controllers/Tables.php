@@ -133,6 +133,16 @@ class Tables extends Admin_Controller
             ];
             
             $this->Tables_model->save($data);
+
+            if ($this->input->is_ajax_request()) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Table added successfully',
+                    'redirect' => base_url('admin/tables')
+                ]);
+                exit;
+            }
+
             $this->session->set_flashdata('success', 'Table added successfully');
             redirect('admin/tables');
         }
@@ -170,6 +180,16 @@ class Tables extends Admin_Controller
             ];
             
             $this->Tables_model->update(['table_id' => $id], $data);
+
+            if ($this->input->is_ajax_request()) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Table updated successfully',
+                    'redirect' => base_url('admin/tables')
+                ]);
+                exit;
+            }
+
             $this->session->set_flashdata('success', 'Table updated successfully');
             redirect('admin/tables');
         }

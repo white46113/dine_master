@@ -5,7 +5,7 @@
     </div>
     <a href="<%base_url('admin/floor_master/add')%>" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
         <i class="fa-solid fa-plus text-xs"></i>
-        ADD NEW FLOOR
+        Add New Floor
     </a>
 </div>
 
