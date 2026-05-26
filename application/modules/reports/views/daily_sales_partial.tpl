@@ -41,7 +41,7 @@
                         <span class="font-bold text-gray-700"><%$report.date|date_format:"%d %b, %Y"%></span>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-black"><%$report.total_orders%></span>
+                        <%$report.total_orders%>
                     </td>
                     <td class="px-6 py-4 text-right">
                         <span class="font-black text-gray-800 text-lg">₹<%$report.revenue|number_format:0%></span>

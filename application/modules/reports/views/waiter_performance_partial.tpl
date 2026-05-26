@@ -19,9 +19,7 @@
                             <span class="font-bold text-gray-700"><%$report.waiter_name%></span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-black"><%$report.total_orders%></span>
-                    </td>
+                    <td class="px-6 py-4 text-center"><%$report.total_orders%></td>
                     <td class="px-6 py-4 text-right">
                         <span class="font-black text-gray-800 text-lg">₹<%$report.revenue|number_format:0%></span>
                     </td>

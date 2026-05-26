@@ -21,9 +21,7 @@
                             <span class="font-bold text-gray-700"><%$report.item_name%></span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-xs font-black"><%$report.total_qty%></span>
-                    </td>
+                    <td class="px-6 py-4 text-center"><%$report.total_qty%></td>
                     <td class="px-6 py-4 text-right">
                         <span class="font-black text-gray-800 text-lg">₹<%$report.revenue|number_format:0%></span>
                     </td>

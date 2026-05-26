@@ -129,9 +129,14 @@ class Waiter extends Admin_Controller
             ];
             
             $this->Waiter_model->save($data);
+            
+            if ($this->input->is_ajax_request()) {
+                echo json_encode(['success' => true, 'message' => 'User added successfully', 'redirect' => base_url('admin/waiter')]);
+                exit;
+            }
+
             $this->session->set_flashdata('success', 'User added successfully');
-            echo json_encode(['success' => true, 'message' => 'User added successfully', 'redirect' => base_url('admin/waiter')]);
-            return;
+            redirect('admin/waiter');
         }
 
         $roles = [
@@ -192,9 +197,14 @@ class Waiter extends Admin_Controller
             }
             
             $this->Waiter_model->update(['user_id' => $id], $data);
+            
+            if ($this->input->is_ajax_request()) {
+                echo json_encode(['success' => true, 'message' => 'User updated successfully', 'redirect' => base_url('admin/waiter')]);
+                exit;
+            }
+
             $this->session->set_flashdata('success', 'User updated successfully');
-            echo json_encode(['success' => true, 'message' => 'User updated successfully', 'redirect' => base_url('admin/waiter')]);
-            return;
+            redirect('admin/waiter');
         }
 
         $roles = [

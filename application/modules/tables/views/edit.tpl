@@ -73,9 +73,8 @@
 
 <!-- Select2 Integration -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
     $('select').select2({
@@ -131,20 +130,16 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(res) {
                     if (res.success) {
-                        toastr.success(res.message, 'Success', {
-                            timeOut: 2000,
-                            closeButton: true,
-                            progressBar: true
-                        });
-                        setTimeout(function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: res.message,
+                            timer: 2000
+                        }).then(() => {
                             window.location.href = res.redirect;
-                        }, 2000);
-                    } else {
-                        toastr.error(res.message || 'Something went wrong.', 'Error', {
-                            timeOut: 1500,
-                            closeButton: true,
-                            progressBar: true
                         });
+                    } else {
+                        Swal.fire('Error', res.message || 'Something went wrong.', 'error');
                     }
                 },
                 error: function(xhr) {
