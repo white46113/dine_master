@@ -25,7 +25,9 @@ class Floor_master extends Admin_Controller {
             $no++;
             $row = [];
             $row[] = $floor->name;
-            $row[] = $floor->added_date;
+            if ($role_id == 1) {
+                $row[] = $floor->restaurant_name;
+            }
             $row[] = '
                 <div class="flex justify-center space-x-2">
                     <a href="' . base_url('admin/floor_master/edit/' . $floor->floor_id) . '" class="w-9 h-9 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all">

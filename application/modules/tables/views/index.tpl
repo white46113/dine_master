@@ -53,14 +53,53 @@ $(document).ready(function() {
             "search": "",
             "lengthMenu": "_MENU_ per page",
         },
-        "drawCallback": function() {
-            // Apply premium styling to DT elements after draw
-            $('.dataTables_paginate .paginate_button').addClass('rounded-xl border-none font-bold text-xs mx-1');
-            $('.dataTables_filter input').addClass('bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all');
-            $('.dataTables_length select').addClass('bg-gray-50 border-none rounded-xl px-2 py-1 text-sm');
-        }
-    });
+        "drawCallback": function(settings) {
+    // Restaurant column: plain text
+    var restaurantIdx = $('#tablesTable thead th').filter(function(){ return $(this).text().trim() === 'Restaurant'; }).index();
+    if (restaurantIdx >= 0) {
+        $('#tablesTable tbody tr').each(function(){
+            var $cell = $(this).find('td').eq(restaurantIdx);
+            var plain = $cell.text().trim();
+            $cell.html(plain);
+        });
+    }
+    // Floor column: plain text
+    var floorIdx = $('#tablesTable thead th').filter(function(){ return $(this).text().trim() === 'Floor'; }).index();
+    if (floorIdx >= 0) {
+        $('#tablesTable tbody tr').each(function(){
+            var $cell = $(this).find('td').eq(floorIdx);
+            var plain = $cell.text().trim();
+            $cell.html(plain);
+        });
+    }
+    // Status column: plain text with colour
+    var statusIdx = $('#tablesTable thead th').filter(function(){ return $(this).text().trim() === 'Status'; }).index();
+    if (statusIdx >= 0) {
+        $('#tablesTable tbody tr').each(function(){
+            var $cell = $(this).find('td').eq(statusIdx);
+            var txt = $cell.text().trim().toLowerCase();
+            var capitalized = txt.charAt(0).toUpperCase() + txt.slice(1);
+            $cell.html(capitalized);
+            $cell.css('color', txt === 'free' ? 'green' : txt === 'occupied' ? 'red' : '');
+            $cell.css('font-weight', 'bold');
+        });
+    }
+    // Capacity column: remove any icons
+    var capacityIdx = $('#tablesTable thead th').filter(function(){ return $(this).text().trim() === 'Capacity'; }).index();
+    if (capacityIdx >= 0) {
+        $('#tablesTable tbody tr').each(function(){
+            var $cell = $(this).find('td').eq(capacityIdx);
+            $cell.find('i').remove();
+        });
+    }
+    // Existing premium styling
+    $('.dataTables_paginate .paginate_button').addClass('rounded-xl border-none font-bold text-xs mx-1');
+    $('.dataTables_filter input').addClass('bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all');
+    $('.dataTables_length select').addClass('bg-gray-50 border-none rounded-xl px-2 py-1 text-sm');
+    }
 });
+});
+
 
 function reloadTable() {
     table.ajax.reload(null, false);

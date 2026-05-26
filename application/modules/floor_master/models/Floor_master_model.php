@@ -18,12 +18,14 @@ class Floor_master_model extends CI_Model {
     }
 
     private function _get_query($role_id, $restaurant_id) {
-        $this->db->from($this->table);
+        $this->db->select('f.*, r.name as restaurant_name');
+        $this->db->from($this->table . ' f');
+        $this->db->join('restaurants r', 'r.restaurant_id = f.restaurant_id', 'left');
         if ($role_id != 1) {
-            $this->db->where('restaurant_id', $restaurant_id);
+            $this->db->where('f.restaurant_id', $restaurant_id);
         }
         $i = 0;
-        $column_search = ['name'];
+        $column_search = ['f.name'];
         foreach ($column_search as $item) {
             if ($_POST['search']['value']) {
                 if ($i === 0) {
@@ -39,10 +41,10 @@ class Floor_master_model extends CI_Model {
             $i++;
         }
         if (isset($_POST['order'])) {
-            $order = ['name', 'sort_order'];
+            $order = ['f.name', 'f.sort_order'];
             $this->db->order_by($order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
         } else {
-            $this->db->order_by('floor_id', 'DESC');
+            $this->db->order_by('f.floor_id', 'DESC');
         }
     }
 

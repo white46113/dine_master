@@ -57,10 +57,35 @@ $(document).ready(function() {
             "lengthMenu": "_MENU_ per page",
         },
         "drawCallback": function() {
-            $('.dataTables_paginate .paginate_button').addClass('rounded-xl border-none font-bold text-xs mx-1');
-            $('.dataTables_filter input').addClass('bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all');
-            $('.dataTables_length select').addClass('bg-gray-50 border-none rounded-xl px-2 py-1 text-sm');
-        }
+    $('.dataTables_paginate .paginate_button').addClass('rounded-xl border-none font-bold text-xs mx-1');
+    $('.dataTables_filter input').addClass('bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 transition-all');
+    $('.dataTables_length select').addClass('bg-gray-50 border-none rounded-xl px-2 py-1 text-sm');
+
+    // Restaurant column: plain text (remove badges)
+    var restaurantIdx = $('#waitersTable thead th')
+        .filter(function(){ return $(this).text().trim() === 'Restaurant'; }).index();
+    if (restaurantIdx >= 0) {
+        $('#waitersTable tbody tr').each(function(){
+            var $cell = $(this).find('td').eq(restaurantIdx);
+            $cell.html($cell.text().trim());
+        });
+    }
+
+    // Status column: plain text with colour
+    var statusIdx = $('#waitersTable thead th')
+        .filter(function(){ return $(this).text().trim() === 'Status'; }).index();
+    if (statusIdx >= 0) {
+        $('#waitersTable tbody tr').each(function(){
+            var $cell = $(this).find('td').eq(statusIdx);
+            var txt = $cell.text().trim().toLowerCase();
+        var capitalized = txt.charAt(0).toUpperCase() + txt.slice(1);
+        $cell.html(capitalized);
+        $cell.css('color', txt === 'active' ? 'green' : txt === 'inactive' ? 'red' : '');
+        $cell.css('font-weight', 'bold');
+        });
+    }
+},
+
     });
 });
 

@@ -14,8 +14,11 @@
         <table id="floorTable" class="w-full border-collapse">
             <thead class="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
                 <tr>
+                    <th class="px-6 py-5 text-left">Sr No</th>
                     <th class="px-6 py-5 text-left">Name</th>
-                    <th class="px-6 py-5 text-left">Added Date</th>
+                    <%if $is_superadmin%>
+                    <th class="px-6 py-5 text-left">Restaurant</th>
+                    <%/if%>
                     <th class="px-6 py-5 text-center">Action</th>
                 </tr>
             </thead>
@@ -45,6 +48,7 @@
                 searchPlaceholder: "Search floors...",
                 search: "",
                 lengthMenu: "_MENU_ per page",
+                infoFiltered: "",
             },
             drawCallback: function() {
                 // Apply premium styling to DT elements after draw

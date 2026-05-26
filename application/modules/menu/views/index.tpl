@@ -36,25 +36,50 @@
 let table;
 $(document).ready(function() {
     table = $('#menuTable').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "order": [],
-        "ajax": {
-            "url": "<%base_url('admin/menu/ajax_list')%>",
-            "type": "POST"
-        },
-        "columnDefs": [
-            { "targets": "_all", "orderable": true },
-            { "targets": [0, -1], "orderable": false },
-            { "targets": [-1], "className": "text-center" }
-        ],
-        "language": {
-            "searchPlaceholder": "Search by name or category...",
-            "search": "",
-            "lengthMenu": "_MENU_ per page",
-            "infoFiltered": ""
+    "processing": true,
+    "serverSide": true,
+    "order": [],
+    "ajax": {
+        "url": "<%base_url('admin/menu/ajax_list')%>",
+        "type": "POST"
+    },
+    "columnDefs": [
+        { "targets": "_all", "orderable": true },
+        { "targets": [0, -1], "orderable": false },
+        { "targets": [-1], "className": "text-center" }
+    ],
+    "language": {
+        "searchPlaceholder": "Search by name or category...",
+        "search": "",
+        "lengthMenu": "_MENU_ per page",
+        "infoFiltered": ""
+    },
+    "drawCallback": function(settings) {
+        // Category column: plain text
+        var categoryIdx = $('#menuTable thead th').filter(function(){ return $(this).text().trim() === 'Category'; }).index();
+        if (categoryIdx >= 0) {
+            $('#menuTable tbody tr').each(function(){
+                var $cell = $(this).find('td').eq(categoryIdx);
+                var plain = $cell.text().trim();
+                $cell.html(plain);
+            });
         }
-    });
+        // Type column: remove icons and set colors
+        var typeIdx = $('#menuTable thead th').filter(function(){ return $(this).text().trim() === 'Type'; }).index();
+        if (typeIdx >= 0) {
+            $('#menuTable tbody tr').each(function(){
+                var $cell = $(this).find('td').eq(typeIdx);
+                $cell.find('i').remove(); // strip any icon
+                var txt = $cell.text().trim().toLowerCase();
+                var color = '';
+                if (txt === 'veg') color = 'green';
+                else if (txt === 'non-veg') color = 'red';
+                else if (txt === 'egg') color = 'brown';
+                if (color) $cell.css('color', color);
+            });
+        }
+    }
+});
 });
 
 function reloadTable() {
