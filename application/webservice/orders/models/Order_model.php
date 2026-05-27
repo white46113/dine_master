@@ -160,9 +160,10 @@ class Order_model extends CI_Model
             $this->db->where('o.added_by', $filters['user_id']);
         if (isset($filters['restaurant_id']))
             $this->db->where('o.restaurant_id', $filters['restaurant_id']);
-        $this->db->select('o.*, CONCAT(t.code, \' | \', t.name) as table_name, oi.order_item_id as item_id, oi.item_name, oi.unit_price, oi.quantity, oi.added_by as item_added_by')
+        $this->db->select('o.*, CONCAT(t.code, \' | \', t.name, \' | \', f.name) as table_name, oi.order_item_id as item_id, oi.item_name, oi.unit_price, oi.quantity, oi.added_by as item_added_by')
             ->from($this->orders . ' o')
             ->join('dining_tables t', 't.table_id = o.table_id', 'left')
+            ->join('floors f', 'f.floor_id = t.floor_id', 'left')
             ->join($this->order_items . ' oi', 'oi.order_id = o.order_id', 'left')
             ->order_by('o.placed_at', 'desc');
         $result = $this->db->get()->result();
