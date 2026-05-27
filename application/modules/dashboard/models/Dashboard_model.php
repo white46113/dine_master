@@ -15,13 +15,19 @@ class Dashboard_model extends CI_Model
             (isset($admin_data['user_role']) && $admin_data['user_role'] == 1);
     }
 
-    private function _apply_restaurant_filter($alias = '')
+    private function _apply_restaurant_filter($alias = '', $is_order = false)
     {
         if (!$this->_is_superadmin()) {
             $admin_data = $this->session->userdata('admin_user');
             if (isset($admin_data['restaurant_id'])) {
                 $prefix = empty($alias) ? '' : $alias . '.';
                 $this->db->where($prefix . 'restaurant_id', $admin_data['restaurant_id']);
+            }
+            
+            // Filter by waiter's own records if role is Waiter (role ID 4)
+            if (isset($admin_data['user_role']) && $admin_data['user_role'] == 4 && $is_order) {
+                $prefix = empty($alias) ? '' : $alias . '.';
+                $this->db->where($prefix . 'added_by', $admin_data['user_id']);
             }
         }
     }
@@ -39,7 +45,7 @@ class Dashboard_model extends CI_Model
         $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
         $this->db->where('o.status', 'COMPLETED');
         $this->db->where('DATE(o.placed_at)', date('Y-m-d'));
-        $this->_apply_restaurant_filter('o');
+        $this->_apply_restaurant_filter('o', true);
         $today_orders = $this->db->get()->result_array();
 
         $today_revenue = 0;
@@ -82,7 +88,7 @@ class Dashboard_model extends CI_Model
         // Active Orders (Not Completed/Cancelled)
         $this->db->from('orders');
         $this->db->where_in('status', ['PLACED', 'PREPARING', 'READY', 'SERVED', 'RUNNING']);
-        $this->_apply_restaurant_filter();
+        $this->_apply_restaurant_filter('', true);
         $stats['active_orders'] = $this->db->count_all_results();
 
         // Total Tables
@@ -92,7 +98,7 @@ class Dashboard_model extends CI_Model
 
         // Total Orders (All time)
         $this->db->from('orders');
-        $this->_apply_restaurant_filter();
+        $this->_apply_restaurant_filter('', true);
         $stats['total_orders'] = $this->db->count_all_results();
 
         return $stats;
@@ -107,7 +113,7 @@ class Dashboard_model extends CI_Model
         $this->db->from('orders o');
         $this->db->join('customers c', 'c.customer_id = o.customer_id', 'left');
         $this->db->join('restaurants r', 'r.restaurant_id = o.restaurant_id', 'left');
-        $this->_apply_restaurant_filter('o');
+        $this->_apply_restaurant_filter('o', true);
         $this->db->where('DATE(o.placed_at)', date('Y-m-d'));
         $this->db->order_by('o.placed_at', 'DESC');
         $this->db->limit($limit);
